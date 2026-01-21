@@ -40,3 +40,4 @@ This book includes Claude Code slash commands for content maintenance:
 ## Author
 
 Jaymin West
+For a community surrounding this, checkout https://www.skool.com/prompt-to-prod
