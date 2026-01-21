@@ -1,0 +1,19 @@
+{
+  "permissions": {
+    "allow": [
+      "Read",
+      "Edit",
+      "Write",
+      "Glob",
+      "Grep",
+      "WebFetch",
+      "WebSearch",
+      "Bash",
+      "Task"
+    ],
+    "deny": []
+  },
+  "env": {
+    "KNOWLEDGE_BASE_ROOT": "."
+  }
+}

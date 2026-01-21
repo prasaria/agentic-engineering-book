@@ -1,0 +1,840 @@
+# Knowledge Management Expertise
+# Target: 500-600 lines | Domain: Operational knowledge for book content management
+
+overview:
+  description: |
+    Knowledge management and content capture—entry location decision tree,
+    content structure patterns, voice guidelines, linking strategies, and
+    question-driven development. This expertise enables correct placement,
+    organization, and development of book content.
+  scope: |
+    Covers book directory structure (chapters/, appendices/), content frontmatter,
+    entry type decisions (new vs extend), inline timestamp patterns, voice guidelines,
+    cross-reference strategies, and question file management. Does NOT cover agent
+    authoring (see agent-authoring expert) or book structure mechanics like TOC
+    generation (see book-structure expert).
+  rationale: |
+    Effective knowledge capture enables insights to be discoverable, properly
+    contextualized, and integrated with related content. Poor knowledge management
+    leads to fragmented insights, lost context, and duplication.
+
+core_implementation:
+  primary_files:
+    - path: chapters/
+      purpose: All book content organized by parts and chapters
+    - path: appendices/examples/
+      purpose: Real project configurations and examples
+    - path: .journal/
+      purpose: Timestamped personal thoughts (hidden, private)
+    - path: CLAUDE.md
+      lines: 34-117
+      purpose: Book structure conventions and content conventions
+    - path: STYLE_GUIDE.md
+      purpose: Voice, evidence standards, structural requirements
+
+  key_patterns:
+    - name: Entry Location Decision
+      summary: Where new content belongs based on topic area
+    - name: Inline Timestamp Pattern
+      summary: Adding dated insights to existing content
+    - name: Question-Driven Development
+      summary: Using _questions.md to guide chapter expansion
+    - name: Cross-Reference Pattern
+      summary: Bidirectional linking between related content
+
+key_operations:
+  determine_entry_location:
+    name: Determine Where Content Belongs
+    description: Decide location for new insights in the book structure
+    when_to_use: Capturing new insights, adding content, expanding topics
+    approach: |
+      Use decision_trees > entry_location_framework for full mapping.
+      Quick reference: Part 1 (foundations), Part 2 (patterns/practices),
+      Part 3 (mental models/tools), Part 4 (examples/appendices).
+      Then: extend existing vs create new (see new_vs_extend_decision tree).
+
+  choose_new_vs_extend:
+    name: Create New Entry vs Extend Existing
+    description: Decide whether to create new file or extend existing content
+    when_to_use: Adding new insights that relate to existing content
+    approach: |
+      Extend existing entry when:
+      - Insight directly relates to existing content scope
+      - Adds nuance or example to established pattern
+      - Answers question posed in entry
+      - Fills gap in existing coverage
+
+      Create new entry when:
+      - Insight doesn't fit existing entry's scope
+      - Topic warrants dedicated exploration
+      - Content is significantly different from existing
+      - Likely to grow independently
+    examples:
+      - scenario: New prompt structuring technique
+        decision: Extend chapters/2-prompt/2-structuring.md
+        reasoning: Fits existing scope, adds to pattern catalog
+      - scenario: New mental model about agent loops
+        decision: Create chapters/8-mental-models/N-new-model.md
+        reasoning: Distinct concept, warrants dedicated exploration
+
+  apply_voice_guidelines:
+    name: Apply Voice and Tone Guidelines
+    description: Ensure content matches established voice patterns
+    when_to_use: Writing or reviewing any book content
+    approach: |
+      See best_practices > Voice and Tone for comprehensive guidance.
+      Key principles: third-person throughout, avoid hedging, imperative mood
+      for instructions, bold assertion + elaboration for mental models.
+
+  use_inline_timestamps:
+    name: Add Timestamped Inline Additions
+    description: Extend existing content with dated insights
+    when_to_use: Adding new learning to existing section without restructuring
+    approach: |
+      Format: *[YYYY-MM-DD]*: Insight text here...
+
+      When to use:
+      - Adding new learning to existing section
+      - Documenting experiential observation
+      - Noting pattern discovered in implementation
+      - Recording evolution of understanding
+
+      Placement:
+      - Add after related content in section
+      - Group related timestamp entries together
+      - Maintain chronological order within groups
+    examples:
+      - scenario: New insight about context management
+        format: |
+          *[2025-12-08]*: Multi-agent systems benefit from explicit context handoff
+          protocols. Without clear boundaries, context can drift between agents.
+      - scenario: Pattern from implementation
+        format: |
+          *[2025-12-09]*: Decision framework pattern from model-selection.md -
+          ASCII flowcharts communicate decision processes more clearly than prose.
+
+  manage_question_development:
+    name: Use Questions to Drive Content Development
+    description: Leverage _questions.md files to guide chapter expansion
+    when_to_use: Planning content development, expanding chapters
+    approach: |
+      See patterns > question_file_pattern for comprehensive guidance.
+      Key principle: Answers go in chapter content, NOT in _questions.md.
+      _questions.md tracks state only using markers: (unmarked), [partial],
+      [answered], [stale], [deferred].
+
+  implement_cross_references:
+    name: Create Effective Cross-References
+    description: Link related content with contextual explanations
+    when_to_use: Connecting related concepts across chapters
+    approach: |
+      Link patterns:
+      - Use relative paths from current file
+      - Include section anchors when specific: path.md#section
+      - Add contextual explanation (why connection matters)
+
+      Bidirectional linking:
+      - When linking from A to B, also add link from B to A
+      - Both links should explain the relationship
+
+      Enhanced cross-reference format:
+      Before (minimal):
+      - **To [Tool Use](path.md):** Tool descriptions are prompts
+
+      After (contextual):
+      - **To [Tool Use](path.md):** Tool descriptions are prompts themselves.
+        Poor tool docs lead to misuse regardless of main prompt quality.
+    pitfalls:
+      - what: Generic "click here" link text
+        why: No context, poor for scanning
+        instead: Descriptive text explaining the connection
+      - what: One-directional links only
+        why: Misses discovery opportunity from other side
+        instead: Add bidirectional links
+
+decision_trees:
+  entry_location_framework:
+    name: Entry Location Decision Tree
+    entry_point: What is the content about?
+    branches:
+      - condition: Core concepts (prompts, models, context, tools)
+        action: Part 1 - Foundations (chapters 1-5)
+        sub_branches:
+          - condition: Four pillars overview, leverage points
+            action: chapters/1-foundations/
+          - condition: Prompt structure/types/patterns
+            action: chapters/2-prompt/
+          - condition: Model selection/behavior/limitations
+            action: chapters/3-model/
+          - condition: Context management/loading/strategies
+            action: chapters/4-context/
+          - condition: Tool design/selection/restrictions
+            action: chapters/5-tool-use/
+      - condition: Patterns and practices
+        action: Part 2 - Craft (chapters 6-7)
+        sub_branches:
+          - condition: Recurring architectural pattern
+            action: chapters/6-patterns/
+          - condition: Operational practice (debugging, eval, production)
+            action: chapters/7-practices/
+      - condition: Mental models and tooling
+        action: Part 3 - Perspectives (chapters 8-9)
+        sub_branches:
+          - condition: Thinking framework or design principle
+            action: chapters/8-mental-models/
+          - condition: Specific tool documentation
+            action: chapters/9-practitioner-toolkit/
+      - condition: Examples and implementations
+        action: Part 4 - Appendices (appendices/examples/)
+
+  new_vs_extend_decision:
+    name: Create New Entry vs Extend Existing
+    entry_point: Does related content exist?
+    branches:
+      - condition: No existing coverage of topic
+        action: Create new entry with appropriate frontmatter
+      - condition: Existing entry covers related ground
+        sub_branches:
+          - condition: New content fits existing scope
+            action: Extend existing entry with new section
+          - condition: New content warrants dedicated exploration
+            action: Create new entry, link from existing
+          - condition: New content is a nuance or example
+            action: Add inline with timestamp
+
+  entry_scope_decision:
+    name: Entry Scope Planning
+    entry_point: How comprehensive should this entry be?
+    branches:
+      - condition: Chapter introduction (_index.md)
+        action: Brief overview with links to sections (50-100 lines)
+      - condition: Concept introduction
+        action: Initial framing with leading questions (100-200 lines)
+      - condition: Comprehensive reference
+        action: Full pattern catalog with examples (400-650 lines)
+      - condition: Mental model
+        action: Focused framework with metaphors (150-250 lines)
+
+patterns:
+  content_structure_pattern:
+    name: Standard Developed Entry Structure
+    context: Fully developed chapter sections
+    implementation: |
+      Structure flow: questions → mental model → patterns
+
+      1. Core Questions (categorized by theme)
+         - Surface what the entry addresses
+         - Provide navigation aid
+
+      2. Your Mental Model
+         - Bold assertion with practical elaboration
+         - Frame conceptual understanding
+
+      3. Domain Content
+         - Patterns, implementations, examples
+         - Actionable details
+
+      4. Connections
+         - Links to related entries with context
+    trade_offs:
+      - advantage: Multiple entry points for different reader needs
+        cost: More structure to maintain
+      - advantage: Questions explicitly acknowledge uncertainty
+        cost: Requires thinking about what's unknown
+    real_examples:
+      - location: chapters/2-prompt/2-structuring.md
+        note: Comprehensive entry with Core Questions, Mental Model, patterns
+
+  inline_addition_pattern:
+    name: Inline Timestamped Addition
+    context: Adding insights to existing content without restructuring
+    implementation: |
+      Format: *[YYYY-MM-DD]*: New insight...
+
+      Use cases:
+      - Adding new learning to existing section
+      - Documenting experiential observation
+      - Noting pattern discovered in implementation
+
+      Example:
+      ## Context Management
+
+      Effective context management requires careful prioritization.
+
+      *[2025-12-08]*: Multi-agent systems benefit from explicit context
+      handoff protocols. Without clear boundaries, context can drift.
+    trade_offs:
+      - advantage: Tracks when learning was captured
+        cost: Visual noise in content
+      - advantage: Preserves existing structure
+        cost: May fragment related insights
+
+  question_file_pattern:
+    name: Question File Development Pattern
+    context: Using _questions.md to drive content development
+    implementation: |
+      Purpose: Generative scaffolding, NOT book output
+
+      Structure:
+      - Questions grouped by theme/subtopic
+      - State markers track progress
+      - References to content that answers questions
+
+      States:
+      - (unmarked) - Fresh, unanswered
+      - [partial] - Started, needs expansion
+      - [answered] - Comprehensive coverage exists
+      - [stale] - May need revisiting
+      - [deferred] - Skipped intentionally
+
+      Key principle:
+      - Answers go in chapter content files
+      - _questions.md tracks state only
+    real_examples:
+      - location: chapters/2-prompt/_questions.md
+        note: Questions organized by theme with state tracking
+
+  leading_questions_pattern:
+    name: Leading Questions for New Entries
+    context: Seeding new entries with questions for future development
+    implementation: |
+      ## Leading Questions
+
+      - How does this pattern scale across different model sizes?
+      - What are the failure modes when context exceeds limits?
+      - How do you measure effectiveness of this approach?
+
+      Purpose:
+      - Guide future development
+      - Explicitly acknowledge uncertainty
+      - Create roadmap for expansion
+    trade_offs:
+      - advantage: Makes entry developable by others
+        cost: Entry feels incomplete until answered
+
+  contextual_cross_reference_pattern:
+    name: Contextual Cross-Reference
+    context: Linking related content with explanation
+    implementation: |
+      ## Connections
+
+      - **To [Topic](relative/path.md)**: Why this connection matters.
+        Additional context about the relationship.
+
+      Enhanced format:
+      - **To [Tool Use](../5-tool-use/_index.md):** Tool descriptions are
+        prompts themselves. Poor tool docs lead to misuse regardless of
+        main prompt quality. Tool restrictions define what agents can do—
+        a form of capability prompting.
+
+      Add 1-2 sentences explaining:
+      - Why the connection matters
+      - What specific insight bridges the concepts
+    real_examples:
+      - location: chapters/2-prompt/_index.md
+        note: Connections section with contextual explanations
+
+cross_domain_inheritance: []
+
+best_practices:
+  - category: Content Placement
+    practices:
+      - practice: Check existing content before creating new entries
+        evidence: CLAUDE.md line 169
+        timestamp: 2025-12-26
+      - practice: Prefer extending existing files over creating new ones
+        evidence: CLAUDE.md line 170
+        timestamp: 2025-12-26
+      - practice: Use entry location decision tree for placement
+        evidence: Entry location framework in expertise
+        timestamp: 2025-12-26
+
+  - category: Voice and Tone
+    practices:
+      - practice: Use direct statements over hedging
+        evidence: STYLE_GUIDE.md voice guidelines
+        timestamp: 2025-12-26
+      - practice: Third-person only throughout (not first-person or second-person)
+        evidence: STYLE_GUIDE.md lines 17-24, commit 26f7974 corrections
+        timestamp: 2025-12-26
+      - practice: Bold assertion + elaboration for mental model sections
+        evidence: pit-of-success.md, knowledge-evolution.md patterns
+        timestamp: 2025-12-26
+      - practice: Imperative mood for instructions (without "you")
+        evidence: STYLE_GUIDE.md lines 37-44
+        timestamp: 2025-12-26
+
+  - category: Content Structure
+    practices:
+      - practice: Lead with Core Questions for developed entries
+        evidence: Commit 0322625 restructuring pattern
+        timestamp: 2025-12-26
+      - practice: Use three-tier structure (questions → mental model → patterns)
+        evidence: structuring.md, foundations/_index.md
+        timestamp: 2025-12-26
+      - practice: Tables for comparing 3-7 options across dimensions
+        evidence: prompt-types.md, structuring.md comparison tables
+        timestamp: 2025-12-26
+      - practice: Lead complex patterns with concrete examples before abstraction
+        evidence: self-improving-experts.md starts with three-command structure
+        timestamp: 2025-12-26
+      - practice: Use timestamped inline additions for variant patterns
+        evidence: self-improving-experts.md expertise-as-mental-model variant (lines 569-655)
+        timestamp: 2025-12-26
+
+  - category: Evidence-Grounded Content (New Learnings)
+    practices:
+      - practice: Comprehensive evidence sections with research citations
+        evidence: chapters/2-prompt/3-language.md (commit a624250) - 635 lines with academic papers, official docs, practitioner sources
+        rationale: Long-form evidence-based chapters establish credibility and provide actionable research-backed guidance
+        timestamp: 2025-12-26
+      - practice: Structure research findings with clear tables showing quantified impact
+        evidence: 3-language.md uses tables for task-type dependency, specificity calibration, model-specific patterns
+        rationale: Tables enable quick scanning of evidence and direct comparison of approaches
+        timestamp: 2025-12-26
+      - practice: Separate academic papers, official documentation, and practitioner sources in references
+        evidence: 3-language.md references section (lines 576-623) categorizes source types
+        rationale: Clarifies evidence strength and helps readers assess claim validity
+        timestamp: 2025-12-26
+      - practice: Include arxiv IDs and specific paper names for reproducibility
+        evidence: 3-language.md includes arxiv IDs like "SatLM arxiv:2305.09656" and "DETAIL Framework arxiv:2512.02246"
+        rationale: Enables readers to verify claims and dive deeper into research
+        timestamp: 2025-12-26
+      - practice: Use "Open Questions" section to acknowledge uncertainty
+        evidence: 3-language.md ends with open research questions (lines 625-633)
+        rationale: Models intellectual humility and guides future exploration
+        timestamp: 2025-12-26
+
+  - category: Cross-References
+    practices:
+      - practice: Bidirectional linking between related entries
+        evidence: Cross-reference implementation pattern
+        timestamp: 2025-12-26
+      - practice: Contextual explanation with each link
+        evidence: Enhanced cross-reference format from commit a72bcf2
+        timestamp: 2025-12-26
+      - practice: Update related index files when adding content
+        evidence: Index file update workflow
+        timestamp: 2025-12-26
+
+  - category: Question Management
+    practices:
+      - practice: Answers go in chapter content, not _questions.md
+        evidence: Question file pattern
+        timestamp: 2025-12-26
+      - practice: Update question states immediately after addressing
+        evidence: Prevents duplicate work, tracks progress
+        timestamp: 2025-12-26
+      - practice: Use leading questions to seed new entries
+        evidence: Leading questions pattern
+        timestamp: 2025-12-26
+
+patterns_from_recent_commits:
+  negative_constraint_removal_pattern:
+    name: Converting Negative to Positive Constraints
+    context: Removing "never" and "don't" language based on evidence
+    implementation: |
+      Pattern from 3-language.md constraint framing section:
+
+      Issue: Negative constraints ("never do X") backfire at scale
+      Evidence: InstructGPT research, 16x.engineer analysis
+
+      Conversion table format:
+      | Negative (Backfires) | Positive (Effective) |
+      |---------------------|---------------------|
+      | Never use global state | Use dependency injection |
+      | Don't expose errors | Return user-friendly messages |
+
+      Implementation: Replace prohibitions with required behaviors
+    trade_offs:
+      - advantage: Reduces semantic activation of unwanted patterns
+        cost: Requires rethinking constraints as positive requirements
+    real_examples:
+      - location: chapters/2-prompt/3-language.md
+        note: Lines 188-263 demonstrate conversion from negative to positive constraints
+
+known_issues:
+  - issue: Voice consistency can drift across long entries
+    workaround: Review against voice guidelines during editing
+    status: open
+    timestamp: 2025-12-26
+
+  - issue: False technical claims can propagate before validation
+    workaround: Verify technical assertions against actual implementation
+    context: Commit 26f7974 removed ~600 lines of hook enforcement claims proven false
+    status: resolved
+    timestamp: 2025-12-26
+    learning: Technical claims about code capabilities must be verified against actual implementation, not assumed from documentation
+
+  - issue: Question states can drift out of sync with content
+    workaround: Periodic review of question files against chapter content
+    status: open
+    timestamp: 2025-12-26
+
+  - issue: Cross-references can become stale when content moves
+    workaround: Search for broken links after restructuring
+    status: open
+    timestamp: 2025-12-26
+
+  - issue: Inline timestamps create visual noise
+    workaround: Consider consolidating into dedicated sections for mature entries
+    status: accepted
+    timestamp: 2025-12-26
+
+  - issue: Research-heavy chapters require significant time investment
+    workaround: Plan for 20+ hours when committing to comprehensive evidence-based content
+    context: chapters/2-prompt/3-language.md took substantial research effort
+    status: accepted
+    timestamp: 2025-12-26
+
+
+documenting_system_patterns:
+  name: Documenting System-Level Patterns (Multi-Agent Architectures)
+  context: Pattern from chapters/6-patterns/2-self-improving-experts.md expansion
+  timestamp: 2025-12-26
+
+  pattern_observed: |
+    System-level patterns (multi-agent architectures) require 5-section structure:
+
+    1. **Evolution Timeline Table** - commit history as narrative backbone
+       (chronological: hash | date | change | impact, highlight CRITICAL pivots)
+
+    2. **System-Level Benefits Comparison** - emergent properties vs individual
+       (before/after table showing dimensions like consistency, boundaries, clarity)
+
+    3. **Template Documentation** - reusable pattern with real examples
+       (role breakdown, tool allocation, frontmatter from actual files with line numbers)
+
+    4. **Structured Schema** - detailed knowledge format specification
+       (sections with purpose/structure/examples, line count targets, mutability strategy)
+
+    5. **Case Study** - concrete application with quantified metrics
+       (8-step process, before/after comparison, ROI calculation)
+
+  key_techniques:
+    - Git commits as verifiable evidence (commit hashes link to actual diffs)
+    - Every claim backed by file path + line numbers
+    - Real quantified metrics from actual usage (not theoretical estimates)
+    - Tables for quick scanning (evolution, benefits, templates, comparisons)
+    - Incremental growth via timestamped sections (preserves base + shows evolution)
+
+  when_to_use:
+    - Multi-agent system architectures (3+ coordinated agents)
+    - Evolution from individual pattern to system paradigm
+    - Reusable templates needing comprehensive reference
+
+  real_examples:
+    - location: chapters/6-patterns/2-self-improving-experts.md (lines 643-1465)
+      note: 822 lines with 15+ commits, 20+ file paths, 10+ metrics, 5 tables
+
+comprehensive_research_chapter_pattern:
+  name: Comprehensive Evidence-Based Chapter Pattern
+  context: Pattern from chapters/2-prompt/3-language.md creation (commit a624250)
+  timestamp: 2025-12-26
+
+  pattern_observed: |
+    Creating substantial research-backed chapters (400-650 lines) that synthesize
+    academic papers, official documentation, and practitioner sources into
+    authoritative technical reference material.
+
+    Structure for evidence-based chapters:
+    1. Opening: Clear scope and relevance statement (what's covered, why it matters)
+    2. Multiple focused sections (5-7 major topics per chapter)
+    3. Evidence integration: Inline citations with quantified claims
+    4. Comparison tables showing approaches across dimensions
+    5. Anti-patterns section demonstrating what NOT to do
+    6. Model-specific guidance when relevant (Claude, GPT, Gemini)
+    7. Comprehensive references section (categorized by source type)
+    8. Open questions section acknowledging research gaps
+
+  key_metrics:
+    evidence_density: "~15-20 citations per 600 lines"
+    structure_ratio: "70% patterns/guidance, 20% examples, 10% references"
+    time_investment: "Plan for 20+ hours of research and synthesis"
+    source_categories: "3 types - academic papers, official docs, practitioner sources"
+
+  citation_patterns:
+    academic_papers: |
+      Include arxiv IDs and paper names for reproducibility:
+      - "SatLM: Declarative Prompting - arxiv:2305.09656"
+      - "DETAIL Framework: Prompt Specificity Impact - arxiv:2512.02246"
+      - "When A Helpful Assistant Is Not Really Helpful - EMNLP 2024, arxiv:2311.10054"
+
+    quantified_claims: |
+      Specific numbers from research, not vague assertions:
+      - "23% improvement with declarative phrasing on reasoning tasks"
+      - "+0.47 accuracy on mathematical tasks with added specificity"
+      - "20-80% time increase for minimal accuracy gain with CoT on reasoning models"
+      - "Up to 40% accuracy variance based solely on delimiter choice"
+
+    official_documentation: |
+      Link directly to provider documentation:
+      - "Anthropic Claude Best Practices: docs.anthropic.com/claude/docs/prompt-engineering"
+      - "OpenAI GPT-4.1 Prompting Guide: cookbook.openai.com"
+      - "Google Gemini Prompting Strategies: ai.google.dev/docs/prompting-strategies"
+
+  table_usage_patterns: |
+    Tables for comparative analysis and quick scanning:
+
+    Task-Type Dependency Table:
+    | Task Type | Preferred Mood | Example | Rationale |
+    Shows how different task categories require different linguistic approaches
+
+    Specificity Impact Table:
+    | Task Category | Specificity Gain | Details |
+    Quantifies evidence for when to add detail vs when to stay flexible
+
+    Model-Specific Patterns:
+    Separate subsections for Claude (XML tags), GPT (Markdown), Gemini (context-last)
+    with concrete code examples for each
+
+  anti_patterns_section: |
+    Dedicated "Anti-Patterns" section showing what NOT to do:
+    - Pattern name and example
+    - Why it's problematic
+    - Better alternative
+
+    Example from 3-language.md:
+    - Over-Hedging: "Perhaps it might be worth..." → "Implement error recovery"
+    - Anthropomorphization: "I know you're very smart..." → Direct task specification
+    - Format Ambiguity: "Nice readable format" → Explicit JSON schema
+
+  when_to_use:
+    - Foundational topics where evidence-grounded guidance provides long-term reference value
+    - Areas with significant academic/industry research to synthesize
+    - Topics where practitioners need verifiable, authoritative claims
+    - Content that will be cited or referenced extensively
+
+  trade_offs:
+    - advantage: Establishes authoritative, verifiable guidance
+      cost: Requires significant research investment (20+ hours)
+    - advantage: Long-term reference value for practitioners
+      cost: Higher maintenance burden as research evolves
+    - advantage: Enables readers to verify claims and explore deeper
+      cost: More complex to write and structure than experience-based content
+
+  real_examples:
+    - location: chapters/2-prompt/3-language.md
+      lines: 635 total
+      sections: 9 major sections (verb semantics, specificity, constraints, delimiters, role/persona, CoT, model-specific, anti-patterns, connections)
+      citations: "9 academic papers, 3 official docs, 4 practitioner sources"
+      tables: 6 comparison/analysis tables
+      note: "Synthesized 75+ sources into coherent practitioner guidance"
+
+  integration_with_existing_content: |
+    Evidence-based chapters reference and update related content:
+    - Added cross-reference in chapters/2-prompt/1-prompt-types.md
+    - Updated chapters/2-prompt/2-structuring.md with link
+    - Updated chapters/2-prompt/_index.md to include new section
+    - Bidirectional linking to chapters/3-model/2-model-behavior.md
+
+    This creates knowledge web where research-backed insights connect
+    to practical implementation guidance.
+
+
+cross_domain_observations_pattern:
+  name: Cross-Domain Learning Registry
+  context: Pattern from .claude/agents/experts/.shared/observations.yaml (Dec 27, 2025)
+  timestamp: 2025-12-27
+
+  pattern_observed: |
+    Multi-domain expert systems benefit from shared learning registry that enables
+    expertise propagation beyond individual domains. The observations.yaml file provides:
+
+    1. **cross_domain_patterns** - Successfully validated patterns with applicability lists
+    2. **failed_adoptions** - Patterns that failed with documented reasons/lessons
+    3. **contribution_protocol** - How improve agents add learnings
+    4. **inheritance_protocol** - How domains validate and adopt patterns
+
+  contribution_decision_criteria: |
+    After updating domain expertise.yaml, assess cross-domain applicability:
+
+    Pattern is cross-domain if:
+    - Solves problem 2+ domains face (e.g., tool selection, safety protocols)
+    - Evidence from actual domain usage (quantified where possible)
+    - Clear applicability list (which domains benefit?)
+
+    Pattern is domain-specific if:
+    - Unique to domain's technical context (e.g., book frontmatter schema)
+    - Workflow specific to domain operations (e.g., TOC generation)
+
+  structure_format: |
+    cross_domain_patterns:
+      - pattern: <kebab-case-name>
+        source: <originating-domain>
+        observation: |
+          Multi-line description of pattern and context
+        applicability:
+          - <domain1>
+          - <domain2>
+        evidence: |
+          Quantified evidence from actual usage
+        timestamp: YYYY-MM-DD
+
+    failed_adoptions:
+      - pattern: <kebab-case-name>
+        attempted_in: <domain>
+        reason: |
+          Why pattern adoption failed
+        lesson: |
+          Meta-learning about when pattern doesn't apply
+        timestamp: YYYY-MM-DD
+
+  validation_approach: |
+    Decentralized governance - no formal approval required. Domains mark patterns
+    as validated via cross_domain_inheritance in their expertise.yaml. Contradictory
+    observations trigger human review.
+
+  when_to_contribute: |
+    Knowledge domain contributions focus on:
+    - Content organization patterns (applies to any documentation domain)
+    - Voice consistency techniques (applies to any writing)
+    - Cross-reference strategies (applies to interconnected content)
+    - Evidence-grounded writing approaches (applies to technical documentation)
+
+    Avoid contributing book-specific patterns (frontmatter schema, chapter hierarchy).
+
+  real_examples:
+    - location: .claude/agents/experts/.shared/observations.yaml
+      patterns_documented: 3 cross-domain (tool-selection-consistency, dual-file-ownership, safety-protocol-migration)
+      failed_adoptions: 2 (single-message-parallelism, question-agent-bash-access)
+
+recent_content_learnings:
+  mental_model_entry_structure:
+    name: Mental Model Entry Structure Pattern
+    context: Pattern from chapters/8-mental-models/5-execution-topologies.md creation
+    timestamp: 2026-01-17
+    pattern_observed: |
+      Mental model entries for technical frameworks require systematic structure:
+      1. Opening definition linking concept to practitioner value
+      2. Core Idea section with boundaries/scope visualization
+      3. Taxonomy section with consistent subsection template
+      4. Measurement/metrics section for each taxonomy element
+      5. Book mapping (connect to existing chapter content)
+
+      Each taxonomy element follows template:
+      - Definition
+      - ASCII diagram (visual representation)
+      - Book Mapping: [Pattern Name](../path.md) with context
+      - When to Use: Bulleted criteria
+      - Measurement Indicators: Observable metrics
+
+      This structure enables practitioners to: understand the concept, classify
+      their situation, apply appropriate patterns, and measure effectiveness.
+    evidence: |
+      chapters/8-mental-models/5-execution-topologies.md (415 lines):
+      - 5 topologies (parallel, sequential, synthesis, nested, persistent)
+      - Each with consistent structure (definition, diagram, book mapping, when to use, metrics)
+      - Book mappings reference existing chapters (6-patterns/, 4-context/)
+      - Measurement indicators provide observable assessment criteria
+    real_examples:
+      - location: chapters/8-mental-models/5-execution-topologies.md
+        note: Lines 63-415 demonstrate pattern across 5 topologies
+
+  changelog_integration_pattern:
+    name: External Changelog Integration to Book Content
+    context: Pattern from commit d69ef22 (Claude Code changelog sync)
+    timestamp: 2026-01-17
+    pattern_observed: |
+      When external tool releases new features, sync to book content via:
+
+      1. Research Phase: Analyze changelog delta (versions since last sync)
+      2. Impact Mapping: Map features to affected chapters
+      3. Integration: Add timestamped sections to relevant chapters
+      4. Cross-Reference: Link between related feature updates
+      5. Evidence: Cite changelog version numbers and official docs
+
+      Format for integrated content:
+      - Section header describing feature
+      - Timestamp matching feature release (*[YYYY-MM-DD]*)
+      - Feature description with operational context
+      - Configuration examples when applicable
+      - Trade-offs table showing when to use/avoid
+      - Cross-references to related book sections
+
+      This keeps book current with tool evolution without manual monitoring.
+    evidence: |
+      Commit d69ef22 synced Claude Code 2.1.5-2.1.9 changelog to book:
+      - chapters/4-context/2-context-strategies.md: Context % monitoring (87 lines)
+      - chapters/5-tool-use/3-tool-restrictions.md: Permission bypass fixes (121 lines)
+      - chapters/5-tool-use/4-scaling-tools.md: MCP auto-selection mode (77 lines)
+      - chapters/4-context/4-multi-agent-context.md: Sub-agent forking (54 lines)
+      - chapters/9-practitioner-toolkit/1-claude-code.md: Keybindings + hooks (271 lines)
+
+      Total: 610 lines of content added across 5 chapters from single changelog analysis.
+    real_examples:
+      - location: chapters/4-context/2-context-strategies.md
+        lines: "104-190"
+        note: Context Window Percentage Monitoring section with thresholds table
+      - location: chapters/5-tool-use/3-tool-restrictions.md
+        lines: "102-219"
+        note: Wildcard Permission Patterns + Permission Bypass Vulnerabilities
+
+  operational_threshold_documentation:
+    name: Operational Threshold Documentation Pattern
+    context: Pattern from context percentage monitoring section
+    timestamp: 2026-01-17
+    pattern_observed: |
+      When documenting features with operational thresholds, provide:
+
+      1. Threshold Table: Range | Signal | Recommended Action
+      2. Numeric guidance with clear breakpoints (not vague "high/low")
+      3. Decision framework based on thresholds
+      4. Integration with existing patterns (cross-reference)
+      5. Trade-offs and when to adjust defaults
+
+      Threshold tables enable quick assessment ("I'm at 65%, what now?")
+      without re-reading full documentation. Decision frameworks remove
+      ambiguity from "should I X?" questions.
+    evidence: |
+      chapters/4-context/2-context-strategies.md lines 123-150:
+
+      Operational Thresholds table:
+      | Range | Signal | Recommended Action |
+      | 0-30% | Healthy | Continue normally |
+      | 30-60% | Monitor | Good checkpoint for intentional compaction |
+      | 60-80% | Caution | Consider fresh session if major phase ends |
+      | 80-95% | Warning | Begin graceful task wrap-up |
+      | 95%+ | Critical | Boot new agent immediately |
+
+      Followed by Decision Framework:
+      1. Set mental alert at 60%
+      2. At natural break points: Compact if above 50%
+      3. At 80%: Stop accepting new work
+      4. At 95%: Force new session
+
+      This removes ambiguity from "when should I compact context?" question.
+    real_examples:
+      - location: chapters/4-context/2-context-strategies.md
+        lines: "123-150"
+        note: Threshold table + decision framework for context percentage monitoring
+
+stability:
+  oscillation_detection:
+    rule: |
+      IF entry E1 at T1 contradicts E0 at T0
+      AND entry E2 at T2 contradicts E1
+      THEN oscillation detected
+    resolution: |
+      Preserve both with conflict marker
+      Escalate to human
+    detected_oscillations: []
+
+  convergence_indicators:
+    insight_rate_trend: "Active - new content patterns from changelog integration and mental models"
+    new_entries_this_cycle: 3  # mental_model_entry_structure, changelog_integration_pattern, operational_threshold_documentation
+    contradiction_count: 0
+    last_reviewed: 2026-01-17
+    notes: |
+      Knowledge domain shows active learning from recent commits:
+      - 610 lines of changelog-driven content added across 5 chapters (commit d69ef22)
+      - New mental model entry (execution-topologies.md, 415 lines) established framework pattern
+      - Operational threshold documentation pattern emerged from context monitoring section
+      - Size governance healthy: 729 lines (well below 900-line warning threshold)
+
+      Patterns extracted:
+      1. Mental model taxonomy structure (consistent subsection templates)
+      2. External changelog integration workflow (research → map → integrate)
+      3. Operational threshold tables + decision frameworks (remove ambiguity)
+
+      Domain remains stable with headroom for growth. Comprehensive coverage maintained.
