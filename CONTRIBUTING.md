@@ -1,6 +1,6 @@
 # Contributing to Agentic Engineering Knowledge Base
 
-This book is developed through the [Agentic Engineering Skool community](https://www.skool.com/agentic-engineering). We welcome contributions from community members who are actively practicing agentic engineering.
+This book is developed through the [Agentic Engineering Skool community](https://www.skool.com/prompt-to-prod). We welcome contributions from community members who are actively practicing agentic engineering.
 
 ## Who Can Contribute
 

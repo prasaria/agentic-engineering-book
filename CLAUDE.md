@@ -140,4 +140,4 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for:
 - Attribution conventions
 - Code of conduct
 
-This book is developed through the [Agentic Engineering Skool community](https://www.skool.com/agentic-engineering).
+This book is developed through the [Agentic Engineering Skool community](https://www.skool.com/prompt-to-prod).
