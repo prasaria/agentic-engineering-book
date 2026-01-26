@@ -471,6 +471,57 @@ Add 1-2 sentences explaining why the connection matters and what specific insigh
 
 **Rationale:** Negative phrasing creates semantic association with unwanted behavior. Positive framing specifies desired behavior without activating problematic patterns.
 
+### Changelog Integration Implementation Pattern
+
+*[2026-01-25]*: Pattern from commit d69ef22 Claude Code changelog integration. When implementing changelog features into chapters:
+
+**Timestamped Entry Format:**
+```markdown
+*[2026-01-11]*: **Feature Name (Version Number)** - Brief headline hook
+
+**How it works:** Paragraph explaining what changed and why it matters.
+
+**Use cases:**
+- Bullet 1
+- Bullet 2
+
+**Pattern: Pattern Name**
+
+Explanation of the pattern this feature exemplifies...
+
+**Contrast with X:** Explain how this differs from/relates to existing capability
+
+**Sources:** [Changelog URL](link)
+```
+
+**Decision Logic for Section Placement:**
+1. Is this a new release of an existing feature? → Add timestamped entry to that feature's section
+2. Does it fit naturally in an existing section (Tips, Configuration, etc.)? → Add there with timestamp
+3. Is it grouped with 2-3 related features? → Create ### subsection within appropriate parent
+4. Does it span 130+ lines across multiple releases? → Create new ## section with proper subsection hierarchy
+
+**Subsection Structure for Complex Features:**
+- ### What/How (conceptual intro)
+- ### Configuration (practical setup)
+- ### Advanced/Context-Specific (interaction patterns)
+- ### Compatibility/Edge Cases (terminal, vim interactions)
+- ### Power-User Patterns (optimization strategies)
+
+**Cross-Reference Implementation:**
+For changelog features, create thematic links, not just mechanical ones:
+- Link to mental models that this feature exemplifies
+- Use comparison tables to show feature trade-offs (Task Dependency Tracking vs Real-time Steering)
+- Frame feature relationships around conceptual patterns, not just documentation pointers
+
+Example: Real-Time Message Steering links to "Progressive Refinement" as a conceptual pattern, not just as "mentioned in practices chapter."
+
+**Testing Changelog Integration:**
+- Verify all version numbers match changelog source
+- Check that timestamped dates align with feature release dates
+- Confirm cross-references use relative paths (working links)
+- Ensure new subsections maintain consistent nesting depth
+- Validate that thematic links explain the connection (not just "See also X")
+
 ## Workflow
 
 1. **Load Specification**

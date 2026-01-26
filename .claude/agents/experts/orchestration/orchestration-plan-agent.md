@@ -1,6 +1,6 @@
 ---
 name: orchestration-plan-agent
-description: Plans orchestration patterns. Expects USER_PROMPT (requirement), HUMAN_IN_LOOP (optional, default: false)
+description: Plans orchestration patterns. Expects USER_PROMPT (requirement), HUMAN_IN_LOOP (optional, default false)
 tools: Read, Glob, Grep, Write
 model: sonnet
 color: yellow

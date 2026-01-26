@@ -1,6 +1,6 @@
 ---
 name: book-structure-plan-agent
-description: Plans book structure changes. Expects USER_PROMPT (requirement), HUMAN_IN_LOOP (optional, default: false)
+description: Plans book structure changes. Expects USER_PROMPT (requirement), HUMAN_IN_LOOP (optional, default false)
 tools: Read, Glob, Grep, Write
 model: sonnet
 color: yellow

@@ -1,6 +1,6 @@
 ---
 name: knowledge-plan-agent
-description: Plans book content updates. Expects USER_PROMPT (requirement), HUMAN_IN_LOOP (optional, default: false)
+description: Plans book content updates. Expects USER_PROMPT (requirement), HUMAN_IN_LOOP (optional, default false)
 tools: Read, Glob, Grep, Write
 model: sonnet
 color: yellow
@@ -434,6 +434,37 @@ Replace prohibitions with required behaviors using comparison table format:
 Negative phrasing creates semantic association - models must represent the forbidden action to understand the constraint, increasing activation of that concept. Positive framing specifies desired behavior without activating unwanted patterns.
 
 **Planning Implication:** When reviewing specs or existing content, identify negative constraints ("never", "don't", "avoid", "prevent") and plan conversion to positive requirements as part of content updates.
+
+### Changelog Integration and Section Organization Pattern
+
+*[2026-01-25]*: Pattern from commit d69ef22 (Claude Code changelog sync 2.1.5-2.1.9). When integrating external tool changelog features into existing chapters:
+
+**Section Organization Decision Tree:**
+- Single feature, <50 lines → timestamped entry in existing section
+- Related feature group, 50-130 lines → new ### subsection within existing parent
+- Feature family, 130+ lines across 3+ versions → new ## top-level section with ### subsections
+
+**Example from Implementation:**
+- Real-Time Message Steering (2.1.0) → timestamped entry in Tips & Tricks section
+- Keyboard Customization (2.1.7, 2.1.18, 2.1.25) → new ## section with 7 subsections (130 lines)
+
+**Cross-Reference Strategy for Changelogs:**
+Don't just link features to other sections. Connect through conceptual patterns:
+- Real-Time Message Steering → Progressive Refinement pattern conceptually
+- Unified Mental Model (Skills/Commands) → Comparison table showing trade-offs
+- Hook Context Injection → Decision table for Block vs Context Injection approaches
+
+Link thematically (how does this advance existing concepts?) rather than mechanically (where else is this mentioned?).
+
+**Subsection Nesting for Rich Features:**
+When creating new section, organize by progression from conceptual to advanced:
+1. Definition (what it is) - Default Bindings
+2. Configuration (how to set up) - Custom Bindings
+3. Context-specific usage - Context-Specific Bindings
+4. Interaction patterns - Terminal Compatibility, Vim Integration
+5. Advanced techniques - Power-User Patterns
+
+This progression helps readers understand before customizing before optimizing.
 
 ## Workflow
 

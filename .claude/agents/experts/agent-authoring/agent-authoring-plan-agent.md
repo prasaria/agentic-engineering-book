@@ -1,6 +1,6 @@
 ---
 name: agent-authoring-plan-agent
-description: Plans agent creation tasks. Expects USER_PROMPT (requirement), HUMAN_IN_LOOP (optional, default: false)
+description: Plans agent creation tasks. Expects USER_PROMPT (requirement), HUMAN_IN_LOOP (optional, default false)
 tools: Read, Glob, Grep, Write
 model: sonnet
 color: yellow

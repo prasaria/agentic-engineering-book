@@ -1,6 +1,6 @@
 ---
 name: claude-config-plan-agent
-description: Plans Claude Code configurations. Expects USER_PROMPT (requirement), HUMAN_IN_LOOP (optional, default: false)
+description: Plans Claude Code configurations. Expects USER_PROMPT (requirement), HUMAN_IN_LOOP (optional, default false)
 tools: Read, Glob, Grep, Write
 model: sonnet
 color: yellow

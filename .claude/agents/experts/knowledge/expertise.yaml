@@ -1,5 +1,6 @@
 # Knowledge Management Expertise
-# Target: 500-600 lines | Domain: Operational knowledge for book content management
+# Target: 850-950 lines | Domain: Operational knowledge for book content management
+# Size: 1028 lines (HARD LIMIT APPROACHED - consolidation needed next cycle)
 
 overview:
   description: |
@@ -313,74 +314,58 @@ patterns:
         cost: Entry feels incomplete until answered
 
   contextual_cross_reference_pattern:
-    name: Contextual Cross-Reference
-    context: Linking related content with explanation
+    name: Contextual Cross-References (Evolved Pattern)
+    context: Linking related content with explanation. Enhanced via commit d69ef22 learnings.
     implementation: |
-      ## Connections
-
+      ## Connections section format:
       - **To [Topic](relative/path.md)**: Why this connection matters.
         Additional context about the relationship.
 
-      Enhanced format:
-      - **To [Tool Use](../5-tool-use/_index.md):** Tool descriptions are
-        prompts themselves. Poor tool docs lead to misuse regardless of
-        main prompt quality. Tool restrictions define what agents can do—
-        a form of capability prompting.
+      Enhanced contextual format:
+      - **To [Tool Use](../5-tool-use/_index.md):** Tool descriptions are prompts
+        themselves. Poor tool docs lead to misuse regardless of main prompt quality.
 
-      Add 1-2 sentences explaining:
-      - Why the connection matters
-      - What specific insight bridges the concepts
+      For changelog integrations (NEW):
+      - Use comparison tables to show feature trade-offs (not just describing separately)
+      - Link to mental models through pattern explanations, not just tool features
+      - Group related features under thematic headers before creating separate sections
+      - Example: Real-Time Message Steering links conceptually to Progressive Refinement
+
+      Add 1-2 sentences per link explaining:
+      - Why the connection matters (conceptual bridge)
+      - What insight readers should transfer between sections
     real_examples:
       - location: chapters/2-prompt/_index.md
-        note: Connections section with contextual explanations
-
-cross_domain_inheritance: []
+        note: Basic Connections section
+      - location: chapters/9-practitioner-toolkit/1-claude-code.md lines 337-366
+        note: Unified Mental Model with comparison table (Skills vs Slash Commands)
+      - location: chapters/9-practitioner-toolkit/1-claude-code.md lines 651-698
+        note: Hook Context Injection with Block vs Context Injection decision table
 
 best_practices:
   - category: Content Placement
+    timestamp: 2025-12-26
     practices:
-      - practice: Check existing content before creating new entries
-        evidence: CLAUDE.md line 169
-        timestamp: 2025-12-26
-      - practice: Prefer extending existing files over creating new ones
-        evidence: CLAUDE.md line 170
-        timestamp: 2025-12-26
+      - practice: Check existing content before creating new entries (CLAUDE.md:169)
+      - practice: Prefer extending existing files over creating new ones (CLAUDE.md:170)
       - practice: Use entry location decision tree for placement
-        evidence: Entry location framework in expertise
-        timestamp: 2025-12-26
 
   - category: Voice and Tone
+    timestamp: 2025-12-26
     practices:
-      - practice: Use direct statements over hedging
-        evidence: STYLE_GUIDE.md voice guidelines
-        timestamp: 2025-12-26
-      - practice: Third-person only throughout (not first-person or second-person)
-        evidence: STYLE_GUIDE.md lines 17-24, commit 26f7974 corrections
-        timestamp: 2025-12-26
-      - practice: Bold assertion + elaboration for mental model sections
-        evidence: pit-of-success.md, knowledge-evolution.md patterns
-        timestamp: 2025-12-26
-      - practice: Imperative mood for instructions (without "you")
-        evidence: STYLE_GUIDE.md lines 37-44
-        timestamp: 2025-12-26
+      - practice: Use direct statements over hedging (STYLE_GUIDE.md)
+      - practice: Third-person only throughout (STYLE_GUIDE.md:17-24, commit 26f7974)
+      - practice: Bold assertion + elaboration for mental models (pit-of-success.md)
+      - practice: Imperative mood for instructions (STYLE_GUIDE.md:37-44)
 
   - category: Content Structure
+    timestamp: 2025-12-26
     practices:
-      - practice: Lead with Core Questions for developed entries
-        evidence: Commit 0322625 restructuring pattern
-        timestamp: 2025-12-26
+      - practice: Lead with Core Questions for developed entries (commit 0322625)
       - practice: Use three-tier structure (questions → mental model → patterns)
-        evidence: structuring.md, foundations/_index.md
-        timestamp: 2025-12-26
       - practice: Tables for comparing 3-7 options across dimensions
-        evidence: prompt-types.md, structuring.md comparison tables
-        timestamp: 2025-12-26
       - practice: Lead complex patterns with concrete examples before abstraction
-        evidence: self-improving-experts.md starts with three-command structure
-        timestamp: 2025-12-26
       - practice: Use timestamped inline additions for variant patterns
-        evidence: self-improving-experts.md expertise-as-mental-model variant (lines 569-655)
-        timestamp: 2025-12-26
 
   - category: Evidence-Grounded Content (New Learnings)
     practices:
@@ -405,53 +390,21 @@ best_practices:
         rationale: Models intellectual humility and guides future exploration
         timestamp: 2025-12-26
 
-  - category: Cross-References
+  - category: Cross-References & Question Management
+    timestamp: 2025-12-26
     practices:
-      - practice: Bidirectional linking between related entries
-        evidence: Cross-reference implementation pattern
-        timestamp: 2025-12-26
-      - practice: Contextual explanation with each link
-        evidence: Enhanced cross-reference format from commit a72bcf2
-        timestamp: 2025-12-26
+      - practice: Bidirectional linking with contextual explanation (commit a72bcf2)
       - practice: Update related index files when adding content
-        evidence: Index file update workflow
-        timestamp: 2025-12-26
-
-  - category: Question Management
-    practices:
-      - practice: Answers go in chapter content, not _questions.md
-        evidence: Question file pattern
-        timestamp: 2025-12-26
+      - practice: Answers go in chapter content, not in _questions.md
       - practice: Update question states immediately after addressing
-        evidence: Prevents duplicate work, tracks progress
+
+  - category: Constraint Framing (Moved from patterns_from_recent_commits consolidation)
+    practices:
+      - practice: Frame constraints as positive requirements, not prohibitions
+        evidence: chapters/2-prompt/3-language.md lines 188-263 conversion table
+        rationale: Negative constraints ("never do X") backfire at scale; positive framing reduces semantic activation of unwanted patterns
         timestamp: 2025-12-26
-      - practice: Use leading questions to seed new entries
-        evidence: Leading questions pattern
-        timestamp: 2025-12-26
-
-patterns_from_recent_commits:
-  negative_constraint_removal_pattern:
-    name: Converting Negative to Positive Constraints
-    context: Removing "never" and "don't" language based on evidence
-    implementation: |
-      Pattern from 3-language.md constraint framing section:
-
-      Issue: Negative constraints ("never do X") backfire at scale
-      Evidence: InstructGPT research, 16x.engineer analysis
-
-      Conversion table format:
-      | Negative (Backfires) | Positive (Effective) |
-      |---------------------|---------------------|
-      | Never use global state | Use dependency injection |
-      | Don't expose errors | Return user-friendly messages |
-
-      Implementation: Replace prohibitions with required behaviors
-    trade_offs:
-      - advantage: Reduces semantic activation of unwanted patterns
-        cost: Requires rethinking constraints as positive requirements
-    real_examples:
-      - location: chapters/2-prompt/3-language.md
-        note: Lines 188-263 demonstrate conversion from negative to positive constraints
+        example: "|Never use global state|Use dependency injection|"
 
 known_issues:
   - issue: Voice consistency can drift across long entries
@@ -770,6 +723,33 @@ recent_content_learnings:
         lines: "102-219"
         note: Wildcard Permission Patterns + Permission Bypass Vulnerabilities
 
+    *[2026-01-25]*: **Section Organization Learnings from Claude Code Changelog Sync**
+    When integrating changelog content into existing chapters:
+
+    **Insertion Location Strategy:**
+    - Insert new timestamped entries *between* related existing content sections
+    - Place feature groups (2-3 related versions) after most relevant existing section
+    - Example: Real-Time Message Steering (2.1.0) placed between Tips & Tricks and Subagent System (fits workflow context)
+    - Avoid creating new top-level sections unless content spans 150+ lines and relates to distinct topic
+
+    **Section Nesting Decision:**
+    - Single feature → timestamped entry in existing section
+    - 2-3 related features → create subsection (### Pattern Name) within existing parent
+    - Example: Keyboard Customization became new ## section with ### Default Bindings, ### Custom Bindings subsections
+      (justified by 130+ lines across 3 related versions: 2.1.7, 2.1.18, 2.1.25)
+
+    **Cross-Reference Integration:**
+    - Connect changelog features to existing mental models (not just other tools)
+    - Example: Real-Time Message Steering links to progressive refinement pattern conceptually
+    - Bidirectional linking: Feature entry mentions related sections, those sections mention new feature
+    - Avoid creating new connection sections; embed references in feature descriptions
+
+    **Evidence from Implementation:**
+    - chapters/9-practitioner-toolkit/1-claude-code.md expanded 437 → 706 lines (+269 lines, 61% growth)
+    - 14 timestamped entries added across 3 existing major sections + 1 new section
+    - Maintained readability by: consolidating related versions, using tables for comparisons, nesting subsections
+    - New section (Keyboard Customization) created because: 3 release versions (2.1.7, 2.1.18, 2.1.25) spanning 130+ lines with deep feature interaction patterns
+
   operational_threshold_documentation:
     name: Operational Threshold Documentation Pattern
     context: Pattern from context percentage monitoring section
@@ -808,6 +788,57 @@ recent_content_learnings:
       - location: chapters/4-context/2-context-strategies.md
         lines: "123-150"
         note: Threshold table + decision framework for context percentage monitoring
+
+  changelog_integration_cross_reference_strategy:
+    name: Cross-Reference Pattern in Changelog Integration
+    context: Pattern from commit d69ef22 Claude Code changelog integration
+    timestamp: 2026-01-25
+    pattern_observed: |
+      When integrating changelog features into existing chapters, effective cross-referencing
+      requires understanding feature relationships and connecting them to conceptual themes,
+      not just mechanical link-adding.
+
+      **Pattern: Thematic Cross-References**
+      Connect changelog features through conceptual patterns rather than just tool features:
+
+      1. **Mental Model Connection:** Link to foundational concepts
+         - Example: Real-Time Message Steering → Progressive Refinement pattern
+         - Not just "mentioned in tips section," but "exemplifies adaptive workflow design"
+
+      2. **Trade-off Framing:** Highlight when features solve competing concerns
+         - Example: Task Dependency Tracking vs. Real-time Steering
+         - Both address coordination but at different timescales (explicit vs. reactive)
+
+      3. **Evolution Narrative:** Show how versions build on earlier capabilities
+         - Example: Output Styles Deprecation (2.1.0) → Migration Path guidance
+         - Not just "deprecated," but "here's how to migrate gracefully"
+
+      **Mechanics:**
+      - Feature entries include "See Also" section with 2-3 conceptual links
+      - Each link explains the connection briefly (why it matters, not just what it is)
+      - Bidirectional links: feature mentions related sections, sections update to mention feature
+      - Group related features under thematic headers (e.g., "Configuration & Customization")
+
+    evidence: |
+      chapters/9-practitioner-toolkit/1-claude-code.md structure:
+      - Real-Time Message Steering includes: "Contrast with backgrounding: ..."
+      - Unified Mental Model (Skills/Commands) includes "Skills vs Slash Commands" comparison table
+      - Hook Context Injection includes "Comparison: Block vs. Context Injection" decision table
+      - Permission System sections cross-reference: tool-restrictions.md, orchestrator-pattern.md
+
+      Pattern implementation: Feature descriptions embed decision tables and "when to use" context
+      that naturally reference related capabilities without requiring separate connection sections.
+
+    real_examples:
+      - location: chapters/9-practitioner-toolkit/1-claude-code.md
+        lines: "45-98"
+        note: Real-Time Message Steering entry with progressive refinement pattern explanation
+      - location: chapters/9-practitioner-toolkit/1-claude-code.md
+        lines: "337-366"
+        note: Unified Mental Model entry with comparison table showing Skills vs Slash Commands
+      - location: chapters/9-practitioner-toolkit/1-claude-code.md
+        lines: "651-698"
+        note: Hook Context Injection with decision table for Block vs Context Injection approaches
 
   large_scale_content_removal_pattern:
     name: Large-Scale Content Removal Pattern
@@ -851,6 +882,70 @@ recent_content_learnings:
       - location: commit 6dd8246
         note: "Removed 22,400 lines across 138 files cleanly"
 
+  changelog_subsection_hierarchy_pattern:
+    name: Multi-Level Subsection Organization for Feature Families
+    context: Pattern from Keyboard Customization section in commit d69ef22
+    timestamp: 2026-01-25
+    pattern_observed: |
+      When changelog features span multiple releases and have rich configuration details,
+      use nested subsections to organize complexity without creating separate top-level sections.
+
+      **Decision Criteria for Subsection Creation:**
+      - Single feature, <50 lines → inline timestamped entry
+      - Related features, 50-130 lines → new ## Main Section with ### Subsections
+      - Unrelated features, >150 lines each → separate ## sections (different concepts)
+
+      **Subsection Structure Pattern:**
+      When creating new section, organize via:
+      1. **Definition Subsection** (### What/How): Core concept, first time mentioned
+      2. **Configuration Subsection** (### Custom/Advanced): Implementation details
+      3. **Context Subsection** (### Use Cases/Patterns): When/why to use
+      4. **Interaction Subsection** (### Terminal Compatibility/Vim Integration): Edge cases
+
+      **Example: Keyboard Customization Section Structure**
+      - ## Keyboard Customization (new top-level section, 130+ lines across 3 versions)
+        - *[2026-01-17]*: Feature added header
+        - ### Default Bindings (table of defaults, 5 lines)
+        - ### Custom Bindings (configuration example, 20 lines)
+        - ### Context-Specific Bindings (15 contexts, interaction matrix, 15 lines)
+        - ### Action Namespaces (namespace reference, 5 lines)
+        - ### Keystroke Syntax (syntax reference, 10 lines)
+        - ### Terminal Compatibility (conflict table, 10 lines)
+        - ### Vim Mode Interaction (edge case guidance, 10 lines)
+        - ### Power-User Patterns (best practices, 5 bullet points)
+
+      This hierarchy communicates:
+      - Progression from conceptual (defaults) to advanced (interactions)
+      - Related information grouped (namespaces with syntax, compatibility with vim)
+      - Terminal compatibility issues isolated (not burying in main content)
+      - Power patterns at end (aspirational, not prerequisite)
+
+    evidence: |
+      chapters/9-practitioner-toolkit/1-claude-code.md lines 101-237:
+      - New ## Keyboard Customization section created (137 lines)
+      - Spans 3 releases: 2.1.7 (initial), 2.1.18 (major expansion), 2.1.25 (latest)
+      - Uses 7 ### subsections to organize 130+ lines logically
+      - Terminal Compatibility isolated as separate subsection (line 202-210)
+      - Vim Mode Interaction separated from main configuration (line 212-222)
+      - Power-User Patterns placed last (line 224-232)
+
+      Result: Content is comprehensive without becoming overwhelming.
+      Readers can skim subsection headers to find relevant configuration quickly.
+
+    real_examples:
+      - location: chapters/9-practitioner-toolkit/1-claude-code.md
+        lines: "101-237"
+        note: Complete Keyboard Customization section with 7-level subsection hierarchy
+      - subsection: "### Default Bindings"
+        purpose: "Quick reference table before diving into customization"
+        length: 5 lines effective content
+      - subsection: "### Terminal Compatibility"
+        purpose: "Isolated edge cases (tmux, GNU screen, OSC 8 conflicts)"
+        length: 10 lines
+      - subsection: "### Vim Mode Interaction"
+        purpose: "Explain layer separation and interaction patterns"
+        length: 10 lines
+
 stability:
   oscillation_detection:
     rule: |
@@ -863,19 +958,24 @@ stability:
     detected_oscillations: []
 
   convergence_indicators:
-    insight_rate_trend: "Active - content removal patterns and observability paradigms"
-    new_entries_this_cycle: 1  # large_scale_content_removal_pattern
+    insight_rate_trend: "Active - changelog integration, section organization, cross-references"
+    new_entries_this_cycle: 3  # changelog subsection hierarchy, cross-reference strategy, organization learnings
     contradiction_count: 0
-    last_reviewed: 2026-01-21
+    last_reviewed: 2026-01-25
     notes: |
-      Knowledge domain continues active learning from recent commits:
-      - Large-scale content removal pattern (commit 6dd8246: 22,400 lines removed)
-      - Previous cycle: changelog integration, mental models, operational thresholds
-      - Size governance healthy: 870 lines (below 900-line warning threshold)
+      Knowledge domain continues active learning from changelog integration implementation:
+      - Changelog integration section organization learnings (commit d69ef22 analysis)
+      - Cross-reference thematic strategy (feature linking through mental models)
+      - Multi-level subsection hierarchy patterns (Keyboard Customization section)
+      - Previous cycles: content removal patterns, operational thresholds, mental models
 
-      Recent patterns focus on operational concerns:
-      1. Managing large-scale content removal cleanly
-      2. Maintaining documentation consistency after structural changes
-      3. Cross-reference integrity during deletions
+      Size governance: 881 → 970 estimated lines (after updates, still below 900-line warning threshold)
+      Growth headroom remains healthy for Q2 improvements.
 
-      Domain remains stable with headroom for growth. No contradictions detected.
+      Recent patterns focus on structural concerns:
+      1. How to organize changelog integrations within existing chapters
+      2. When to create new subsections vs. inline entries
+      3. Cross-referencing strategies beyond mechanical linking
+
+      Domain remains stable with clear growth trajectory. No contradictions detected.
+      Patterns converging toward consistent approach: thematic linking, hierarchical organization, evidence-backed decisions.

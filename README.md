@@ -1,5 +1,7 @@
 # Agentic Engineering: The Book
 
+[![License: CC BY-NC-SA 4.0](https://img.shields.io/badge/License-CC%20BY--NC--SA%204.0-lightgrey.svg)](https://creativecommons.org/licenses/by-nc-sa/4.0/)
+
 > [!CAUTION]
 > **This book is maintained by LLMs using the techniques described within.**
 > Content is written and updated by Claude using agentic workflows, slash commands, and self-improving expert agents. Human review ensures accuracy, but the authoring process itself is an exercise in agentic engineering.
@@ -48,3 +50,7 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines. This book is developed th
 ## Author
 
 Jaymin West
+
+## License
+
+This work is licensed under [CC BY-NC-SA 4.0](LICENSE). You may share and adapt this content for non-commercial purposes with attribution. See [LICENSE](LICENSE) for details.
