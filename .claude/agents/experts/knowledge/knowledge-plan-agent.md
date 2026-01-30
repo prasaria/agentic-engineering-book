@@ -248,6 +248,34 @@ This prevents propagation of false technical assertions that require large-scale
 
 This prevents broken links and outdated references after large deletions. Commit 6dd8246 removed 22,400 lines across 138 files cleanly by following this pattern.
 
+*[2026-01-30]*: **Model-Native Swarm Documentation Pattern** - When documenting fundamentally new coordination paradigms (like Kimi K2.5's model-native swarm vs SDK orchestration), use this structure:
+1. **Architecture Contrast Diagram**: ASCII showing structural difference (SDK external calls vs model-internal reasoning)
+2. **Evidence Section**: Document training methodology (PARL, Critical Steps metric) that produced capability
+3. **Quantified Performance Claims**: Specific numbers (3-4.5× speedup, 100 subagents, 80% reduction)
+4. **Comparison Table**: Trade-offs across 8-11 dimensions (coordination logic, debugging, infrastructure, etc.)
+5. **When to Use Decision Framework**: Good fit vs poor fit scenarios with rationale
+6. **Bidirectional Cross-References**: Update existing patterns to reference new paradigm
+
+Evidence: chapters/3-model/4-multi-model-architectures.md lines 277-420 (158 lines) + cross-references in 3-orchestrator-pattern.md and 5-execution-topologies.md. Pattern grounds "magic" claims in verifiable training details while providing practical decision guidance.
+
+*[2026-01-30]*: **File-Based Coordination Documentation Pattern** - When documenting hidden/gated features (like TeammateTool):
+1. **Feature Status Transparency**: Document gating mechanism upfront (server-side gated, community bypass)
+2. **Mental Model Before Mechanics**: Frame abstraction level (Task = fork(), TeammateTool = orchestration framework)
+3. **Operations Catalog with Observable State**: Document primitives with filesystem paths for verification
+4. **Five Pattern Templates**: Standard coordination patterns (Leader-Worker, Swarm, Pipeline, Council, HITL) with ASCII diagrams
+5. **Comparison Table**: Capability matrix (Task vs TeammateTool across 8 capabilities)
+6. **Decision Framework Flow Chart**: Binary questions leading to tool recommendations
+
+Evidence: chapters/9-practitioner-toolkit/1-claude-code.md lines 243-531 (287 lines). Pattern enables practitioners to understand and verify hidden features through observable state (~/.claude/teams/ directory structure).
+
+*[2026-01-30]*: **Cross-Reference for New Concepts Pattern** - When adding new concepts that relate to existing patterns:
+1. **Bidirectional Linking with Context**: Both files explain relationship (new → existing, existing → new)
+2. **Update Connections Section**: 4-6 explicit relationship entries explaining conceptual bridges
+3. **Update Existing Pattern Content**: Inline context additions (not just appended links)
+4. **Preserve Link Symmetry**: Verify bidirectional references exist
+
+Evidence: Model-native swarm required 4 Connections updates + 2 inline sections in existing patterns (orchestrator-pattern.md, execution-topologies.md). Total ~160-180 lines across 4-6 files creates integrated knowledge web. Pattern: comprehensive new content (150+ lines) + targeted existing content updates (2-5 lines per related pattern).
+
 | If the insight relates to... | Store in... | Entry type |
 |------------------------------|-------------|------------|
 | The four pillars overview, leverage points | `chapters/1-foundations/` | Extend existing or new section file |

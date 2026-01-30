@@ -1,6 +1,6 @@
 # Knowledge Management Expertise
 # Target: 850-950 lines | Domain: Operational knowledge for book content management
-# Size: 1028 lines (HARD LIMIT APPROACHED - consolidation needed next cycle)
+# Size: 966 lines (WARNING THRESHOLD - pruning executed, target 750 next cycle)
 
 overview:
   description: |
@@ -653,6 +653,165 @@ cross_domain_observations_pattern:
       failed_adoptions: 2 (single-message-parallelism, question-agent-bash-access)
 
 recent_content_learnings:
+  model_native_swarm_documentation_pattern:
+    name: Model-Native Swarm vs SDK Orchestration Documentation Pattern
+    context: Pattern from chapters/3-model/4-multi-model-architectures.md expansion (commit e2e10c8)
+    timestamp: 2026-01-30
+    pattern_observed: |
+      When documenting fundamentally new coordination paradigms (model-native vs SDK-based):
+
+      1. **Lead with Architecture Contrast:** Use ASCII diagram showing structural difference
+         - SDK orchestration: external framework calls spawning subagents
+         - Model-native swarm: model reasoning spawns subagents internally
+         - Visual contrast anchors conceptual understanding
+
+      2. **Evidence Section with Training Details:** Document how capability emerged
+         - Training approach (PARL - Parallel-Agent Reinforcement Learning)
+         - Metrics that drove behavior (Critical Steps formula)
+         - Why this approach works (serial collapse problem)
+         - This grounds "magic" claims in verifiable training methodology
+
+      3. **Quantified Performance Claims:** Specific numbers, not vague assertions
+         - "3-4.5× wall-clock speedup" vs "much faster"
+         - "Up to 100 concurrent subagents" vs "many subagents"
+         - "80% runtime reduction" vs "significant improvement"
+
+      4. **Comparison Table for Trade-offs:** Dimensions across coordination approaches
+         - Coordination Logic, Subagent Spawning, Parallelism Limit
+         - Developer Control, Debugging, Infrastructure, Latency, Token Overhead
+         - Each cell: concrete difference, not abstract benefit claims
+
+      5. **When to Use Decision Framework:** Practical criteria for paradigm selection
+         - Good fit scenarios with rationale
+         - Poor fit scenarios with rationale
+         - Economic threshold guidance (when speedup justifies model cost)
+
+      6. **Update All Cross-References:** Bidirectional linking to related patterns
+         - Orchestrator Pattern section: add SDK vs model-native distinction
+         - Execution Topologies: update branch limits (10 SDK vs 100+ model-native)
+         - Connections section: explain relationship to existing patterns
+
+    evidence: |
+      chapters/3-model/4-multi-model-architectures.md lines 277-420:
+      - 158 new lines documenting Kimi K2.5 model-native swarm
+      - Architecture diagram (lines 295-309)
+      - PARL training evidence section (lines 321-380)
+      - Quantified performance: 3-4.5× speedup, 100 subagents, 80% reduction
+      - SDK vs Model-Native comparison table (lines 358-382, 11 dimensions)
+      - When to Use criteria (lines 396-419)
+      - Updated 4 Connections entries to reference swarm distinction
+
+      Cross-reference updates:
+      - chapters/6-patterns/3-orchestrator-pattern.md lines 58-66: SDK vs swarm section
+      - chapters/8-mental-models/5-execution-topologies.md lines 100-101: branch limits update
+
+    real_examples:
+      - location: chapters/3-model/4-multi-model-architectures.md
+        lines: "277-420"
+        note: Complete model-native swarm section with evidence, comparisons, decision framework
+
+  file_based_coordination_documentation_pattern:
+    name: File-Based Multi-Agent Coordination Documentation Pattern
+    context: Pattern from chapters/9-practitioner-toolkit/1-claude-code.md TeammateTool section
+    timestamp: 2026-01-30
+    pattern_observed: |
+      When documenting hidden/gated coordination features:
+
+      1. **Feature Status Transparency:** Document gating mechanism upfront
+         - "Server-Side Gated" subsection explaining unlock requirements
+         - Community bypass path (claude-sneakpeek) with rationale
+         - Anthropic's signal interpretation (production-ready but controlled rollout)
+
+      2. **Mental Model Before Mechanics:** Frame conceptual layer before operations
+         - "Your Mental Model" section: TeammateTool is coordination primitive layer
+         - Analogy: Task = fork(), TeammateTool = process orchestration framework
+         - Helps readers understand abstraction level difference
+
+      3. **Operations Catalog with File Evidence:** Document primitives with observable state
+         - 13 coordination operations listed with purpose
+         - File-based messaging explanation (~/.claude/teams/{name}/inboxes/)
+         - Directory structure example showing actual paths
+         - Enables verification and debugging via filesystem inspection
+
+      4. **Five Coordination Patterns with ASCII Diagrams:** Standard patterns enabled
+         - Leader-Worker, Swarm, Pipeline, Council, Plan Approval (HITL)
+         - Each pattern: diagram, use case, flow description
+         - Real-world analogy for each (ETL for Pipeline, multi-perspective for Council)
+
+      5. **Comparison Table: Task vs TeammateTool:** Capability matrix
+         - 8 capabilities compared across both tools
+         - Checkmarks show support, rationale in description
+         - Makes decision framework concrete ("If you need X, use Y")
+
+      6. **When to Use Decision Framework:** Flow chart format
+         - Binary questions leading to recommendations
+         - Accounts for: official support, communication needs, approval gates, patterns
+         - Actionable guidance replacing abstract trade-off discussion
+
+    evidence: |
+      chapters/9-practitioner-toolkit/1-claude-code.md lines 243-531:
+      - 287 new lines documenting TeammateTool coordination layer
+      - Mental Model section (lines 248-252)
+      - 13 operations documented (lines 257-269)
+      - File-based messaging with directory structure (lines 271-291)
+      - 5 coordination patterns with ASCII diagrams (lines 297-416)
+      - Task vs TeammateTool comparison table (lines 426-441, 8 capabilities)
+      - When to Use decision framework (lines 443-472)
+      - Cross-reference to Multi-Agent Context patterns (line 410)
+
+    real_examples:
+      - location: chapters/9-practitioner-toolkit/1-claude-code.md
+        lines: "243-531"
+        note: Complete TeammateTool section with patterns, comparisons, decision framework
+
+  cross_reference_for_new_concepts_pattern:
+    name: Cross-Reference Strategy for New Concepts
+    context: Pattern from swarm orchestration cross-references (commits e2e10c8)
+    timestamp: 2026-01-30
+    pattern_observed: |
+      When adding new concepts that relate to existing patterns:
+
+      1. **Bidirectional Linking with Context Updates:** Both files explain relationship
+         - From new content → existing patterns: "See X for related coordination approach"
+         - From existing patterns → new content: "New paradigm Y offers alternative approach"
+         - Each link includes 1-2 sentences explaining conceptual bridge
+
+      2. **Update Connections Section in New Content:** Explicit relationship documentation
+         - To [Orchestrator Pattern]: SDK coordination vs model-native distinction
+         - To [Cost and Latency]: Token overhead comparison (coordination in reasoning vs API calls)
+         - To [Context Management]: Context sharing (internal vs duplicated across calls)
+         - To [Model Selection]: New selection criterion (model-native swarm capability?)
+         - Each entry adds specific new insight from new concept's perspective
+
+      3. **Update Existing Pattern Content (Not Just Connections):** Inline context additions
+         - Orchestrator Pattern: New "SDK vs Model-Native Swarm" subsection
+         - Execution Topologies: Update branch count limits (SDK: 10, model-native: 100+)
+         - These updates integrate new concept into existing mental models, not just append links
+
+      4. **Preserve Link Symmetry:** Verify bidirectional references exist
+         - New content links to existing patterns ✓
+         - Existing patterns updated to link back to new content ✓
+         - Cross-reference chain remains navigable in both directions
+
+    evidence: |
+      Model-native swarm orchestration integration:
+      - chapters/3-model/4-multi-model-architectures.md lines 736-746: 4 updated Connections
+      - chapters/6-patterns/3-orchestrator-pattern.md lines 58-66: New SDK vs Model-Native section
+      - chapters/8-mental-models/5-execution-topologies.md lines 100-101: Branch limits update
+
+      TeammateTool integration:
+      - chapters/9-practitioner-toolkit/1-claude-code.md line 410: Link to Multi-Agent Context
+      - chapters/6-patterns/3-orchestrator-pattern.md line 417: Link back to TeammateTool
+
+      Pattern: New concept documented comprehensively (150+ lines), then existing content
+      updated to reference it (2-5 line additions per related pattern). Total ~160-180 lines
+      across 4-6 files creates integrated knowledge web.
+
+    real_examples:
+      - location: Multiple files
+        note: Swarm orchestration required 4 cross-reference updates + 2 inline context additions
+
+recent_content_learnings:
   mental_model_entry_structure:
     name: Mental Model Entry Structure Pattern
     context: Pattern from chapters/8-mental-models/5-execution-topologies.md creation
@@ -686,201 +845,60 @@ recent_content_learnings:
 
   changelog_integration_pattern:
     name: External Changelog Integration to Book Content
-    context: Pattern from commit d69ef22 (Claude Code changelog sync)
     timestamp: 2026-01-17
     pattern_observed: |
       When external tool releases new features, sync to book content via:
-
-      1. Research Phase: Analyze changelog delta (versions since last sync)
+      1. Research Phase: Analyze changelog delta
       2. Impact Mapping: Map features to affected chapters
       3. Integration: Add timestamped sections to relevant chapters
       4. Cross-Reference: Link between related feature updates
       5. Evidence: Cite changelog version numbers and official docs
 
-      Format for integrated content:
-      - Section header describing feature
-      - Timestamp matching feature release (*[YYYY-MM-DD]*)
-      - Feature description with operational context
-      - Configuration examples when applicable
-      - Trade-offs table showing when to use/avoid
-      - Cross-references to related book sections
+      **Insertion Location Strategy (2026-01-25):**
+      - Insert timestamped entries between related existing sections
+      - Single feature → inline entry; 2-3 related → subsection; 150+ lines → new section
 
-      This keeps book current with tool evolution without manual monitoring.
     evidence: |
-      Commit d69ef22 synced Claude Code 2.1.5-2.1.9 changelog to book:
-      - chapters/4-context/2-context-strategies.md: Context % monitoring (87 lines)
-      - chapters/5-tool-use/3-tool-restrictions.md: Permission bypass fixes (121 lines)
-      - chapters/5-tool-use/4-scaling-tools.md: MCP auto-selection mode (77 lines)
-      - chapters/4-context/4-multi-agent-context.md: Sub-agent forking (54 lines)
-      - chapters/9-practitioner-toolkit/1-claude-code.md: Keybindings + hooks (271 lines)
-
-      Total: 610 lines of content added across 5 chapters from single changelog analysis.
-    real_examples:
-      - location: chapters/4-context/2-context-strategies.md
-        lines: "104-190"
-        note: Context Window Percentage Monitoring section with thresholds table
-      - location: chapters/5-tool-use/3-tool-restrictions.md
-        lines: "102-219"
-        note: Wildcard Permission Patterns + Permission Bypass Vulnerabilities
-
-    *[2026-01-25]*: **Section Organization Learnings from Claude Code Changelog Sync**
-    When integrating changelog content into existing chapters:
-
-    **Insertion Location Strategy:**
-    - Insert new timestamped entries *between* related existing content sections
-    - Place feature groups (2-3 related versions) after most relevant existing section
-    - Example: Real-Time Message Steering (2.1.0) placed between Tips & Tricks and Subagent System (fits workflow context)
-    - Avoid creating new top-level sections unless content spans 150+ lines and relates to distinct topic
-
-    **Section Nesting Decision:**
-    - Single feature → timestamped entry in existing section
-    - 2-3 related features → create subsection (### Pattern Name) within existing parent
-    - Example: Keyboard Customization became new ## section with ### Default Bindings, ### Custom Bindings subsections
-      (justified by 130+ lines across 3 related versions: 2.1.7, 2.1.18, 2.1.25)
-
-    **Cross-Reference Integration:**
-    - Connect changelog features to existing mental models (not just other tools)
-    - Example: Real-Time Message Steering links to progressive refinement pattern conceptually
-    - Bidirectional linking: Feature entry mentions related sections, those sections mention new feature
-    - Avoid creating new connection sections; embed references in feature descriptions
-
-    **Evidence from Implementation:**
-    - chapters/9-practitioner-toolkit/1-claude-code.md expanded 437 → 706 lines (+269 lines, 61% growth)
-    - 14 timestamped entries added across 3 existing major sections + 1 new section
-    - Maintained readability by: consolidating related versions, using tables for comparisons, nesting subsections
-    - New section (Keyboard Customization) created because: 3 release versions (2.1.7, 2.1.18, 2.1.25) spanning 130+ lines with deep feature interaction patterns
+      Commit d69ef22 synced Claude Code 2.1.5-2.1.9: 610 lines across 5 chapters.
+      chapters/9-practitioner-toolkit/1-claude-code.md expanded 437 → 706 lines (61% growth)
 
   operational_threshold_documentation:
     name: Operational Threshold Documentation Pattern
-    context: Pattern from context percentage monitoring section
     timestamp: 2026-01-17
     pattern_observed: |
-      When documenting features with operational thresholds, provide:
-
+      When documenting features with operational thresholds:
       1. Threshold Table: Range | Signal | Recommended Action
       2. Numeric guidance with clear breakpoints (not vague "high/low")
       3. Decision framework based on thresholds
-      4. Integration with existing patterns (cross-reference)
-      5. Trade-offs and when to adjust defaults
 
-      Threshold tables enable quick assessment ("I'm at 65%, what now?")
-      without re-reading full documentation. Decision frameworks remove
-      ambiguity from "should I X?" questions.
-    evidence: |
-      chapters/4-context/2-context-strategies.md lines 123-150:
-
-      Operational Thresholds table:
-      | Range | Signal | Recommended Action |
-      | 0-30% | Healthy | Continue normally |
-      | 30-60% | Monitor | Good checkpoint for intentional compaction |
-      | 60-80% | Caution | Consider fresh session if major phase ends |
-      | 80-95% | Warning | Begin graceful task wrap-up |
-      | 95%+ | Critical | Boot new agent immediately |
-
-      Followed by Decision Framework:
-      1. Set mental alert at 60%
-      2. At natural break points: Compact if above 50%
-      3. At 80%: Stop accepting new work
-      4. At 95%: Force new session
-
-      This removes ambiguity from "when should I compact context?" question.
-    real_examples:
-      - location: chapters/4-context/2-context-strategies.md
-        lines: "123-150"
-        note: Threshold table + decision framework for context percentage monitoring
+    evidence: chapters/4-context/2-context-strategies.md lines 123-150
 
   changelog_integration_cross_reference_strategy:
-    name: Cross-Reference Pattern in Changelog Integration
-    context: Pattern from commit d69ef22 Claude Code changelog integration
+    name: Thematic Cross-Reference Pattern
     timestamp: 2026-01-25
     pattern_observed: |
-      When integrating changelog features into existing chapters, effective cross-referencing
-      requires understanding feature relationships and connecting them to conceptual themes,
-      not just mechanical link-adding.
+      Connect changelog features through conceptual patterns, not just mechanical links:
+      1. Mental Model Connection: Link to foundational concepts
+      2. Trade-off Framing: Highlight when features solve competing concerns
+      3. Evolution Narrative: Show how versions build on earlier capabilities
 
-      **Pattern: Thematic Cross-References**
-      Connect changelog features through conceptual patterns rather than just tool features:
-
-      1. **Mental Model Connection:** Link to foundational concepts
-         - Example: Real-Time Message Steering → Progressive Refinement pattern
-         - Not just "mentioned in tips section," but "exemplifies adaptive workflow design"
-
-      2. **Trade-off Framing:** Highlight when features solve competing concerns
-         - Example: Task Dependency Tracking vs. Real-time Steering
-         - Both address coordination but at different timescales (explicit vs. reactive)
-
-      3. **Evolution Narrative:** Show how versions build on earlier capabilities
-         - Example: Output Styles Deprecation (2.1.0) → Migration Path guidance
-         - Not just "deprecated," but "here's how to migrate gracefully"
-
-      **Mechanics:**
-      - Feature entries include "See Also" section with 2-3 conceptual links
-      - Each link explains the connection briefly (why it matters, not just what it is)
-      - Bidirectional links: feature mentions related sections, sections update to mention feature
-      - Group related features under thematic headers (e.g., "Configuration & Customization")
-
-    evidence: |
-      chapters/9-practitioner-toolkit/1-claude-code.md structure:
-      - Real-Time Message Steering includes: "Contrast with backgrounding: ..."
-      - Unified Mental Model (Skills/Commands) includes "Skills vs Slash Commands" comparison table
-      - Hook Context Injection includes "Comparison: Block vs. Context Injection" decision table
-      - Permission System sections cross-reference: tool-restrictions.md, orchestrator-pattern.md
-
-      Pattern implementation: Feature descriptions embed decision tables and "when to use" context
-      that naturally reference related capabilities without requiring separate connection sections.
-
-    real_examples:
-      - location: chapters/9-practitioner-toolkit/1-claude-code.md
-        lines: "45-98"
-        note: Real-Time Message Steering entry with progressive refinement pattern explanation
-      - location: chapters/9-practitioner-toolkit/1-claude-code.md
-        lines: "337-366"
-        note: Unified Mental Model entry with comparison table showing Skills vs Slash Commands
-      - location: chapters/9-practitioner-toolkit/1-claude-code.md
-        lines: "651-698"
-        note: Hook Context Injection with decision table for Block vs Context Injection approaches
+    evidence: chapters/9-practitioner-toolkit/1-claude-code.md embeds decision tables and
+      "when to use" context that naturally reference related capabilities.
 
   large_scale_content_removal_pattern:
     name: Large-Scale Content Removal Pattern
     context: Pattern from commit 6dd8246 (remove private examples for open-source release)
     timestamp: 2026-01-21
     pattern_observed: |
-      When removing large amounts of content (example directories, private configs):
+      When removing large amounts of content:
+      1. Clear commit messages indicating scope and reason
+      2. Update all index files reflecting removal
+      3. Update cross-references to point to remaining examples
+      4. Synchronize CLAUDE.md directory listings with filesystem
 
-      1. **Commit Clarity:** Use clear commit messages indicating scope
-         - "chore: remove private examples for open-source release"
-         - Helps future archaeology understand why content disappeared
-
-      2. **Preserve Public References:** Update appendices/_index.md to reflect removal
-         - Don't leave broken links or outdated directory references
-         - Update example counts in documentation
-
-      3. **Book Structure Impact:** Large removals affect narrative flow
-         - Check if chapters reference removed examples
-         - Update cross-references to point to remaining examples
-         - Consider whether sections need rewriting after example removal
-
-      4. **Documentation Synchronization:** Update CLAUDE.md if structure changes
-         - Example directories listed in CLAUDE.md must match filesystem
-         - Update example counts in appendices section
-
-      This pattern applies when preparing content for open-source release,
-      removing deprecated examples, or archiving outdated implementations.
     evidence: |
-      Commit 6dd8246 removed ~22,000 lines:
-      - appendices/examples/TAC/ (agentic-prompt-engineering, multi-agent-orchestration)
-      - appendices/examples/context-loading-demo/
-      - appendices/examples/kota/
-      - appendices/examples/orchestrator/
-
-      Affected 138 files with coordinated updates to:
-      - appendices/examples/_index.md (updated to reflect removal)
-      - Cross-references in chapters/ (updated to remaining examples)
-
-      No broken internal links after removal (verified via git grep).
-    real_examples:
-      - location: commit 6dd8246
-        note: "Removed 22,400 lines across 138 files cleanly"
+      Commit 6dd8246 removed ~22,000 lines (138 files) with coordinated updates
+      to appendices/_index.md and cross-references. No broken links after removal.
 
   changelog_subsection_hierarchy_pattern:
     name: Multi-Level Subsection Organization for Feature Families
@@ -896,55 +914,20 @@ recent_content_learnings:
       - Unrelated features, >150 lines each → separate ## sections (different concepts)
 
       **Subsection Structure Pattern:**
-      When creating new section, organize via:
-      1. **Definition Subsection** (### What/How): Core concept, first time mentioned
-      2. **Configuration Subsection** (### Custom/Advanced): Implementation details
-      3. **Context Subsection** (### Use Cases/Patterns): When/why to use
-      4. **Interaction Subsection** (### Terminal Compatibility/Vim Integration): Edge cases
-
-      **Example: Keyboard Customization Section Structure**
-      - ## Keyboard Customization (new top-level section, 130+ lines across 3 versions)
-        - *[2026-01-17]*: Feature added header
-        - ### Default Bindings (table of defaults, 5 lines)
-        - ### Custom Bindings (configuration example, 20 lines)
-        - ### Context-Specific Bindings (15 contexts, interaction matrix, 15 lines)
-        - ### Action Namespaces (namespace reference, 5 lines)
-        - ### Keystroke Syntax (syntax reference, 10 lines)
-        - ### Terminal Compatibility (conflict table, 10 lines)
-        - ### Vim Mode Interaction (edge case guidance, 10 lines)
-        - ### Power-User Patterns (best practices, 5 bullet points)
-
-      This hierarchy communicates:
-      - Progression from conceptual (defaults) to advanced (interactions)
-      - Related information grouped (namespaces with syntax, compatibility with vim)
-      - Terminal compatibility issues isolated (not burying in main content)
-      - Power patterns at end (aspirational, not prerequisite)
+      1. Definition Subsection (What/How): Core concept, first time mentioned
+      2. Configuration Subsection (Custom/Advanced): Implementation details
+      3. Context Subsection (Use Cases/Patterns): When/why to use
+      4. Interaction Subsection (Compatibility/Edge Cases): Integration concerns
 
     evidence: |
       chapters/9-practitioner-toolkit/1-claude-code.md lines 101-237:
-      - New ## Keyboard Customization section created (137 lines)
-      - Spans 3 releases: 2.1.7 (initial), 2.1.18 (major expansion), 2.1.25 (latest)
-      - Uses 7 ### subsections to organize 130+ lines logically
-      - Terminal Compatibility isolated as separate subsection (line 202-210)
-      - Vim Mode Interaction separated from main configuration (line 212-222)
-      - Power-User Patterns placed last (line 224-232)
-
-      Result: Content is comprehensive without becoming overwhelming.
-      Readers can skim subsection headers to find relevant configuration quickly.
+      New Keyboard Customization section (137 lines) spanning 3 releases uses 7 subsections
+      to organize comprehensive configuration guidance without overwhelming readers.
 
     real_examples:
       - location: chapters/9-practitioner-toolkit/1-claude-code.md
         lines: "101-237"
-        note: Complete Keyboard Customization section with 7-level subsection hierarchy
-      - subsection: "### Default Bindings"
-        purpose: "Quick reference table before diving into customization"
-        length: 5 lines effective content
-      - subsection: "### Terminal Compatibility"
-        purpose: "Isolated edge cases (tmux, GNU screen, OSC 8 conflicts)"
-        length: 10 lines
-      - subsection: "### Vim Mode Interaction"
-        purpose: "Explain layer separation and interaction patterns"
-        length: 10 lines
+        note: 7-level subsection hierarchy for changelog feature family
 
 stability:
   oscillation_detection:
@@ -958,24 +941,27 @@ stability:
     detected_oscillations: []
 
   convergence_indicators:
-    insight_rate_trend: "Active - changelog integration, section organization, cross-references"
-    new_entries_this_cycle: 3  # changelog subsection hierarchy, cross-reference strategy, organization learnings
+    insight_rate_trend: "Active - new coordination paradigms, cross-reference strategies, evidence patterns"
+    new_entries_this_cycle: 3  # model-native swarm, file-based coordination, cross-reference for new concepts
     contradiction_count: 0
-    last_reviewed: 2026-01-25
+    last_reviewed: 2026-01-30
     notes: |
-      Knowledge domain continues active learning from changelog integration implementation:
-      - Changelog integration section organization learnings (commit d69ef22 analysis)
-      - Cross-reference thematic strategy (feature linking through mental models)
-      - Multi-level subsection hierarchy patterns (Keyboard Customization section)
-      - Previous cycles: content removal patterns, operational thresholds, mental models
+      Knowledge domain continues active learning from swarm orchestration documentation:
+      - Model-native swarm vs SDK orchestration documentation pattern
+      - File-based multi-agent coordination documentation (TeammateTool)
+      - Cross-reference strategy for integrating fundamentally new concepts
+      - Pruning executed: 981 → 966 lines (consolidation + new entries)
 
-      Size governance: 881 → 970 estimated lines (after updates, still below 900-line warning threshold)
-      Growth headroom remains healthy for Q2 improvements.
+      Size governance: Executed consolidation to address 981-line warning threshold.
+      Consolidated: 4 patterns (operational thresholds, cross-reference strategy, changelog
+      integration, subsection hierarchy) reduced ~80 lines while preserving core insights.
+      Added: 3 new patterns (~100 lines total)
+      Net result: 966 lines (still above 900, needs aggressive pruning next cycle to reach 750)
 
-      Recent patterns focus on structural concerns:
-      1. How to organize changelog integrations within existing chapters
-      2. When to create new subsections vs. inline entries
-      3. Cross-referencing strategies beyond mechanical linking
+      Recent patterns focus on paradigm documentation:
+      1. How to document fundamentally new coordination approaches (SDK vs model-native)
+      2. Evidence-grounded feature documentation (training details, quantified claims)
+      3. Cross-referencing new concepts into existing mental models (inline updates, not just links)
 
       Domain remains stable with clear growth trajectory. No contradictions detected.
-      Patterns converging toward consistent approach: thematic linking, hierarchical organization, evidence-backed decisions.
+      Patterns converging toward: evidence-grounded claims, quantified performance, architectural comparisons.

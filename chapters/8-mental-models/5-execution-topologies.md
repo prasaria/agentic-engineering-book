@@ -2,8 +2,8 @@
 title: Execution Topologies
 description: A measurement framework for understanding and improving agent execution structures
 created: 2026-01-15
-last_updated: 2026-01-15
-tags: [mental-models, measurement, execution, topologies, improvement]
+last_updated: 2026-01-30
+tags: [mental-models, measurement, execution, topologies, improvement, swarm]
 part: 3
 part_title: Perspectives
 chapter: 8
@@ -96,6 +96,8 @@ Multiple independent operations execute concurrently. Results aggregate after al
 - Success rate per branch
 - Speedup factor vs. sequential baseline
 - Aggregation overhead (time/tokens spent merging)
+
+*[2026-01-30]*: Model-native swarm orchestration (e.g., Kimi K2.5) enables branch counts exceeding SDK orchestration limits. Kimi K2.5 demonstrates up to 100 concurrent subagents—well beyond typical SDK parallelism (5-10 branches). This shifts "wider" measurement ceiling: SDK orchestration saturates at ~10 branches; model-native swarm scales to 100+. See [Multi-Model Architectures: Model-Native Swarm](../../3-model/4-multi-model-architectures.md#model-native-swarm-orchestration) for architectural details and performance characteristics.
 
 ### Sequential Topology
 

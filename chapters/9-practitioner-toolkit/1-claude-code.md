@@ -2,8 +2,8 @@
 title: Claude Code
 description: Anthropic's CLI coding agent with subagents, Skills, and hooks
 created: 2025-12-08
-last_updated: 2026-01-17
-tags: [tools, claude-code, coding-agent, anthropic, slash-commands, expert-pattern, skills, orchestration, tool-restriction, hooks, sandbox, security]
+last_updated: 2026-01-30
+tags: [tools, claude-code, coding-agent, anthropic, slash-commands, expert-pattern, skills, orchestration, tool-restriction, hooks, sandbox, security, multi-agent, teammatetool, coordination]
 part: 3
 part_title: Perspectives
 chapter: 9
@@ -239,6 +239,289 @@ For now, design architectures that work within the flat model. The workarounds e
 **See Also**:
 - [Orchestrator Pattern](../6-patterns/3-orchestrator-pattern.md) — Design patterns for flat orchestration
 - [Multi-Agent Context](../4-context/4-multi-agent-context.md) — Managing context across agent boundaries
+
+---
+
+## TeammateTool: Native Multi-Agent Coordination (Hidden)
+
+*[2026-01-30]*: Claude Code ships with TeammateTool, a multi-agent coordination layer beyond the basic Task tool. This feature is server-side gated but unlockable via `claude-sneakpeek`.
+
+### Your Mental Model
+
+**TeammateTool is the coordination primitive layer that Task abstracts over.** Task provides "spawn and wait"; TeammateTool provides spawn, join, broadcast, plan approval, and structured messaging. The difference resembles `fork()` (Task) versus a full process orchestration framework (TeammateTool).
+
+### What It Provides
+
+**13 Coordination Operations:**
+
+TeammateTool exposes coordination primitives at a lower level than the Task tool:
+
+- **Spawn**: Create new teammate agents with role definitions
+- **Join**: Wait for specific teammates to complete
+- **Write**: Send message to specific teammate's inbox
+- **Broadcast**: Send message to all teammates
+- **Plan Approval**: Explicit human-in-the-loop gate
+- **Shutdown**: Graceful team termination
+- **List**: Enumerate active teammates
+- **Status**: Query teammate execution state
+
+Additional operations exist in the codebase but remain undocumented in public materials.
+
+**File-Based Messaging:**
+
+Teams communicate via `~/.claude/teams/{name}/inboxes/` directory structure. Each teammate has an inbox; coordinators write messages, teammates read and process. This filesystem-based approach enables:
+
+- Inspection of messages mid-execution (debugging)
+- Persistence across session restarts
+- Simple coordination semantics (write file = send message)
+- Observable state for monitoring tools
+
+**Example directory structure:**
+```
+~/.claude/teams/research-team/
+├── inboxes/
+│   ├── researcher-1/
+│   │   ├── message-001.json
+│   │   └── message-002.json
+│   ├── researcher-2/
+│   │   └── message-001.json
+│   └── coordinator/
+│       └── message-001.json
+```
+
+**Spawn Backends:**
+
+| Backend | Use Case | Trade-offs |
+|---------|----------|------------|
+| `in-process` | Fast, isolated contexts within session | Limited to Claude Code session lifecycle; no visual isolation |
+| `tmux` | Persistent, observable via tmux sessions | Requires tmux installed; higher overhead; visible across session restarts |
+| `iterm2` | Visual tabs for each teammate | macOS-only; requires iTerm2; visual debugging support |
+
+### Coordination Patterns Enabled
+
+TeammateTool enables five coordination patterns documented in the implementation:
+
+**1. Leader-Worker**
+
+```
+┌──────────┐
+│  Leader  │
+└─────┬────┘
+      │ Spawn N workers
+      ├─────────┬─────────┬─────────┐
+      ▼         ▼         ▼         ▼
+   Worker1  Worker2  Worker3  Worker4
+      │         │         │         │
+      │ Write results back to leader  │
+      └─────────┴─────────┴─────────┘
+                  │
+                  ▼ Join (wait for all)
+             ┌──────────┐
+             │  Leader  │
+             │ Synthesis│
+             └──────────┘
+```
+
+Leader spawns N workers, distributes work via Write, collects results via Join. Common for parallel data processing, batch operations, or distributed search.
+
+**2. Swarm**
+
+```
+┌──────────────────────────────────┐
+│         Broadcast (all)          │
+└──────────┬───────────────────────┘
+           │
+    ┌──────┼──────┬──────┬──────┐
+    ▼      ▼      ▼      ▼      ▼
+  Peer1  Peer2  Peer3  Peer4  Peer5
+    │      │      │      │      │
+    │  Local rules + emergent behavior  │
+    └──────┴──────┴──────┴──────┘
+```
+
+N peers spawned simultaneously, Broadcast coordinates, emergent behavior from local rules. No central coordinator after initialization; agents self-organize based on shared state.
+
+**3. Pipeline**
+
+```
+Agent A ──Write──> Agent B ──Write──> Agent C ──Write──> Agent D
+  │                   │                   │                   │
+  └─── Process ───────└─── Transform ────└─── Enrich ────────└─── Finalize
+```
+
+Sequential processing where each agent completes before next begins. Agent A writes to Agent B's inbox, B processes and writes to C's inbox, etc. Classic ETL pattern for multi-stage transformations.
+
+**4. Council**
+
+```
+         ┌──────────────┐
+         │   Arbiter    │
+         └──────┬───────┘
+                │ Broadcast question
+       ┌────────┼────────┬────────┐
+       ▼        ▼        ▼        ▼
+   Security  Perf   UX      Legal
+   Expert   Expert Expert  Expert
+       │        │        │        │
+       │   Write responses back   │
+       └────────┴────────┴────────┘
+                │
+                ▼ Join + synthesize
+         ┌──────────────┐
+         │   Arbiter    │
+         │  Final rec   │
+         └──────────────┘
+```
+
+Spawn domain experts, Broadcast question, collect responses, synthesize with arbiter. Enables multi-perspective analysis without requiring experts to coordinate directly.
+
+**5. Plan Approval (HITL)**
+
+```
+┌──────────┐
+│ Planner  │
+└─────┬────┘
+      │ Generate spec
+      ▼
+┌──────────────┐
+│ Plan Approval│ ◄── Human reviews
+│   (blocks)   │
+└──────┬───────┘
+       │ Approved
+       ▼
+┌──────────┐
+│ Builder  │
+└──────────┘
+```
+
+Planning agent generates spec, Plan Approval tool blocks execution until human reviews, execution proceeds after approval. Implements human-in-the-loop gate as a first-class coordination primitive.
+
+### Architectural Significance
+
+TeammateTool indicates Anthropic's thinking on multi-agent coordination:
+
+**Three-Tier Hierarchy:**
+
+1. **Task tool** - Simple delegation, return-only communication. Agent spawns subagent, waits for completion, receives result.
+2. **Subagents** - Context isolation, parallel execution. Multiple Tasks in single message enable concurrency.
+3. **TeammateTool** - Full coordination layer: messaging, waiting, approval gates, structured communication.
+
+The feature's existence in production code suggests the Claude Agent SDK is evolving beyond simple delegation toward structured multi-agent orchestration primitives.
+
+**Comparison: Task vs TeammateTool**
+
+| Capability | Task | TeammateTool |
+|------------|------|--------------|
+| Spawn agents | ✓ | ✓ |
+| Wait for completion | ✓ (implicit) | ✓ (explicit via Join) |
+| Send messages | ✗ | ✓ (Write, Broadcast) |
+| Selective waiting | ✗ | ✓ (Join specific agents) |
+| Human approval gates | ✗ | ✓ (Plan Approval) |
+| Graceful shutdown | ✗ | ✓ (Shutdown) |
+| Inspect running agents | ✗ | ✓ (List, Status) |
+| Backend selection | ✗ | ✓ (in-process, tmux, iterm2) |
+
+TeammateTool provides significantly richer coordination semantics at the cost of explicit orchestration complexity.
+
+### Relationship to Existing Patterns
+
+**Plan Approval Alignment:**
+
+The built-in Plan Approval operation matches the plan→build→improve cycle. TeammateTool makes this pattern a first-class coordination primitive rather than emergent workflow. Human review becomes an explicit coordination step, not a workflow convention.
+
+**Context Isolation:**
+
+TeammateTool teammates maintain separate contexts like subagents but add structured communication. This solves the "how do agents coordinate without passing full contexts" problem—messages stay in inboxes, not shared context windows.
+
+**Nesting Constraint Bypass:**
+
+Unlike Task (unavailable to subagents), TeammateTool operates at a lower level. Whether teammates spawned via TeammateTool can themselves use TeammateTool remains undocumented. The feature's architecture suggests nested teams might be possible, but no confirmation exists.
+
+**Connection to Multi-Agent Context Patterns:**
+
+File-based messaging implements [Message Passing](../4-context/4-multi-agent-context.md) without context pollution. Each agent reads only messages addressed to it, preventing the context bloat common in shared-state coordination. See [Multi-Agent Context](../4-context/4-multi-agent-context.md) for context management strategies across agent boundaries.
+
+### Feature Flag Status
+
+**Server-Side Gated:**
+
+TeammateTool ships with Claude Code but requires server-side feature flags to activate. The tool is not accessible via standard configuration files or environment variables. This gating suggests production-ready code held back for controlled rollout.
+
+**Community Unlock:**
+
+The `claude-sneakpeek` tool bypasses gating for experimental access. This unofficial unlock path enables practitioner exploration before official release. The existence of a community bypass indicates:
+
+1. Code is sufficiently stable for external testing
+2. Anthropic is open to early adopter feedback
+3. Broader release likely as SDK matures
+
+**Anthropic's Signal:**
+
+Shipping but gating suggests: (1) code is production-ready, (2) rollout is strategic/controlled, (3) broader release likely as SDK matures. The timing aligns with the Claude Code SDK rename to Claude Agent SDK (late 2025), indicating multi-agent coordination is a core strategic direction.
+
+### When to Use TeammateTool vs Task
+
+**Use Task when:**
+
+- Simple delegation suffices (spawn, wait, return)
+- Agents work independently without coordination
+- Official support and stability required
+- Minimal coordination complexity preferred
+
+**Use TeammateTool when:**
+
+- Agents need to communicate during execution
+- Selective waiting (Join specific agents, not all)
+- Human approval gates required (Plan Approval)
+- Visual debugging needed (tmux, iterm2 backends)
+- Exploring cutting-edge coordination patterns
+
+**Decision Framework:**
+
+```
+Is this officially supported? ──No──> Use Task (safer for production)
+                │
+               Yes
+                │
+Do agents need to communicate? ──No──> Use Task (simpler)
+                │
+               Yes
+                │
+Is human approval required? ──Yes──> TeammateTool (Plan Approval)
+                │
+               No
+                │
+Do agents run sequentially? ──Yes──> Consider Pipeline pattern
+                │
+               No
+                │
+Multiple perspectives needed? ──Yes──> Consider Council pattern
+                │
+               No
+                │
+Default: Use TeammateTool ──> Enable richer coordination
+```
+
+### Open Questions
+
+- Which coordination operations beyond the 8 identified exist in the codebase?
+- Can TeammateTool teammates spawn nested teams?
+- How does file-based messaging scale to 10+ teammates writing concurrently?
+- What happens when inboxes fill—overflow behavior, message ordering guarantees?
+- Will TeammateTool remain CLI-specific or migrate to Claude Agent SDK?
+- How does Plan Approval integrate with the hooks system?
+- What happens if a teammate crashes while holding unprocessed messages?
+- Do backends (tmux, iterm2) affect coordination semantics or just observability?
+- What monitoring/observability tools exist for team coordination beyond filesystem inspection?
+
+### Sources
+
+- Claude Code codebase analysis (TeammateTool implementation)
+- `claude-sneakpeek` community unlock tool
+- Claude Agent SDK rename announcement (late 2025)
+- Filesystem observations of `~/.claude/teams/` structure
+
+---
 
 ### Defining Subagents
 

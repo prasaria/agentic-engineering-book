@@ -2,8 +2,8 @@
 title: Multi-Model Architectures
 description: When and how to use multiple models in agent systems—orchestrator patterns, cascades, routing strategies, and planning versus execution separation
 created: 2025-12-10
-last_updated: 2025-12-10
-tags: [model, multi-model, orchestrator, cascade, routing, agentic]
+last_updated: 2026-01-30
+tags: [model, multi-model, orchestrator, cascade, routing, agentic, swarm]
 part: 1
 part_title: Foundations
 chapter: 3
@@ -273,6 +273,150 @@ The improvement came from specialization. Planning models focused on decompositi
 The cost savings came from volume. Execution steps outnumber planning steps 5-10×. Using a cheap model for the high-volume phase cut costs while preserving quality through better planning.
 
 **Source:** [Planning-Execution Separation in LLM Workflows](https://arxiv.org/abs/2406.12582)
+
+---
+
+## Model-Native Swarm Orchestration
+
+*[2026-01-30]*: Moonshot AI's Kimi K2.5 introduced model-native swarm orchestration—a 1 trillion parameter MoE model that spawns and coordinates multiple subagents internally rather than through external framework code.
+
+Unlike SDK-based orchestration patterns (LangGraph, AutoGen, Claude Code's Task tool), Kimi K2.5 embeds coordination logic within the model's reasoning itself. The model decides when to parallelize, spawns subagents dynamically, and synthesizes results—all as trained behavior rather than prompted instructions.
+
+This architectural shift moves orchestration from application layer to model capability. Instead of writing coordination code, developers provide tasks and the model handles decomposition, parallel execution, and synthesis autonomously.
+
+### The Pattern
+
+```
+┌─────────────────────────────────────────────────┐
+│   Main Agent (Kimi K2.5)                        │
+│   - Receives task                               │
+│   - Decides: sequential or parallel?            │
+│   - Spawns subagents if beneficial              │
+│   - Synthesizes results                         │
+└─────────────────────────────────────────────────┘
+                     │
+    ┌────────────────┼────────────────┬────────────┐
+    ▼                ▼                ▼            ▼
+┌─────────┐    ┌─────────┐    ┌─────────┐   ...  ┌─────────┐
+│Subagent │    │Subagent │    │Subagent │        │Subagent │
+│   #1    │    │   #2    │    │   #3    │        │  #100   │
+└─────────┘    └─────────┘    └─────────┘        └─────────┘
+    │                │                │                │
+    └────────────────┴────────────────┴────────────────┘
+                          ▼
+           ┌─────────────────────────────┐
+           │   Main Agent synthesizes     │
+           │   all subagent outputs       │
+           └─────────────────────────────┘
+```
+
+The model spawns up to 100 concurrent subagents for complex tasks. Each subagent executes independently with its own tool access. The main agent coordinates execution, tracks dependencies, and combines outputs—all without external orchestration framework.
+
+### Evidence: PARL Training and Critical Steps
+
+Kimi K2.5's orchestration capability comes from Parallel-Agent Reinforcement Learning (PARL)—a training approach that rewards parallelization only when it reduces wall-clock completion time.
+
+**The Serial Collapse Problem:**
+Models trained on sequential demonstrations default to single-agent execution even when parallel execution would be faster. They learn "solve step A, then B, then C" rather than "identify independent steps and execute concurrently."
+
+PARL addresses this through the **Critical Steps** metric:
+
+```
+CriticalSteps = Σ(Smain(t) + max_i(Ssub,i(t)))
+```
+
+Where:
+- `Smain(t)` = steps taken by main agent at time t
+- `max_i(Ssub,i(t))` = maximum steps taken by any subagent at time t
+- Sum across all timesteps in task completion
+
+This metric counts only steps along the critical path—the longest sequential dependency chain. Parallelization reduces Critical Steps when independent subtasks execute concurrently. Sequential execution keeps Critical Steps high even with many subagents.
+
+**Training Reward:**
+The model receives higher reward for solutions with lower Critical Steps count. This incentivizes identifying parallelizable work and spawning subagents appropriately, while avoiding unnecessary parallelization when tasks have strict sequential dependencies.
+
+### Performance: 80% Runtime Reduction
+
+*[2026-01-30]*: Moonshot AI reports Kimi K2.5 achieves 3-4.5× wall-clock speedup on complex tasks through model-native swarm orchestration.
+
+**Quantified results:**
+- **Runtime reduction:** Up to 80% on tasks with high parallelization potential
+- **Wall-clock improvement:** 3-4.5× faster completion vs. sequential execution
+- **Scalability:** 100 concurrent subagents demonstrated
+- **Tool calls:** 1500+ parallel tool invocations in complex workflows
+
+**Example scenario (complex research task):**
+- Sequential execution: 45 minutes (single agent, 120 steps)
+- Model-native swarm: 10 minutes (1 main agent + 40 subagents, 28 Critical Steps)
+- Speedup: 4.5× faster
+
+The gains scale with task parallelizability. Tasks with strict sequential dependencies see minimal improvement. Tasks with many independent subtasks (multi-source research, parallel analysis, bulk processing) benefit most.
+
+**Source:** Moonshot AI technical documentation (January 2026)
+
+### Comparison: SDK Orchestration vs. Model-Native Swarm
+
+| Dimension | SDK Orchestration | Model-Native Swarm |
+|-----------|-------------------|-------------------|
+| **Coordination Logic** | External framework code (LangGraph, AutoGen) | Model reasoning (trained behavior) |
+| **Subagent Spawning** | Explicit API calls or Task tool invocations | Model decision during generation |
+| **Parallelism Limit** | Framework/infrastructure constraints (5-10) | Model capacity constraints (100+) |
+| **Developer Control** | High (explicit routing, handoffs) | Medium (prompt guidance, not code) |
+| **Debugging** | Trace through coordination code | Inspect model reasoning traces |
+| **Infrastructure** | Requires orchestration layer | Single model API endpoint |
+| **Latency Overhead** | Framework coordination + network calls | Model-internal coordination only |
+| **Token Overhead** | Context duplication across agents | Shared context in model memory |
+| **Adaptability** | Fixed coordination logic | Dynamic parallelization decisions |
+| **Implementation** | Write coordination code | Write task prompts |
+
+**Key distinction:** SDK orchestration separates planning from execution through code. Model-native swarm embeds both in trained model behavior. This trades explicit control for learned efficiency.
+
+### Trade-offs
+
+**Autonomy vs. Control:**
+The model decides when and how to parallelize. Developers provide guidance through prompts but cannot enforce specific coordination strategies. This autonomy enables adaptive parallelization but reduces determinism for workflows requiring precise execution order.
+
+**Debuggability:**
+SDK orchestration exposes coordination logic in traceable code. Model-native swarm embeds coordination in model reasoning, making it harder to inspect decision-making. Debugging requires analyzing model traces rather than stepping through framework code.
+
+**Token Efficiency:**
+Model-native swarm potentially reduces token overhead by sharing context internally rather than duplicating across API calls. However, coordination still consumes tokens—the model must reason about task decomposition, subagent allocation, and result synthesis.
+
+**Infrastructure Simplicity:**
+Eliminates orchestration framework, reducing deployment complexity. Trade-off: couples orchestration capability to specific model families. Applications cannot switch models without rebuilding coordination layer.
+
+**Quality Variance:**
+Trained coordination behavior may vary across similar tasks. SDK orchestration produces identical coordination decisions for identical inputs. Model-native swarm may decompose tasks differently based on subtle prompt variations.
+
+### When to Use Model-Native Swarm
+
+**Good fit:**
+- Model supports native swarm capability (currently limited to Kimi K2.5)
+- Tasks benefit from dynamic parallelization (model determines optimal decomposition)
+- Willing to trade explicit control for autonomous coordination
+- High parallelization potential (research, analysis, bulk processing)
+- Trust model's coordination decisions based on validation
+
+**Poor fit:**
+- Requires deterministic coordination (regulatory, safety-critical)
+- Complex handoff logic between subtasks (stateful workflows)
+- Need to switch models frequently (tight coupling to model family)
+- Low parallelization potential (inherently sequential tasks)
+- Debugging and observability are critical requirements
+
+**Economic threshold:**
+Model-native swarm makes sense when parallelization speedup (3-4.5×) exceeds the cost of running larger model with swarm capability versus smaller model with SDK orchestration. Calculate total cost including model inference and infrastructure.
+
+### Open Questions
+
+- How do model-native swarms compare to SDK orchestration on identical tasks for cost, latency, and output quality?
+- What debugging patterns emerge for inspecting coordination decisions embedded in model reasoning?
+- How does prompt engineering change when orchestration is a trained capability rather than instructed behavior?
+- Will future models (GPT-5, Claude Opus 5) adopt model-native swarm, or is this approach model-family-specific?
+- What's the optimal abstraction for developers: expose swarm controls via API parameters, or treat as internal model behavior?
+- How does Critical Steps metric extend to workflows with probabilistic dependencies or conditional branching?
+
+---
 
 ### Structured Intermediate Representations
 
@@ -589,12 +733,12 @@ Assuming cheap models will self-report failures or users will catch errors.
 
 ## Connections
 
-- **To [Orchestrator Pattern](../6-patterns/3-orchestrator-pattern.md):** Multi-model architectures often use orchestration patterns. The orchestrator coordinates specialist models just as it coordinates specialist agents. Single-message parallelism applies to multi-model calls—invoke multiple models concurrently rather than sequentially.
+- **To [Orchestrator Pattern](../6-patterns/3-orchestrator-pattern.md):** Multi-model architectures often use orchestration patterns. The orchestrator coordinates specialist models just as it coordinates specialist agents. Single-message parallelism applies to multi-model calls—invoke multiple models concurrently rather than sequentially. Model-native swarm orchestration represents a shift from SDK-based coordination to trained model behavior.
 
-- **To [Cost and Latency](../7-practices/3-cost-and-latency.md):** Multi-model architectures are cost optimization strategies. The 15× token overhead in orchestrator-specialist patterns trades tokens for quality. Model cascades trade latency for cost. Understanding these trade-offs shapes architectural decisions.
+- **To [Cost and Latency](../7-practices/3-cost-and-latency.md):** Multi-model architectures are cost optimization strategies. The 15× token overhead in orchestrator-specialist patterns trades tokens for quality. Model cascades trade latency for cost. Model-native swarm orchestration reduces coordination overhead by embedding parallelization in model reasoning rather than external framework calls.
 
-- **To [Context Management](../4-context/_index.md):** Context window size varies across model tiers. Haiku supports shorter context than Opus. Multi-model routing must account for context limits—complex requests with large context may require frontier models regardless of task complexity.
+- **To [Context Management](../4-context/_index.md):** Context window size varies across model tiers. Haiku supports shorter context than Opus. Multi-model routing must account for context limits—complex requests with large context may require frontier models regardless of task complexity. Model-native swarm shares context internally rather than duplicating across API calls, potentially reducing total token consumption.
 
-- **To [Model Selection](1-model-selection.md):** Single-model selection focuses on capability matching. Multi-model architectures add routing logic that selects models dynamically based on request characteristics, enabling optimization across cost, latency, and capability dimensions simultaneously.
+- **To [Model Selection](1-model-selection.md):** Single-model selection focuses on capability matching. Multi-model architectures add routing logic that selects models dynamically based on request characteristics, enabling optimization across cost, latency, and capability dimensions simultaneously. Model-native swarm capability introduces a new selection criterion: does the model support autonomous parallel orchestration?
 
-- **To [Evaluation](../7-practices/2-evaluation.md):** Multi-model systems require evaluation at the architecture level, not just model level. Test routing accuracy, quality gate precision, and end-to-end performance across model transitions.
+- **To [Evaluation](../7-practices/2-evaluation.md):** Multi-model systems require evaluation at the architecture level, not just model level. Test routing accuracy, quality gate precision, and end-to-end performance across model transitions. Model-native swarm systems require evaluating coordination quality—whether the model parallelizes appropriately and synthesizes results correctly.

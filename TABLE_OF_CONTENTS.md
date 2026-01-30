@@ -1,6 +1,6 @@
 # Table of Contents
 
-*Generated: 2026-01-15*
+*Generated: 2026-01-30*
 
 ---
 
@@ -66,6 +66,7 @@ Recurring architectures and approaches for building agentic systems
 - [Plan-Build-Review Pattern](chapters/6-patterns/1-plan-build-review.md)
 - [Self-Improving Expert Commands](chapters/6-patterns/2-self-improving-experts.md)
 - [Orchestrator Pattern](chapters/6-patterns/3-orchestrator-pattern.md)
+- [Autonomous Loops (Ralph Wiggum)](chapters/6-patterns/4-autonomous-loops.md)
 
 ### Chapter 7: Practices
 

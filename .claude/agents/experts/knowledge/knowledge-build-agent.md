@@ -298,6 +298,38 @@ This removes ambiguity from "when should I X?" questions. Example: chapters/4-co
 *[2026-01-17]*: External changelog integration pattern from commit d69ef22. When external tool releases features, sync to book via:
 1. Research Phase: Analyze changelog delta (versions since last sync)
 2. Impact Mapping: Map features to affected chapters
+3. Integration: Add timestamped sections with configuration examples and trade-off tables
+4. Cross-Reference: Link features to existing mental models (not just other tools)
+
+Evidence: Commit d69ef22 synced Claude Code 2.1.5-2.1.9, adding 610 lines across 5 chapters. Insertion strategy: single feature → inline entry; 2-3 related → subsection; 150+ lines → new section.
+
+*[2026-01-30]*: **Paradigm Comparison Documentation** - When documenting fundamentally different coordination approaches:
+1. Lead with ASCII diagram showing architectural contrast (external framework vs model-internal)
+2. Include Evidence Section documenting training methodology (how capability emerged)
+3. Use quantified performance claims (3-4.5× speedup, not "much faster")
+4. Comparison table covering 8-11 dimensions (coordination, debugging, infrastructure, etc.)
+5. Decision framework: good fit vs poor fit scenarios with economic thresholds
+
+Implementation: chapters/3-model/4-multi-model-architectures.md lines 277-420 documents SDK orchestration vs model-native swarm. Structure grounds claims in verifiable training details (PARL, Critical Steps metric) while providing practical selection guidance.
+
+*[2026-01-30]*: **Hidden Feature Documentation** - For server-gated features like TeammateTool:
+1. Feature Status Transparency: Document gating mechanism and bypass path upfront
+2. Mental Model Before Mechanics: Frame abstraction level difference (fork vs orchestration framework)
+3. Operations Catalog: Document primitives with observable filesystem paths for verification
+4. Pattern Templates: Provide 5 standard coordination patterns (Leader-Worker, Swarm, Pipeline, Council, HITL) with ASCII diagrams
+5. Capability Comparison Table: Task vs TeammateTool across 8 dimensions
+6. Flow Chart Decision Framework: Binary questions leading to tool recommendations
+
+Implementation: chapters/9-practitioner-toolkit/1-claude-code.md lines 243-531. Enables verification through observable state (~/.claude/teams/ directory structure) and provides actionable pattern selection guidance.
+
+*[2026-01-30]*: **Bidirectional Cross-Reference Implementation** - When integrating new concepts:
+1. Add Connections section to new content with 4-6 relationship entries
+2. Update existing pattern content with inline sections (not just appended links)
+3. Each link includes 1-2 sentences explaining conceptual bridge
+4. Verify symmetry: new → existing links + existing → new links
+
+Example: Model-native swarm integration required 4 Connections entries in new content + inline sections in orchestrator-pattern.md (SDK vs Model-Native subsection) and execution-topologies.md (branch limit updates). Total: 150+ lines new content + 2-5 lines per related pattern.
+2. Impact Mapping: Map features to affected chapters
 3. Integration: Add timestamped sections to relevant chapters with format:
    - Section header describing feature
    - Timestamp matching release (*[YYYY-MM-DD]*)

@@ -2,8 +2,8 @@
 title: Orchestrator Pattern
 description: Hub-and-spoke coordination of specialized sub-agents in a single workflow
 created: 2025-12-08
-last_updated: 2026-01-21
-tags: [patterns, multi-agent, orchestration, coordination, tool-restriction]
+last_updated: 2026-01-30
+tags: [patterns, multi-agent, orchestration, coordination, tool-restriction, swarm]
 part: 2
 part_title: Craft
 chapter: 6
@@ -54,6 +54,16 @@ This is the critical insight: parallelism is achieved at the message level, not 
 **How you scale multi-agent work**: Spawn all independent agents in a single message rather than sequential messages. This isn't just about orchestrators—it's the fundamental pattern for parallelizing any multi-agent work. Three Task calls in one message execute concurrently. Three Task calls across three messages execute sequentially. The difference compounds: 10 agents in parallel complete in roughly the same wall-clock time as 1 agent; 10 agents serialized take 10× longer.
 
 **Sources**: [Anthropic: How we built our multi-agent research system](https://www.anthropic.com/engineering/multi-agent-research-system), [Subagents - Claude Code Docs](https://docs.claude.com/en/docs/claude-code/sub-agents)
+
+### SDK Orchestration vs. Model-Native Swarm
+
+*[2026-01-30]*: The orchestration patterns described here assume SDK-level coordination—external code or tools (Task, LangGraph, AutoGen) manage agent spawning and result synthesis. Kimi K2.5 introduced an alternative: model-native swarm orchestration.
+
+**Key distinction:** SDK orchestration uses explicit tool calls to spawn subagents. The orchestrator invokes Task tools, waits for responses, and synthesizes results through framework code. Model-native swarm embeds orchestration within the model's reasoning—the model decides when to parallelize, spawns subagents internally, and coordinates execution through trained behavior rather than prompted instructions.
+
+**Trade-off:** SDK orchestration provides explicit control and traceable coordination logic. Model-native swarm offers autonomous parallelization and potentially lower coordination overhead, but reduces visibility into orchestration decisions and couples workflows to specific model families.
+
+**See:** [Multi-Model Architectures: Model-Native Swarm Orchestration](../../3-model/4-multi-model-architectures.md#model-native-swarm-orchestration) for detailed comparison, including PARL training approach, Critical Steps metric, and performance characteristics (100+ subagents, 3-4.5× speedup).
 
 ### Dependency-Aware Batching
 
@@ -404,3 +414,4 @@ Claude Code achieves similar patterns through discipline (single-message paralle
 - [Google ADK](../9-practitioner-toolkit/2-google-adk.md) - framework with native workflow primitives
 - [Context: Multi-Agent Context Isolation](../4-context/_index.md#multi-agent-context-isolation) - the foundational context management strategy that makes orchestration viable
 - [Context Loading Demo](../../appendices/examples/context-loading-demo/README.md) - minimal example showing context payload construction and verification layer
+- [Claude Code: TeammateTool](../9-practitioner-toolkit/1-claude-code.md#teammatetool-native-multi-agent-coordination-hidden) - Native implementation of coordination primitives (spawn, join, broadcast, plan approval) discussed abstractly in this pattern. Hidden feature providing file-based messaging and five coordination patterns (Leader-Worker, Swarm, Pipeline, Council, Plan Approval).
