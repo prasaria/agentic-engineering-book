@@ -62,7 +62,7 @@ This balances discoverability (agent knows what's possible) with context efficie
 **In Practice**: Claude Code implements this with a skills library—data analysis, git operations, debugging, etc. Each skill packages domain expertise as injectable context rather than requiring separate specialized agents.
 
 **See Also**:
-- [Context: Progressive Disclosure](../4-context/_index.md#progressive-disclosure-pattern) — Managing context window through layered information
+- [Context: Progressive Disclosure](../4-context/3-context-patterns.md#progressive-disclosure-pattern) — Managing context window through layered information
 - [Claude Code: Skills System](../9-practitioner-toolkit/1-claude-code.md#skills-system) — Concrete implementation in production
 - [Prompt](../2-prompt/_index.md) — Model-invoked vs user-invoked patterns for skill activation
 

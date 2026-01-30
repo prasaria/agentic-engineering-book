@@ -38,7 +38,7 @@ Patterns for managing large numbers of tools without overwhelming context or deg
 **Decision Point**: If you're managing <20 simple tools, eager loading is fine. If you're connecting MCP servers with dozens of endpoints each, dynamic discovery becomes essential.
 
 **See Also**:
-- [Context: Progressive Disclosure](../4-context/_index.md#progressive-disclosure-pattern) — The underlying pattern for tiered information loading
+- [Context: Progressive Disclosure](../4-context/3-context-patterns.md#progressive-disclosure-pattern) — The underlying pattern for tiered information loading
 - [Cost and Latency](../7-practices/3-cost-and-latency.md) — Token cost implications of discovery vs. eager loading
 
 **Source**: [Advanced Tool Use - Anthropic](https://www.anthropic.com/engineering/advanced-tool-use)
@@ -74,7 +74,7 @@ Patterns for managing large numbers of tools without overwhelming context or deg
 - Tasks requiring agent reasoning between each tool call
 
 **See Also**:
-- [Context: Multi-Agent Context Isolation](../4-context/_index.md#multi-agent-context-isolation) — Related pattern for preventing context pollution through agent boundaries
+- [Context: Multi-Agent Context Isolation](../4-context/4-multi-agent-context.md#multi-agent-context-isolation) — Related pattern for preventing context pollution through agent boundaries
 - [Cost and Latency: Token Cost Models](../7-practices/3-cost-and-latency.md#token-cost-models-by-feature-type) — How programmatic orchestration compares to other approaches
 
 **Source**: [Advanced Tool Use - Anthropic](https://www.anthropic.com/engineering/advanced-tool-use)

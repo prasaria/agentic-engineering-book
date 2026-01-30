@@ -65,7 +65,7 @@ Traditional software logs after the fact. Hooks let platforms observe themselves
 **Implementation Pattern**: Wire PostToolUse hooks to write structured logs (JSON) containing tool name, parameters, results, duration, and cost estimates. Aggregate these logs for operational dashboards showing agent activity in real-time.
 
 **See Also**:
-- [Tool Use: Lifecycle Hooks](../5-tool-use/_index.md#tool-restrictions-as-security-boundaries) — How hooks integrate with tool permission boundaries
+- [Tool Use: Tool Restrictions as Security Boundaries](../5-tool-use/3-tool-restrictions.md#tool-restrictions-as-security-boundaries) — How hooks integrate with tool permission boundaries
 - [Claude Code Hooks Documentation](/.claude/ai_docs/claude-code/hooks.md) — Complete technical reference
 
 **Test-First Discipline**

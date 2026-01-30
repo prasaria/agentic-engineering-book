@@ -29,7 +29,7 @@ The shift from "assistant" to "system" thinking changes how you use it—instead
 ## Connections
 
 - **To [Prompt](../2-prompt/_index.md):** Skills and slash commands demonstrate model-invoked vs user-invoked prompt patterns. See [Model-Invoked vs. User-Invoked Prompts](../2-prompt/_index.md#model-invoked-vs-user-invoked-prompts) for design trade-offs.
-- **To [Context](../4-context/_index.md):** Skills implement the [Progressive Disclosure pattern](../4-context/_index.md#progressive-disclosure-pattern) for context management
+- **To [Context](../4-context/_index.md):** Skills implement the [Progressive Disclosure pattern](../4-context/3-context-patterns.md#progressive-disclosure-pattern) for context management
 - **To [Cost and Latency](../7-practices/3-cost-and-latency.md):** Token cost models for different feature types—understanding the economics of tools, Skills, subagents, and MCP
 - **ReAct Loop:** How does Claude Code implement the ReAct pattern?
 - **Human-in-the-Loop:** How do you stay in the loop while using Claude Code?
@@ -574,7 +574,7 @@ Configure tool access per subagent to follow least-privilege principles:
 
 This is production IAM thinking applied to agents: deny-all by default, allowlist only what's necessary.
 
-For MCP (Model Context Protocol) tools, the same pattern applies with extended naming: `mcp__<server>__<tool>`. See [Tool Use: MCP Tool Declarations](../5-tool-use/_index.md#mcp-tool-declarations-in-frontmatter) for the full pattern.
+For MCP (Model Context Protocol) tools, the same pattern applies with extended naming: `mcp__<server>__<tool>`. See [Tool Use: MCP Tool Declarations](../5-tool-use/3-tool-restrictions.md#mcp-tool-declarations-in-frontmatter) for the full pattern.
 
 ### Proactive Spawning
 
@@ -597,7 +597,7 @@ Each skill consists of:
 - **Markdown instructions**: Detailed guidance (500-5,000 words)
 - **Optional resources**: Supporting files in `scripts/`, `references/`, `assets/`
 
-Skills use three-tier loading for context efficiency (see [Progressive Disclosure pattern](../4-context/_index.md#progressive-disclosure-pattern)):
+Skills use three-tier loading for context efficiency (see [Progressive Disclosure pattern](../4-context/3-context-patterns.md#progressive-disclosure-pattern)):
 1. **Metadata** loads into every prompt (descriptions only)
 2. **Full instructions** load when the model determines relevance
 3. **Supporting resources** load on-demand when referenced
@@ -689,7 +689,7 @@ When the agent encounters a task involving API endpoints, it autonomously loads 
 
 ### Connections
 
-- **To [Context](../4-context/_index.md):** Skills implement the [Progressive Disclosure pattern](../4-context/_index.md#progressive-disclosure-pattern)—specialized knowledge loads only when needed, preserving context capacity for other work
+- **To [Context](../4-context/_index.md):** Skills implement the [Progressive Disclosure pattern](../4-context/3-context-patterns.md#progressive-disclosure-pattern)—specialized knowledge loads only when needed, preserving context capacity for other work
 - **To [Tool Use](../5-tool-use/_index.md):** Skills teach meta-patterns for tool usage; tools provide capabilities, Skills teach when and how to use them effectively
 - **To [Prompt](../2-prompt/_index.md):** Skills are model-invoked rather than user-invoked—the agent determines relevance through reasoning, not explicit commands
 
@@ -855,7 +855,7 @@ This is the recommended pattern until Claude Code adds HEAD/subagent permission 
 
 **See Also**:
 - [Orchestrator Pattern: Capability Minimization](../6-patterns/3-orchestrator-pattern.md#capability-minimization) — The subagent side of this pattern
-- [Tool Use: Tool Restrictions as Security Boundaries](../5-tool-use/_index.md#tool-restrictions-as-security-boundaries) — Security framing
+- [Tool Use: Tool Restrictions as Security Boundaries](../5-tool-use/3-tool-restrictions.md#tool-restrictions-as-security-boundaries) — Security framing
 
 ### Output Styles Deprecation
 

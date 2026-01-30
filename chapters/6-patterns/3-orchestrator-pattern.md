@@ -354,7 +354,7 @@ When an orchestrator uses different tools than its subagents, it creates natural
 
 Orchestrators should assign different tool sets to different subagent roles. For native tools, this follows least-privilege principles. For MCP tools, the same pattern applies—validators get browser tools, scouts get search tools, etc.
 
-See [Tool Use: MCP Tool Declarations](../5-tool-use/_index.md#mcp-tool-declarations-in-frontmatter) for the frontmatter syntax and role-based assignment patterns.
+See [Tool Use: MCP Tool Declarations](../5-tool-use/3-tool-restrictions.md#mcp-tool-declarations-in-frontmatter) for the frontmatter syntax and role-based assignment patterns.
 
 ---
 
@@ -412,6 +412,6 @@ Claude Code achieves similar patterns through discipline (single-message paralle
 - [Plan-Build-Review](1-plan-build-review.md) - simpler version without parallel experts
 - [Self-Improving Experts](2-self-improving-experts.md) - how the domain experts evolve
 - [Google ADK](../9-practitioner-toolkit/2-google-adk.md) - framework with native workflow primitives
-- [Context: Multi-Agent Context Isolation](../4-context/_index.md#multi-agent-context-isolation) - the foundational context management strategy that makes orchestration viable
+- [Context: Multi-Agent Context Isolation](../4-context/4-multi-agent-context.md#multi-agent-context-isolation) - the foundational context management strategy that makes orchestration viable
 - [Context Loading Demo](../../appendices/examples/context-loading-demo/README.md) - minimal example showing context payload construction and verification layer
 - [Claude Code: TeammateTool](../9-practitioner-toolkit/1-claude-code.md#teammatetool-native-multi-agent-coordination-hidden) - Native implementation of coordination primitives (spawn, join, broadcast, plan approval) discussed abstractly in this pattern. Hidden feature providing file-based messaging and five coordination patterns (Leader-Worker, Swarm, Pipeline, Council, Plan Approval).

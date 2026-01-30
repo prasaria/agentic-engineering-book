@@ -67,6 +67,9 @@ Recurring architectures and approaches for building agentic systems
 - [Self-Improving Expert Commands](chapters/6-patterns/2-self-improving-experts.md)
 - [Orchestrator Pattern](chapters/6-patterns/3-orchestrator-pattern.md)
 - [Autonomous Loops (Ralph Wiggum)](chapters/6-patterns/4-autonomous-loops.md)
+- [ReAct Pattern](chapters/6-patterns/5-react-pattern.md)
+- [Human-in-the-Loop Pattern](chapters/6-patterns/6-human-in-the-loop.md)
+- [Progressive Disclosure Pattern](chapters/6-patterns/7-progressive-disclosure.md)
 
 ### Chapter 7: Practices
 
@@ -102,9 +105,16 @@ Tools for agentic engineering with operational insights
 - [Practitioner Toolkit](chapters/9-practitioner-toolkit/_index.md)
 - [Claude Code](chapters/9-practitioner-toolkit/1-claude-code.md)
 - [Google ADK](chapters/9-practitioner-toolkit/2-google-adk.md)
+- [IDE Integrations](chapters/9-practitioner-toolkit/3-ide-integrations.md)
+- [Agent Frameworks](chapters/9-practitioner-toolkit/4-agent-frameworks.md)
 
 ---
 
 ## Appendices
 
-- [Examples](appendices/examples/)
+### Examples
+
+Reference implementations demonstrating book patterns
+
+- [Examples Overview](appendices/examples/README.md)
+- [KotaDB Case Study](appendices/examples/kotadb/CASE_STUDY.md)

@@ -73,7 +73,7 @@ This explains why Haiku excels at scouting—it's not doing heavy reasoning, it'
 
 **See Also**:
 - [Orchestrator Pattern: Capability Minimization](../6-patterns/3-orchestrator-pattern.md#capability-minimization) — How tool restriction complements model selection
-- [Context: Context Loading vs. Accumulation](../4-context/_index.md#context-loading-vs-context-accumulation) — The "payload" mental model that makes small models work
+- [Context: Context Loading vs. Accumulation](../4-context/3-context-patterns.md#context-loading-vs-context-accumulation) — The "payload" mental model that makes small models work
 - [Context Loading Demo](../../appendices/examples/context-loading-demo/README.md) — Demonstrates Haiku as retrieval agent with minimal context payloads (~800 tokens)
 
 ---

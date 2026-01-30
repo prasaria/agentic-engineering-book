@@ -30,7 +30,7 @@ Agents that are too slow or too expensive don't ship. These constraints shape ev
 - **To [Context](../4-context/_index.md):** How does context size affect cost/latency?
 - **To [Evaluation](2-evaluation.md):** How do you include cost/latency in your eval metrics?
 - **To [Orchestrator Pattern: Capability Minimization](../6-patterns/3-orchestrator-pattern.md#capability-minimization):** Restricting subagent tools reduces context size → lower token cost per agent
-- **To [Scaling Tool Use](../5-tool-use/_index.md#scaling-tool-use):** Dynamic tool discovery (85% token reduction) and programmatic orchestration (37% token reduction) are production-tested optimization patterns
+- **To [Scaling Tool Use](../5-tool-use/4-scaling-tools.md):** Dynamic tool discovery (85% token reduction) and programmatic orchestration (37% token reduction) are production-tested optimization patterns
 
 ---
 

@@ -23,6 +23,8 @@ These entries document specific tools used in agentic engineering projects, capt
 |------|----------|-------------|
 | [Claude Code](1-claude-code.md) | Coding agent | Anthropic's CLI coding agent with subagent system, Skills, and hooks |
 | [Google ADK](2-google-adk.md) | Agent framework | Multi-agent-first framework with workflow primitives and state management |
+| [IDE Integrations](3-ide-integrations.md) | IDE tools | AI coding assistants integrated into development environments |
+| [Agent Frameworks](4-agent-frameworks.md) | Framework comparison | Comparing LangGraph, CrewAI, AutoGen, and Claude Agent SDK |
 
 ---
 

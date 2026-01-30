@@ -72,7 +72,7 @@ Slight latency on selection (additional tool call to fetch full content) for dra
 ### Implementation Patterns
 
 - Tool descriptions as metadata layer (Read/Grep as on-demand fetchers)
-- Structured indices with `description` fields (see [MCP Tool Declarations](../5-tool-use/_index.md#mcp-tool-declarations-in-frontmatter))
+- Structured indices with `description` fields (see [MCP Tool Declarations](../5-tool-use/3-tool-restrictions.md#mcp-tool-declarations-in-frontmatter))
 - Skills systems (see [Claude Code: Skills](../9-practitioner-toolkit/1-claude-code.md))
 
 ---
