@@ -407,6 +407,260 @@ Claude Code achieves similar patterns through discipline (single-message paralle
 
 ---
 
+## Communication Excellence
+
+*[2026-01-30]*: Orchestration skill research from cc-mirror reveals sophisticated communication patterns that transform user experience from "watching a machine work" to "collaborating with intelligence."
+
+### The Conductor Philosophy
+
+**Core Identity:** "Absorb complexity, radiate simplicity"
+
+Users describe outcomes; orchestrators decompose and coordinate; workers execute with tools. The orchestrator shields users from internal machinery—task graphs, parallel execution, dependency resolution—presenting only progress and results.
+
+**Forbidden Vocabulary:**
+
+Never expose orchestration mechanics in user-facing communication:
+
+| Forbidden | Natural Alternative |
+|-----------|-------------------|
+| "Spawning subagents" | "Breaking this into parallel tracks" |
+| "Task graph analysis" | "Checking a few angles" |
+| "Fan-out pattern" | "Got several threads running" |
+| "Map-reduce phase" | "Pulling it together now" |
+| "Background agent count" | "Early returns looking promising" |
+
+### Vibe-Reading Adaptation
+
+Orchestrators detect and adapt to user energy:
+
+| User State | Signals | Orchestrator Response |
+|------------|---------|----------------------|
+| **Excited** | Exclamation marks, rapid messages | Match energy, celebrate wins visibly |
+| **Overwhelmed** | Long pauses, vague requests | Simplify, break into smaller steps |
+| **Frustrated** | Repeated questions, short responses | Direct solutions, skip process exposition |
+| **Curious** | Detail questions, exploratory tone | Share insights, explain discoveries |
+| **Rushed** | "quick", "fast", time pressure | Cut ceremony, prioritize completion |
+
+### Progress Communication Patterns
+
+Maintain engagement without revealing machinery:
+
+**Starting:**
+```
+"Breaking this into parallel tracks"
+"Checking a few angles on this"
+```
+
+**Working:**
+```
+"Got several threads running"
+"Early returns look promising"
+```
+
+**Synthesis:**
+```
+"Pulling it together now"
+"Building on what I found"
+```
+
+**Completion:**
+Meaningful celebration with results, not process description. Show findings with file:line references, unexpected discoveries highlighted, connection to user intent explicit.
+
+**Generic synthesis (forbidden):**
+- ❌ "I analyzed the code"
+- ❌ "Task completed successfully"
+- ✅ "Found SQL injection vulnerability in auth.py line 147"
+- ✅ "Unexpected: Authentication bypasses rate limiting entirely"
+
+**Sources:** [cc-mirror orchestration skill](https://raw.githubusercontent.com/numman-ali/cc-mirror/main/src/skills/orchestration/SKILL.md), [Communication Guide](https://raw.githubusercontent.com/numman-ali/cc-mirror/main/src/skills/orchestration/references/guide.md)
+
+---
+
+## Read vs. Delegate Guidelines
+
+*[2026-01-30]*: Research from production orchestrators reveals clear thresholds for when orchestrators should read directly versus delegating to agents.
+
+### Mandatory Direct Reads
+
+**Always read directly, never delegate:**
+- **Skill references** - Core orchestration knowledge
+- **Domain guides** - Project-specific standards
+- **Agent output files** - Results from completed subagents (for synthesis)
+
+These are coordination context, not search operations. Delegating them breaks orchestrator reasoning.
+
+### The 1-2 File Threshold
+
+**Orchestrator reads directly (1-2 files):**
+- Quick index lookups
+- Small configuration files
+- Single-file verification
+- Specification documents
+
+**Delegate to agents (3+ files):**
+- Codebase exploration
+- Multiple source file analysis
+- Deep documentation review
+- Pattern searching across repository
+
+### Why This Threshold Matters
+
+| Aspect | Direct Read (1-2 files) | Delegate (3+ files) |
+|--------|------------------------|---------------------|
+| **Context cost** | Minimal overhead | High if done directly |
+| **Parallelism** | Serial bottleneck | Concurrent execution |
+| **Orchestrator focus** | Maintains synthesis capacity | Preserves decision-making clarity |
+| **Total latency** | Faster for small scope | Faster for large scope |
+
+### Delegation Rationale
+
+Orchestrators coordinate; workers execute. When file reading becomes exploration rather than reference lookup, delegation:
+- Frees orchestrator context for synthesis
+- Enables parallel investigation
+- Returns summaries instead of raw data
+- Maintains clean separation of concerns
+
+**Anti-pattern:** Orchestrator reads 15 files to understand a module, fills context with code, then struggles to synthesize findings. **Pattern:** Orchestrator spawns analyze-module agent, receives "Module uses OAuth2 with custom middleware in 3 layers" summary, decides next action with clean context.
+
+**Sources:** [cc-mirror orchestration patterns](https://raw.githubusercontent.com/numman-ali/cc-mirror/main/src/skills/orchestration/references/patterns.md), [Tool ownership guidelines](https://raw.githubusercontent.com/numman-ali/cc-mirror/main/src/skills/orchestration/SKILL.md)
+
+---
+
+## Background Execution Mechanics
+
+*[2026-01-30]*: TeammateTool and orchestration skill research document background execution as fundamental to parallelism, not a feature toggle.
+
+### Default to Background
+
+**Always use `run_in_background=True`** when spawning agents. This is the default in production orchestrators and should be the default mental model.
+
+**Why background-first:**
+- Enables true parallelism (multiple agents executing concurrently)
+- Orchestrator continues coordination work while agents execute
+- Automatic completion notifications prevent polling overhead
+- Foreground execution serializes work (one agent at a time)
+
+### Non-Blocking vs. Blocking Checks
+
+**Non-blocking check** (`block=False`):
+```
+TaskOutput(task_id="task-123", block=False)
+→ Returns current progress or "still running"
+```
+
+Use for status updates while orchestrator continues other work.
+
+**Blocking wait** (`block=True`):
+```
+TaskOutput(task_id="task-123", block=True)
+→ Waits for completion, returns full results
+```
+
+Use only when results immediately needed for next decision.
+
+### Notification Handling
+
+Background agents automatically notify orchestrator on completion. No polling required.
+
+**Workflow:**
+1. Orchestrator spawns agents with `run_in_background=True`
+2. Orchestrator continues coordination work (spawn more agents, synthesize partial results)
+3. Agents complete and send notifications
+4. Orchestrator processes notifications sequentially
+5. Orchestrator fetches results via TaskOutput when synthesis begins
+
+### Trade-offs
+
+| Pattern | Parallelism | Orchestrator Throughput | Use Case |
+|---------|-------------|------------------------|----------|
+| Background (default) | High | High | Multi-agent workflows |
+| Foreground | None | Blocked | Simple single-agent delegation |
+
+**The mental model:** Background execution is not about "running things later"—it's about enabling the orchestrator to do multiple things concurrently. The orchestrator becomes a coordination hub, not a sequential task runner.
+
+**Sources:** [cc-mirror orchestration skill](https://raw.githubusercontent.com/numman-ali/cc-mirror/main/src/skills/orchestration/references/tools.md), [TeammateTool documentation](https://github.com/mikekelly/claude-sneakpeek/blob/main/docs/research/native-multiagent-gates.md)
+
+---
+
+## Pattern Composition
+
+*[2026-01-30]*: Real-world orchestration combines fundamental patterns into complex workflows. Research from production orchestrators documents common compositions.
+
+### PR Review (Fan-Out + Map-Reduce)
+
+**Structure:**
+```
+1. Read PR metadata (orchestrator, 1 file)
+2. Fan-Out: Spawn 3 parallel reviewers (single message)
+   - security-reviewer (Opus): Check vulnerabilities
+   - performance-auditor (Sonnet): Analyze efficiency
+   - code-quality-checker (Sonnet): Review style/patterns
+3. Continue: Load domain guide for PR standards
+4. Receive completion notifications (3 agents)
+5. Map-Reduce: Synthesize findings into unified review
+6. Deliver: Prioritized issues with severity levels
+```
+
+**User experience:**
+```
+"Got several threads running on this review..."
+
+[30 seconds later]
+
+"Interesting findings across security, performance, and code quality:
+
+🔴 Critical: SQL injection vulnerability in auth.py line 147
+🟡 Performance: N+1 query pattern in posts.controller (3 locations)
+🟢 Quality: Consider extracting validation logic to service layer
+
+The SQL issue needs immediate attention before merge."
+```
+
+### Feature Implementation (Pipeline + Fan-Out + Background)
+
+**Structure:**
+```
+1. Clarify via AskUserQuestion (4×4 rich questions)
+2. Pipeline Phase 1: Research (Haiku)
+   - Find existing theme code
+   - Check component library support
+3. Pipeline Phase 2: Plan (Opus)
+   - Design architecture
+   - Identify component changes
+4. Fan-Out: Implement (Sonnet, 4 agents parallel)
+   - Agent A: Theme provider setup
+   - Agent B: Component updates
+   - Agent C: Storage logic
+   - Agent D: Toggle UI component
+5. Pipeline Phase 3: Integration (Sonnet)
+6. Background: Run tests while continuing
+```
+
+**Key composition:** Pipeline for dependent phases, Fan-Out for independent work, Background for long-running validation.
+
+### Bug Diagnosis (Fan-Out + Pipeline)
+
+**Structure:**
+```
+1. Fan-Out: Parallel investigation (Haiku, 3 agents)
+   - Agent A: Analyze error logs
+   - Agent B: Trace code flow
+   - Agent C: Review system monitoring
+2. Synthesis: Identify pattern (orchestrator)
+3. Pipeline: Sequential fix (Sonnet)
+   - Implement connection pooling
+   - Add retry logic
+   - Update error handling
+4. Background: Run integration tests
+5. Verification (Haiku)
+```
+
+**Pattern insight:** Start broad (fan-out exploration), narrow to root cause (synthesis), apply fix sequentially (pipeline dependencies), validate in background.
+
+**Sources:** [cc-mirror orchestration examples](https://raw.githubusercontent.com/numman-ali/cc-mirror/main/src/skills/orchestration/references/examples.md), [Orchestration patterns documentation](https://raw.githubusercontent.com/numman-ali/cc-mirror/main/src/skills/orchestration/references/patterns.md)
+
+---
+
 ## See Also
 
 - [Plan-Build-Review](1-plan-build-review.md) - simpler version without parallel experts
@@ -415,3 +669,5 @@ Claude Code achieves similar patterns through discipline (single-message paralle
 - [Context: Multi-Agent Context Isolation](../4-context/4-multi-agent-context.md#multi-agent-context-isolation) - the foundational context management strategy that makes orchestration viable
 - [Context Loading Demo](../../appendices/examples/context-loading-demo/README.md) - minimal example showing context payload construction and verification layer
 - [Claude Code: TeammateTool](../9-practitioner-toolkit/1-claude-code.md#teammatetool-native-multi-agent-coordination-hidden) - Native implementation of coordination primitives (spawn, join, broadcast, plan approval) discussed abstractly in this pattern. Hidden feature providing file-based messaging and five coordination patterns (Leader-Worker, Swarm, Pipeline, Council, Plan Approval).
+- [Tool Design: Rich User Questioning](../5-tool-use/1-tool-design.md#rich-user-questioning-patterns) - AskUserQuestion 4×4 pattern for scope clarification before orchestration
+- [Model Selection: Multi-Agent Strategy](../3-model/1-model-selection.md#multi-agent-model-selection) - Spawn count economics and pipeline escalation for coordinated agents

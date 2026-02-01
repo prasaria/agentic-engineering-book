@@ -570,6 +570,44 @@ patterns:
       - location: .skool/
         note: "33 files across courses/, categories/, .journal/, posts/ (commit d1a6306). Foundation Library: 18 lessons referencing chapters/1-5. source_chapter field links back to book."
 
+  retroactive_frontmatter_pattern:
+    name: Retroactive Frontmatter Addition for Previously Unstructured Content
+    context: Adding book frontmatter to existing content that predates structured navigation requirements
+    implementation: |
+      Pattern observed in commit 1d06516 (appendices frontmatter addition):
+
+      When to apply retroactively:
+      - Content exists but lacks frontmatter (predates TOC integration)
+      - Content needs discoverable navigation entry
+      - Content has logical position in book structure
+      - Content is permanent reference material (not ephemeral artifacts)
+
+      Retroactive frontmatter process:
+      1. Identify logical position (part, chapter, section)
+      2. Assign next available section number if multiple files in directory
+      3. Create complete frontmatter with all required fields
+      4. Calculate order value (part.chapter.section)
+      5. Use current date for created AND last_updated (frontmatter addition date)
+      6. Regenerate TOC to include newly structured content
+
+      Chapter/section assignment for appendices:
+      - Appendices = Part 4
+      - Each appendix subdirectory = potential chapter (appendices/examples/ = ch 10)
+      - README.md = section 0 (directory overview)
+      - Subdirectory files = section 1+ (CASE_STUDY.md = section 1)
+
+      Coordination: Frontmatter addition + TOC regeneration in same commit
+    trade_offs:
+      - advantage: Brings legacy content into discoverable navigation
+        cost: Retroactive created timestamp doesn't reflect original creation date
+      - advantage: Enables TOC inclusion without restructuring content
+        cost: Must decide appropriate chapter/section placement for content not designed with structure in mind
+    real_examples:
+      - location: appendices/examples/README.md
+        note: "Commit 1d06516 added frontmatter (part: 4, chapter: 10, section: 0) to preexisting examples directory overview"
+      - location: appendices/examples/kotadb/CASE_STUDY.md
+        note: "Commit 1d06516 added frontmatter (part: 4, chapter: 10, section: 1) to preexisting case study, establishing section numbering"
+
 cross_domain_inheritance: []
 
 best_practices:
@@ -590,6 +628,9 @@ best_practices:
       - practice: NEVER use colons in description field values - causes silent agent discovery failures
         evidence: commit b6a2b47 fixed 38 agent frontmatters changing "Expects:" to "Expects", added CRITICAL warning in CLAUDE.md line 150
         timestamp: 2026-01-17
+      - practice: Appendices use part 4 with chapter numbers starting at 10, section 0 for directory README
+        evidence: commit 1d06516 - appendices/examples/ structured as chapter 10 with README.md section 0, CASE_STUDY.md section 1
+        timestamp: 2026-01-30
 
   - category: Directory Organization
     practices:
@@ -641,6 +682,9 @@ best_practices:
       - practice: Bidirectional cross-references with contextual descriptions (explain why link matters, not just what it links to)
         evidence: commit a624250 pattern—links explain relevance, not bare pointers
         timestamp: 2025-12-26
+      - practice: Add frontmatter retroactively to permanent reference content when integrating into TOC navigation
+        evidence: commit 1d06516 added frontmatter to appendices/examples/ files (README + CASE_STUDY) for discoverability
+        timestamp: 2026-01-30
 
   - category: Parallel Hierarchies
     practices:
@@ -696,6 +740,12 @@ known_issues:
     status: by-design
     evidence: TOC requires explicit regeneration (last update commit e3a4517)
     timestamp: 2025-12-26
+
+  - issue: Relative path links break when content files reference each other incorrectly
+    workaround: Use relative paths from current file location, include section anchors when specific (path.md#section)
+    status: open
+    evidence: commit 1d06516 fixed broken KotaDB absolute paths (/.claude/ → ./kotadb/.claude/)
+    timestamp: 2026-01-30
 
 anti_patterns:
   - anti_pattern: Using colons in frontmatter description field (agent or book)
@@ -763,9 +813,9 @@ stability:
     detected_oscillations: []
 
   convergence_indicators:
-    insight_rate_trend: stable
+    insight_rate_trend: decreasing
     contradiction_count: 0
-    last_reviewed: 2026-01-21
+    last_reviewed: 2026-01-30
     notes: |
       Cleanup cycle 2025-12-28:
       - Reduced redundant examples from 3-5 to 2 per pattern
@@ -789,3 +839,13 @@ stability:
       - Learning: Infrastructure-first before content prevents structural refactoring mid-build
       - Zero contradictions with existing patterns (parallel hierarchies complement, not conflict)
       - File size: 759 lines (within target range, +54 lines from external platform patterns)
+
+      Improvement cycle 2026-01-30:
+      - Added 1 new pattern (retroactive_frontmatter_pattern) + 2 best practices + 1 known issue
+      - Analyzed PR review commit (1d06516): Retroactive frontmatter for appendices, link path fixes
+      - Analyzed swarm commit (20500f1): 10 agents, 3512 lines, validated coordinated multi-file workflow
+      - Pattern: Retroactive frontmatter enables legacy content integration into TOC without restructuring
+      - Learning: Appendices follow part 4, chapter 10+ structure with section 0 for directory README
+      - Insight rate decreasing: 4 commits analyzed, only 1 new pattern (rest validation of existing patterns)
+      - Zero contradictions with existing patterns (retroactive pattern complements new section creation)
+      - File size: 892 lines (within target, +133 lines from new pattern + git analysis)

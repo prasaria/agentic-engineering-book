@@ -494,6 +494,55 @@ When creating new section, organize by progression from conceptual to advanced:
 
 This progression helps readers understand before customizing before optimizing.
 
+### External Research Integration Patterns
+
+*[2026-01-30]*: Pattern from claude-sneakpeek research integration (commits de68e9f, 20500f1). When integrating external research (community tools, production code, practitioner blogs):
+
+**Three-Tier Integration Approach:**
+1. **Lightweight Injection** - Add timestamped section to related existing entry (50-100 lines)
+2. **Dedicated Section** - New comprehensive section for complex patterns (150-280 lines)
+3. **Bidirectional Navigation** - Update existing patterns to reference new content
+
+**Content Quality Preservation:**
+- Maintain third-person voice consistency
+- Include comparison tables to existing patterns
+- Document trade-offs explicitly
+- Add source attribution with commit hashes
+
+**When to Use:**
+- External source documents pattern not yet captured in book
+- Production orchestrators reveal new practices
+- Community tools provide evidence for existing patterns
+- Academic research validates or refines approaches
+
+**Real Examples from Recent Integration:**
+- Model-Native Swarm Orchestration (commits de68e9f): 158 lines in multi-model-architectures.md + cross-references to 2 existing patterns
+- TeammateTool Documentation (commit de68e9f): 287 lines in claude-code.md with 5 coordination pattern templates
+- Conductor Philosophy (commit 20500f1): 63 lines in orchestrator-pattern.md documenting communication patterns
+- 4×4 Rich Question Pattern (commit 20500f1): 111 lines in tool-design.md with maximal questioning structure
+
+### Discovery Pattern: Multi-Agent Orchestration Learning
+
+*[2026-01-30]*: Pattern from orchestration research integration. When external sources reveal sophisticated multi-agent patterns:
+
+**Key Learnings to Capture:**
+1. **Communication Patterns** - How orchestrators interact with users (Conductor Philosophy)
+2. **Decision Heuristics** - Thresholds for when to read vs delegate (1-2 file threshold)
+3. **Execution Models** - Default background execution enables parallelism
+4. **Pattern Composition** - Real workflows nest multiple fundamentals
+
+**Planning Questions:**
+- Does this pattern represent a new category or enhance existing pattern?
+- Should it be documented in Practices (operational guidance) or Patterns (architectural)?
+- What comparison tables help readers decide when to use this vs alternatives?
+- Which existing patterns need updating with cross-references to new insight?
+
+**Evidence Collection Strategy:**
+- Source attribution (URL, commit hash, timestamp)
+- Quantified claims (performance improvement, complexity reduction)
+- Concrete examples from production orchestrators
+- Trade-off analysis vs existing approaches
+
 ## Workflow
 
 1. **Understand Context**

@@ -737,6 +737,69 @@ The language clarification spec included explicit testing criteria:
 
 Build validation steps into refactoring specs so build agent can self-check.
 
+### External Research Integration Implementation
+
+*[2026-01-30]*: Pattern from commits de68e9f and 20500f1. When implementing content from external research sources:
+
+**Lightweight Injection Points:**
+- Add timestamped section to related existing entry (50-100 lines)
+- Preserve existing voice and structure
+- Lead with context explaining external source relationship
+- Use comparison tables to position against existing patterns
+
+**Dedicated Sections for Complex Patterns:**
+- Model-native swarm documentation: 158 lines with performance metrics
+- TeammateTool coordination primitives: 287 lines with 5 pattern templates
+- Conductor Philosophy: 63 lines on user communication patterns
+- Feature gate reverse engineering: 190 lines on technique discovery
+
+**Quality Standards for External Integration:**
+- Third-person voice throughout (no "the research shows" → "findings demonstrate")
+- Trade-off tables comparing new pattern to existing alternatives
+- Source attribution with commit hashes and URLs
+- Temporal anchors (*[YYYY-MM-DD]*) for discovery dates
+
+**Cross-Reference Strategy:**
+When adding new orchestration patterns from research:
+1. Update related existing sections with inline context (1-2 sentences)
+2. Create Connections section in new content linking back to related patterns
+3. Verify bidirectional linking (new → existing, existing → new)
+4. Use thematic links ("This relates to X because...") not mechanical ones
+
+**Real Examples:**
+- Model-native swarm required updates to orchestrator-pattern.md and execution-topologies.md
+- TeammateTool needs comparison against Task tool in claude-code.md
+- Feature gate research needs architectural contrast diagrams
+
+### Orchestration Pattern Documentation
+
+*[2026-01-30]*: Patterns specific to multi-agent orchestration content from production research:
+
+**Conductor Philosophy (Communication Excellence):**
+- Forbidden vocabulary mapping (8 terms: technical → natural)
+- Vibe-reading patterns (4 user states + orchestrator adaptations)
+- Progress communication without exposing machinery
+- Completion celebration with concrete findings + line references
+
+**Decision Heuristic: 1-2 File Threshold for Orchestrator Reads:**
+- Orchestrators read 1-2 files directly for reference lookups
+- Delegate to agents when exploring 3+ files
+- Rationale table showing context cost vs parallelism trade-off
+- Anti-pattern: Reading 15 files directly then struggling to synthesize
+
+**Background Execution as Default Mental Model:**
+- run_in_background=True is fundamental, not optional
+- Foreground execution serializes work (exception, not default)
+- Blocking checks (block=True) only when results immediately needed
+- Completion notifications prevent polling overhead
+
+**Pattern Composition Real-World Examples:**
+1. PR Review: Fan-Out (3 reviewers) + Map-Reduce (synthesis)
+2. Feature Implementation: Pipeline (research → design → implement → integrate) + Fan-Out (4 parallel builders) + Background (tests)
+3. Bug Diagnosis: Fan-Out (investigation) + Pipeline (sequential fix)
+
+Document as case studies with structure diagram → approach → results flow.
+
 ## Report
 
 Concise implementation summary:

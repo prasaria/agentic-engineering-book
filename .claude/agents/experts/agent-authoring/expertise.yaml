@@ -123,8 +123,13 @@ key_operations:
 
       Content Updates (Workers/Builders):
       - Read, Write, Edit, Grep, Glob
-      - Optional: Bash (for implementation tasks)
+      - Optional: Bash (for implementation tasks requiring filesystem/git operations)
       - NO Task (workers don't spawn others)
+
+      Operational Tasks (Git/Deployment/External Setup):
+      - Read, Write, Edit, Grep, Glob, Bash
+      - Bash enables git commands, directory operations, external project setup
+      - Examples: github agents, external-teacher agents, deployment agents
 
       Coordination (Orchestrators):
       - Task, Read, Grep, Glob
@@ -133,15 +138,21 @@ key_operations:
     examples:
       - role: Scout/Explorer
         tools: Read, Glob, Grep
-      - role: Knowledge Build Agent
+      - role: Knowledge Build Agent (content-focused)
         tools: Read, Write, Edit, Grep, Glob
-      - role: Audit Orchestrator
-        tools: Task, Read, Write, Glob, Grep, Bash
+      - role: External Teacher Plan Agent (operational)
+        tools: Read, Glob, Grep, Write, Bash
+        rationale: Needs Bash for git init, ls, path validation before teaching
+      - role: External Teacher Build Agent (operational)
+        tools: Read, Write, Edit, Glob, Grep, Bash
+        rationale: Needs Bash for mkdir, directory creation in external projects
     pitfalls:
       - what: Giving all agents all tools
         instead: Minimal tool set for role
       - what: Simple coordinators with Write access
         instead: Only complex orchestrators generate reports
+      - what: Adding Bash to content-only build agents unnecessarily
+        instead: Grant Bash only when agent must execute filesystem/git operations beyond read/write
 
   select_model_for_agent:
     name: Select Model for Agent
@@ -592,6 +603,19 @@ best_practices:
       - practice: Operational build agents (git, deployment) need Bash for command execution
         evidence: github-build-agent uses Bash for git/gh commands
         timestamp: 2025-12-26
+      - practice: External teaching agents need Bash for filesystem/git operations during setup
+        evidence: |
+          external-teacher-plan-agent granted Bash for git init, ls, path validation
+          external-teacher-build-agent granted Bash for creating .claude/ directories in external projects
+          Differs from content-only domains (knowledge, book-structure) which don't need Bash
+        timestamp: 2026-01-30
+        rationale: Teaching external projects requires real filesystem operations beyond read/write content
+      - practice: Tool selection correlates with domain purpose (operational vs content vs configuration)
+        evidence: |
+          Operational domains (github, external-teacher, do-management): Bash for plan AND build
+          Content domains (knowledge, book-structure, agent-authoring): No Bash for plan/build (only improve)
+          Configuration domains (claude-config, curriculum): Bash only when managing external files
+        timestamp: 2026-01-30
 
   - category: Naming
     practices:
@@ -715,10 +739,22 @@ stability:
     detected_oscillations: []
 
   convergence_indicators:
-    insight_rate_trend: "stable-high"
+    insight_rate_trend: "stable-decreasing"
     contradiction_count: 0
-    last_reviewed: 2026-01-17
+    last_reviewed: 2026-01-30
     notes: |
+      *[2026-01-30 - External teaching workflow learnings]*
+      New learnings: +2 best practices (external-teacher Bash access patterns)
+      Size after additions: ~782 lines (within healthy 750-900 range)
+
+      External-teacher agents granted Bash for git/directory operations during teaching:
+      - Plan agent needs `git init`, `ls`, path validation before teaching
+      - Build agent needs file system operations for external project setup
+      - Pattern differs from content domains (knowledge, book-structure) where Bash not needed
+
+      This aligns with operational domain pattern (github, external-teacher, do-management)
+      where Bash enables real-world coordination beyond pure content management.
+
       *[2026-01-17 - Post-description-colon-fix]*
       Critical configuration error discovered and fixed: colons in description field values
       cause silent agent discovery failures. Commit b6a2b47 fixed 38 agents across 12 domains.

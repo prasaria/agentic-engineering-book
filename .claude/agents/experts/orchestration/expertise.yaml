@@ -516,6 +516,98 @@ patterns_discovered_in_recent_work:
         note: Tracks version progression for delta fetch
     timestamp: 2026-01-11
 
+  swarm_orchestration_pattern:
+    name: Model-Native Swarm Orchestration vs SDK Orchestration
+    context: Two architectural approaches to multi-agent coordination
+    discovered: 2026-01-30 (commit de68e9f)
+    implementation: |
+      Orchestration can happen at two different layers:
+
+      **SDK Orchestration (Claude Code, LangGraph, AutoGen):**
+      - Coordination logic in external framework code
+      - Explicit Task/API calls to spawn subagents
+      - Framework handles waiting, synthesis, error handling
+      - Developer writes coordination code
+      - Example: /do spawns plan→build→improve via Task calls
+
+      **Model-Native Swarm (Kimi K2.5):**
+      - Coordination logic embedded in model reasoning
+      - Model decides when to parallelize during generation
+      - Spawns up to 100 subagents internally
+      - Trained via PARL (Parallel-Agent Reinforcement Learning)
+      - Critical Steps metric rewards parallelization
+
+      Trade-offs documented:
+      - SDK: High control, explicit debugging, portable across models
+      - Swarm: Autonomous parallelization, lower overhead, model-specific
+
+      Performance: Kimi K2.5 achieves 3-4.5× speedup (80% runtime reduction)
+      on parallelizable tasks via model-native swarm.
+
+      When to use each:
+      - SDK: Deterministic workflows, explicit control required, model switching
+      - Swarm: Dynamic parallelization, trust model decisions, high speedup potential
+
+      This represents architectural shift from application-layer orchestration
+      to model-capability orchestration. Future frontier models may adopt similar.
+    evidence: chapters/3-model/4-multi-model-architectures.md#model-native-swarm-orchestration
+    cross_references:
+      - chapters/6-patterns/3-orchestrator-pattern.md#sdk-orchestration-vs-model-native-swarm
+    timestamp: 2026-01-30
+
+  teammatetool_coordination_pattern:
+    name: TeammateTool - Native Multi-Agent Coordination
+    context: Claude Code's hidden coordination layer beyond Task tool
+    discovered: 2026-01-30 (commit de68e9f)
+    implementation: |
+      TeammateTool provides coordination primitives beyond Task's spawn-wait:
+
+      **13 Operations:**
+      - Spawn: Create teammates with role definitions
+      - Join: Wait for specific teammates (not all)
+      - Write: Send message to teammate's inbox
+      - Broadcast: Send message to all teammates
+      - Plan Approval: Human-in-the-loop gate
+      - Shutdown: Graceful team termination
+      - List/Status: Enumerate/query active teammates
+
+      **File-Based Messaging:**
+      - Location: ~/.claude/teams/{name}/inboxes/
+      - Each teammate has inbox directory
+      - Write file = send message (observable state)
+      - Enables debugging, persistence, simple semantics
+
+      **Five Coordination Patterns:**
+      1. Leader-Worker: Spawn N workers, join all
+      2. Swarm: Workers coordinate via broadcast
+      3. Pipeline: Sequential handoffs with Write
+      4. Council: Multiple perspectives, synthesis phase
+      5. Plan Approval: Explicit human gate
+
+      **Task vs TeammateTool:**
+      - Task: Simple delegation (spawn, wait, return)
+      - TeammateTool: Full coordination (messaging, selective waiting, approval gates)
+
+      **Current Status:**
+      - Server-side gated (requires feature flags)
+      - Unlockable via claude-sneakpeek
+      - Production-ready code, controlled rollout
+      - Aligns with Claude Agent SDK strategic direction
+
+      **When to Use:**
+      - Use Task: Simple delegation, official support, minimal complexity
+      - Use TeammateTool: Inter-agent messaging, selective joins, human approval gates
+
+      Connection to patterns:
+      - Plan Approval operation = built-in plan→build→improve cycle
+      - File-based messaging = context isolation without pollution
+      - Nesting: Unknown if teammates can spawn nested teams
+    evidence: chapters/9-practitioner-toolkit/1-claude-code.md#teammatetool-native-multi-agent-coordination-hidden
+    cross_references:
+      - chapters/4-context/4-multi-agent-context.md (message passing pattern)
+      - chapters/6-patterns/3-orchestrator-pattern.md (coordination primitives)
+    timestamp: 2026-01-30
+
 potential_enhancements:
   - enhancement: Automated spec file cleanup after successful build
     rationale: Prevent .claude/plans/ from accumulating stale specs
@@ -546,17 +638,22 @@ stability:
   convergence_indicators:
     insight_rate_trend: stable
     contradiction_count: 0
-    last_reviewed: 2026-01-17
+    last_reviewed: 2026-01-30
     notes: |
       Domain stabilizing after pruning (940→464 lines in cb89c17).
       Key patterns validated: flat orchestration, single-message parallelism,
       4-agent expert pattern, approval gates, expertise size governance.
 
-      New learnings this cycle: 3 patterns (frontmatter safety, delta monitoring, governance)
-      Cross-domain contributions: 1 pattern (frontmatter safety applies to agent-authoring)
+      New learnings this cycle: 2 patterns (swarm orchestration, TeammateTool coordination)
+      Cross-domain contributions: 2 patterns (both apply to multi-model, context, tool-use domains)
 
       ELA Component 2 implemented (orchestration trace logging).
       ELA Component 3 implemented (cross-domain registry).
       Observability infrastructure enables self-improving orchestration.
 
-      Size health: 464→517 lines (+53 from this improvement cycle, well under 750 target)
+      Size health: 517→663 lines (+146 from this improvement cycle, still under 750 target)
+
+      Architectural evolution detected:
+      - Model-native swarm represents shift from SDK to model-capability orchestration
+      - TeammateTool indicates Anthropic's strategic direction toward richer coordination
+      - Both patterns complement existing SDK orchestration (not replacements)

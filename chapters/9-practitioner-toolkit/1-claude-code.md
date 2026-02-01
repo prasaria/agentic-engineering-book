@@ -984,6 +984,205 @@ def pre_tool_use(event):
 
 ---
 
+## Advanced: Feature Gate Reverse Engineering
+
+*[2026-01-30]*: Claude Code ships with capabilities hidden behind server-side feature gates. Community research documents techniques for discovering and enabling these features through surgical patching.
+
+**⚠️ Warning:** This is fragile, unsupported territory. The techniques below are observational research from the `claude-sneakpeek` project, not officially documented or recommended practices. Patches couple tightly to minified code structure and break with updates.
+
+### Your Mental Model
+
+**Feature gates are string anchors in minified JavaScript.** Claude Code's `cli.js` is minified and obfuscated—function names change between builds (`xK()`, `Yz()`), but string literals survive minification unchanged. Stable strings like `"tengu_brass_pebble"` (swarm mode gate) or `"TodoWrite"` (team mode gate) serve as anchors for locating surrounding gate logic.
+
+### String Anchor Discovery Technique
+
+**The pattern:**
+1. Find stable string literal in minified code (e.g., `"tengu_brass_pebble"`)
+2. Extract surrounding function using regex pattern
+3. Dynamically capture minified function name
+4. Replace gate logic with unconditional return
+
+**Example: Swarm Mode Gate**
+
+**Original minified code:**
+```javascript
+function xK(){
+  if(Yz(process.env.CLAUDE_CODE_AGENT_SWARMS))return!1;
+  return wQ("tengu_brass_pebble",!1)
+}
+```
+
+**Detection regex:**
+```javascript
+const SWARM_GATE_FN_RE = /function\s+([a-zA-Z_$][\w$]*)\(\)\{if\([\w$]+\(process\.env\.CLAUDE_CODE_AGENT_SWARMS\)\)return!1;return\s*[\w$]+\("tengu_brass_pebble",!1\)\}/;
+```
+
+**Patched code:**
+```javascript
+function xK(){return!0}
+```
+
+### Regex Pattern Extraction Methodology
+
+**Critical insight:** Patterns match exact minified structure, not semantic meaning.
+
+**Anchor marker pattern:**
+```javascript
+const SWARM_GATE_MARKER = /tengu_brass_pebble/;
+```
+
+**Function extraction pattern:**
+```javascript
+const SWARM_GATE_FN_RE =
+  /function\s+([a-zA-Z_$][\w$]*)\(\)\{if\([\w$]+\(process\.env\.CLAUDE_CODE_AGENT_SWARMS\)\)return!1;return\s*[\w$]+\("tengu_brass_pebble",!1\)\}/;
+```
+
+**Capturing groups:**
+- `([a-zA-Z_$][\w$]*)` - Function name (group 1, dynamically extracted)
+- Environment check pattern
+- Statsig call pattern
+
+**Replacement strategy:**
+```javascript
+const gate = content.match(SWARM_GATE_FN_RE);
+const fnName = gate[1];
+const patched = content.replace(
+  gate[0],
+  `function ${fnName}(){return!0}`
+);
+```
+
+### Version Pinning Strategy
+
+**Stability vs. staying current:**
+
+| Approach | Trade-off |
+|----------|-----------|
+| **Pin to validated version** | Patches stable, features frozen, security updates delayed |
+| **Track latest** | Latest features, patches break frequently, continuous maintenance |
+
+**claude-sneakpeek strategy:** Pin to `@anthropic-ai/claude-code@2.0.76`
+
+**Rationale:**
+- Patches validated against known minified structure
+- Feature gates at predictable locations
+- Avoids breaking changes in newer versions
+- Updates require deliberate validation
+
+**When to update pins:**
+- Critical security patches released
+- Desired features only in newer versions
+- Community confirms patches work for target version
+
+### Three-State Detection
+
+Feature gates exist in three observable states:
+
+| State | Detection Method | Meaning |
+|-------|------------------|---------|
+| `disabled` | Gate function pattern matches | Original gate present, feature blocked |
+| `enabled` | Marker absent + swarm code detected | Gate patched, feature unlocked |
+| `unknown` | No marker, no swarm code | Version incompatible or feature removed |
+
+**Detection implementation:**
+```typescript
+export const detectSwarmModeState = (content: string): SwarmModeState => {
+  const gate = findSwarmGateFunction(content);
+  if (gate) return 'disabled';
+
+  if (!SWARM_GATE_MARKER.test(content)) {
+    const hasSwarmCode = /TeammateTool|teammate_mailbox|launchSwarm/.test(content);
+    if (hasSwarmCode) return 'enabled';
+    return 'unknown';
+  }
+
+  return 'unknown';
+};
+```
+
+### Fragility Considerations
+
+**Why this is fragile:**
+
+1. **Minified code coupling**: Regex patterns match exact minified JavaScript structure. Any minifier setting change breaks patterns.
+2. **Function name volatility**: Minified function names change unpredictably. Dynamic capture required.
+3. **String literal dependency**: Anthropic could rename `"tengu_brass_pebble"` or change gate structure entirely.
+4. **No versioning contract**: Features can appear/disappear between releases without notice.
+5. **Maintenance burden**: Each Claude Code update requires pattern re-validation.
+
+**Mitigation strategies:**
+- Version pinning (stability over features)
+- Automated patch testing in CI
+- Backup/restore mechanism for `cli.js`
+- State detection before and after patching
+- Clear documentation of which version patterns work for
+
+### Example: TeammateTool Discovery
+
+**String anchor:** `"TodoWrite"` variable assignment
+
+**Multi-stage search:**
+```typescript
+const TODO_WRITE_MARKER = /(var|let|const)\s+[A-Za-z_$][\w$]*="TodoWrite";/;
+const IS_ENABLED_FN_RE = /isEnabled\(\)\{return!([A-Za-z_$][\w$]*)\(\)\}/;
+```
+
+**Why more complex:** Team mode gate not directly adjacent to feature code. Requires windowed search:
+1. Find `TodoWrite` marker
+2. Search 8000-character window after marker
+3. Extract `isEnabled()` function
+4. Locate referenced gate function
+5. Patch gate function
+
+**Window-based search optimization:**
+```typescript
+const markerIndex = content.indexOf('"TodoWrite"');
+const window = content.slice(markerIndex, markerIndex + 8000);
+const match = window.match(IS_ENABLED_FN_RE);
+```
+
+### Observational Research vs. Recommended Practice
+
+**Frame this as:**
+- "Research documents how hidden features are discovered"
+- "Community unlock for experimental access"
+- "Observational analysis of feature gating"
+
+**Not as:**
+- "How to customize Claude Code in production"
+- "Officially supported modification technique"
+- "Stable API for feature enablement"
+
+**Use cases where acceptable:**
+- Research and learning about multi-agent coordination
+- Prototyping workflows before official release
+- Contributing feedback to Anthropic on gated features
+- Understanding Claude Code's internal architecture
+
+**Use cases where inappropriate:**
+- Production systems requiring stability
+- Commercial products depending on patched features
+- Environments where maintenance burden unacceptable
+- Situations where official support required
+
+### Relationship to TeammateTool
+
+Feature gates discovered through these techniques unlock capabilities documented in the TeammateTool section:
+- Spawn, Join, Write, Broadcast operations
+- File-based messaging (`~/.claude/teams/`)
+- Five coordination patterns (Leader-Worker, Swarm, Pipeline, Council, Plan Approval)
+- Backend selection (in-process, tmux, iterm2)
+
+**See:** [TeammateTool: Native Multi-Agent Coordination](#teammatetool-native-multi-agent-coordination-hidden) for what these patches unlock.
+
+### Sources
+
+- [claude-sneakpeek swarm mode patching](https://github.com/mikekelly/claude-sneakpeek/blob/main/src/core/variant-builder/swarm-mode-patch.ts)
+- [Feature gate discovery research](https://raw.githubusercontent.com/mikekelly/claude-sneakpeek/main/docs/research/native-multiagent-gates.md)
+- [Patching techniques analysis](.claude/.cache/research/external/claude-sneakpeek-patching-techniques-2026-01-30.md)
+
+---
+
 *Your CLAUDE.md, settings, or setup notes:*
 
 
