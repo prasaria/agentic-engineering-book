@@ -330,7 +330,7 @@ best_practices:
       - practice: Use /do-swarm for parallel coordination with inter-agent messaging, multiple experts
         evidence: .claude/commands/do-swarm.md
         timestamp: 2026-02-02
-      - practice: /do-swarm requires TeammateTool access (server-side gated, may need claude-sneakpeek)
+      - practice: /do-swarm requires TeammateTool access (server-side gated, requires CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1)
         evidence: .claude/commands/do-swarm.md#requirements
         timestamp: 2026-02-02
       - practice: For quick research swarms, skip shutdown ceremony (teammates timeout naturally ~5 min)
@@ -645,10 +645,11 @@ patterns_discovered_in_recent_work:
       - TeammateTool: Full coordination (messaging, selective waiting, approval gates)
 
       **Current Status:**
-      - Server-side gated (requires feature flags)
-      - Unlockable via claude-sneakpeek
+      - Server-side gated (requires CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1)
+      - Official feature flag via environment variable
       - Production-ready code, controlled rollout
       - Aligns with Claude Agent SDK strategic direction
+      - Documentation: https://code.claude.com/docs/en/agent-teams
 
       **When to Use:**
       - Use Task: Simple delegation, official support, minimal complexity
@@ -801,7 +802,7 @@ patterns_discovered_in_recent_work:
         expert perspectives, complex multi-agent workflows
 
       **Requirements:**
-      TeammateTool access (server-side gated, may require claude-sneakpeek unlock)
+      TeammateTool access (server-side gated, requires CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1 environment variable)
     evidence: .claude/commands/do-swarm.md
     cross_references:
       - chapters/6-patterns/8-expert-swarm-pattern.md (pattern documentation)

@@ -18,6 +18,15 @@ overview:
     Effective knowledge capture enables insights to be discoverable, properly
     contextualized, and integrated with related content. Poor knowledge management
     leads to fragmented insights, lost context, and duplication.
+  terminology:
+    official_terms:
+      subagents: "Task tool - agents that report back to orchestrator only (no peer messaging)"
+      agent_teams: "TeammateTool - independent Claude Code sessions with peer-to-peer messaging and shared task lists"
+      team_lead: "Main session that creates agent team via CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1"
+      teammates: "Independent Claude Code sessions coordinated through TeammateTool operations"
+      feature_gate: "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1 env var enables agent teams (previously claude-sneakpeek only)"
+    documentation: "https://code.claude.com/docs/en/agent-teams"
+    official_status: "Experimental, disabled by default in Claude Code 2.0.76+. Environment variable enables access."
 
 core_implementation:
   primary_files:
@@ -756,6 +765,145 @@ external_research_integration:
       - Comparison tables for mindset (agent vs traditional code)
       - Structured failure mode template (4-part format)
 
+agent_teams_documentation:
+  name: Large Multi-File Feature Documentation
+  context: Agent Teams (TeammateTool) multi-file update (2026-02-05)
+  timestamp: 2026-02-05
+  pattern_observed: |
+    Agent teams documentation required coordinated updates across 6+ files
+    with interdependencies and terminology synchronization. Successful
+    execution depended on phased approach: foundation first, then
+    dependents. Key learnings for similar large documentation efforts.
+
+    **Phase 1: Foundation (Core Concepts)**
+    - chapters/9-practitioner-toolkit/1-claude-code.md: Added "Agent Teams" section (420 lines, lines 246-667)
+    - Comprehensive coverage: Prerequisites, Core Capabilities, Display Modes, Keyboard Controls, Getting Started,
+      Advanced Features, Coordination Patterns, Best Practices, Troubleshooting, Limitations, Decision Framework
+    - Updated terminology section to include official status and feature gate migration
+
+    **Phase 2: Command Documentation**
+    - .claude/commands/do-swarm.md: Updated prerequisites, display modes, limitations (623 lines)
+    - Mirrored terminology from official docs
+    - Added explicit CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1 instructions
+    - Included validation patterns for feature availability
+
+    **Phase 3: Dependent Patterns**
+    - chapters/6-patterns/8-expert-swarm-pattern.md: Added Agent Teams Messaging subsection (lines 153-172)
+    - chapters/6-patterns/3-orchestrator-pattern.md: Updated Agent Teams references
+    - chapters/4-context/4-multi-agent-context.md: Added agent teams vs subagents section
+
+    **Phase 4: Expertise Updates**
+    - 13 expert domain expertise.yaml files: Updated terminology and cross-references
+    - CLAUDE.md: Updated feature gate references in documentation tables
+
+  key_techniques:
+    - Phased execution prevents broken references during updates
+    - Foundation-first approach ensures terminology consistency
+    - Cross-file terminology defined in official docs (code.claude.com), then propagated
+    - Display modes documented in command level first, then referenced from chapter docs
+    - Official limitations section acts as single source of truth
+
+  critical_learnings:
+    - Feature gate migration: claude-sneakpeek internal → CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS public env var
+    - Official terminology distinction maintained throughout: "agent teams" (peer messaging) vs "subagents" (report-back)
+    - Prerequisites section critical when feature is experimental/gated (enables/verification pattern)
+    - Display modes (in-process vs split-pane) are user-facing, must be documented early in chapter
+    - Limitations section requires continuous updates as feature matures (6 limitations documented as of 2026-02-05)
+
+  when_to_use:
+    - Large documentation efforts spanning 5+ files
+    - Features with experimental status requiring explicit enablement
+    - Cross-system terminology requiring consistency (chapter + command + expertise)
+    - Multi-phase rollouts where dependencies are critical
+
+  evidence: |
+    - chapters/9-practitioner-toolkit/1-claude-code.md: 420-line Agent Teams section (2026-02-05)
+    - .claude/commands/do-swarm.md: Updated prerequisites + display modes (2026-02-05)
+    - chapters/6-patterns/8-expert-swarm-pattern.md: Agent Teams Messaging subsection
+    - Terminology synchronized across 14 files (1-claude-code.md, do-swarm.md, 6 chapter files, 6 expertise.yaml files, CLAUDE.md)
+    - Official docs (code.claude.com) serve as authoritative source
+
+  anti_patterns:
+    - what: Updating dependent files before foundation
+      why: Broken cross-references, terminology inconsistency
+      instead: Update foundation (claude-code.md), validate, then cascade updates
+    - what: Duplicating prerequisites across command + chapter docs
+      why: Maintenance burden when feature status changes
+      instead: Reference official prerequisites once, link from dependent docs
+    - what: Vague status ("available soon", "in development")
+      why: No clear enablement path for readers
+      instead: Specific version (2.0.76+), explicit env var, verification steps
+
+memory_management_documentation:
+  name: Memory Management Feature Documentation (310 lines)
+  context: Session memory + .claude/rules/ system documentation (chapters/9-practitioner-toolkit/1-claude-code.md)
+  timestamp: 2026-02-05
+  pattern_observed: |
+    Documenting memory persistence features requires explaining automatic vs manual mechanisms,
+    showing hierarchy across memory tiers, and providing decision frameworks for selecting
+    appropriate mechanism. The Memory Management section (310 lines) demonstrates:
+
+    **Structure for memory system documentation:**
+    1. Opening mental model: Bold assertion bridging concepts ("Session memory bridges ephemeral context and persistent knowledge")
+    2. Automatic mechanism explanation: How It Works → Observable Behavior → Feature Gate Status
+    3. Manual mechanisms: Commands (/remember, /compact, # shortcut) with workflows
+    4. Modular system: Directory structure → Path-scoped rules → Conditional loading → Symlinks
+    5. Complete hierarchy table: 7 tiers with Tier/Location/Scope/Automatic/Example Use columns
+    6. Feature comparison table: 5 mechanisms × 5 dimensions (Automatic/Persistent/Modular/Path-Scoped/Control)
+    7. Decision framework: ASCII tree with binary branching (automatic vs manual → path-specific vs shared)
+    8. Practical examples: 3+ copy-paste examples showing real usage
+    9. Bidirectional cross-reference: Link to context fundamentals with relationship explanation
+
+    **Key structural decisions:**
+    - Automatic mechanisms first (session memory), then manual (.claude/rules/)
+    - Each mechanism gets: How It Works → Observable Behavior → Examples
+    - Tables for comparison (hierarchy table, feature comparison, enables fast scanning)
+    - ASCII decision tree guides readers to appropriate mechanism
+    - Bidirectional linking: Memory Management → Context Fundamentals, Context Fundamentals → Memory Management
+    - Inline timestamp addition to context fundamentals (*[2026-02-05]*: Claude Code's session memory feature...)
+
+    **Bidirectional linking pattern refinement:**
+    - Added cross-reference in claude-code.md Connections section (line 33)
+    - Added inline timestamp entry in context-fundamentals.md (lines 26-27)
+    - Both links explain the relationship (session memory addresses context vs memory distinction)
+    - Enables discovery from either direction
+    - Pattern: Major feature docs add Connections entry; related fundamentals get inline timestamp
+
+  evidence: |
+    chapters/9-practitioner-toolkit/1-claude-code.md lines 1138-1448 (310 lines)
+    - 9 subsections: Mental Model, Session Memory, /remember, /compact, # shortcut, .claude/rules/,
+      Hierarchy, Comparison, Decision Framework, Examples, Open Questions
+    - 3 tables: Complete Memory Hierarchy (7 tiers), Feature Comparison (5×5), Decision Framework (ASCII tree)
+    - Bidirectional cross-reference: claude-code.md ↔ context-fundamentals.md
+    - Tags updated: Added session-memory, memory-management, persistent-memory, rules, path-scoping
+
+    chapters/4-context/1-context-fundamentals.md lines 26-27 (2 lines added)
+    - Inline timestamped addition linking to Memory Management section
+    - Explains how session memory addresses the context vs memory distinction
+
+  when_to_use:
+    - Documenting features with automatic AND manual variants
+    - Explaining memory/persistence systems with multiple mechanisms
+    - Showing hierarchical systems (7-tier memory hierarchy)
+    - Providing decision guidance across multiple options
+
+  key_techniques:
+    - Mental model opens with bridging assertion (ephemeral → persistent)
+    - Automatic mechanisms first (session memory), manual second (.claude/rules/)
+    - Tables for quick scanning (hierarchy table, feature comparison)
+    - ASCII decision trees guide mechanism selection
+    - Practical examples use copy-paste code blocks
+    - Bidirectional cross-references with relationship explanation
+    - Feature gate warnings upfront (availability callouts)
+
+  trade_offs:
+    - advantage: Comprehensive coverage enables readers to select appropriate mechanism
+      cost: 310 lines requires strong navigation structure (9 subsections)
+    - advantage: Decision framework reduces cognitive load for mechanism selection
+      cost: ASCII tree must stay synchronized with actual mechanism capabilities
+    - advantage: Bidirectional linking improves discoverability
+      cost: Requires coordinated updates across multiple files
+
 stability:
   oscillation_detection:
     rule: |
@@ -768,25 +916,33 @@ stability:
     detected_oscillations: []
 
   convergence_indicators:
-    insight_rate_trend: "Stable - consolidation cycle with 2 new patterns (command docs, debugging expansion)"
-    new_entries_this_cycle: 2  # consolidated 4 expert swarm sub-patterns → 1, added slash command docs + debugging expansion
+    insight_rate_trend: "Increasing - two patterns extracted from major documentation efforts"
+    new_entries_this_cycle: 2  # agent_teams_documentation + memory_management_documentation
     contradiction_count: 0
-    last_reviewed: 2026-02-02
+    last_reviewed: 2026-02-05
     notes: |
-      **Pruning executed:** 994 lines → 782 lines (212-line reduction)
-      - Consolidated 4 expert swarm sub-patterns into 1 comprehensive entry
-      - Preserved all high-utility patterns, removed duplication
-      - Added 2 new patterns: slash command documentation structure, debugging expansion
+      **Cycle activities:**
+      - Analyzed major multi-file documentation update (agent teams, 420 lines)
+      - Analyzed memory management documentation (session memory + .claude/rules/, 310 lines)
+      - Extracted phased execution pattern from coordinated 6+ file updates
+      - Extracted bidirectional linking pattern refinement (Connections + inline timestamp)
 
-      **New pattern learnings:**
-      - Slash command docs use imperative 7-step workflow format
-      - Debugging chapters expand effectively with symptom-first structure
-      - Decision trees and comparison tables serve diagnostic content well
+      **New patterns added:**
+      1. Large Multi-File Feature Documentation (agent_teams_documentation, ~95 lines)
+         - Phased execution approach prevents broken references
+         - Foundation-first + cascade pattern for terminology consistency
+      2. Memory Management Feature Documentation (memory_management_documentation, ~75 lines)
+         - Automatic vs manual mechanism documentation structure
+         - Bidirectional cross-reference pattern (Connections entry + inline timestamp)
+         - Decision framework for mechanism selection (ASCII tree)
+         - Hierarchy table pattern (7 tiers with 5 dimensions)
 
-      **Size governance:** Back to 782 lines (target 750, warning at 900)
-      - Headroom: 118 lines to warning threshold
-      - Next pruning: Not needed until >900 lines
+      **Size governance:** 872 lines → 947 lines (+75 lines for memory pattern)
+      - Status: APPROACHING WARNING (947 lines, warning at 900)
+      - Headroom: -47 lines (already past warning threshold)
+      - Action: Consider pruning lower-value tactical entries in next improve cycle
+      - Target: Return to ~850 lines (100 line buffer to warning)
 
-      **Contradiction rate:** Zero. Consolidation preserved existing patterns.
+      **Contradiction rate:** Zero. Both patterns complement existing guidance.
 
-      **Utility ratio:** Both new patterns applied in production content (high utility).
+      **Utility ratio:** High - both patterns applied in substantial production content (420 + 310 = 730 lines).

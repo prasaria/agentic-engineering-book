@@ -223,6 +223,8 @@ tags: [domain, concept]
 
 *[2026-02-02]*: **Debugging Chapter Expansion Implementation** - When expanding operational guidance chapters, use symptom-first structure: Mindset comparison table → Core framework table → Multi-branch decision tree → Failure modes (Symptoms/Diagnosis/Root/Fixes). Each failure mode gets 4-part structured documentation. Decision trees guide readers through diagnostic sequence ("if X then check Y")
 
+*[2026-02-05]*: **Memory Management Documentation Implementation** - When documenting memory/persistence features with automatic + manual variants, use 9-section structure: (1) Opening mental model with bridging assertion, (2) Automatic mechanism (How It Works → Observable Behavior → Feature Gates), (3) Manual mechanisms (commands with workflows), (4) Modular system (directory structure → path-scoping → symlinks), (5) Hierarchy table (7 tiers × 5 dimensions), (6) Feature comparison table (mechanisms × dimensions), (7) Decision framework (ASCII tree), (8) Practical examples (copy-paste code blocks), (9) Bidirectional cross-references. Add Connections entry in feature doc + inline timestamp in related fundamentals. Example: chapters/9-practitioner-toolkit/1-claude-code.md lines 1138-1448 (310 lines) with bidirectional link to chapters/4-context/1-context-fundamentals.md lines 26-27.
+
 ## Common Pitfalls
 
 - **Pitfall name:** <How to avoid>
@@ -354,6 +356,32 @@ Implementation: chapters/3-model/4-multi-model-architectures.md lines 277-420 do
 6. Flow Chart Decision Framework: Binary questions leading to tool recommendations
 
 Implementation: chapters/9-practitioner-toolkit/1-claude-code.md lines 243-531. Enables verification through observable state (~/.claude/teams/ directory structure) and provides actionable pattern selection guidance.
+
+*[2026-02-05]*: **Multi-File Feature Rollout Documentation** - Large documentation efforts spanning 5+ files require phased execution:
+
+**Phase 1: Foundation** - Write comprehensive foundational section in primary chapter (claude-code.md). Include prerequisites, mental model, capabilities, advanced features, best practices, limitations. This becomes source of truth for terminology and feature status.
+
+**Phase 2: Commands** - Update slash command documentation (.claude/commands/do-swarm.md) with explicit references to foundation chapter. Commands inherit terminology and feature status from primary chapter.
+
+**Phase 3: Patterns** - Add cross-references in related pattern files (expert-swarm-pattern.md, orchestrator-pattern.md) using inline subsections + links. Don't duplicate foundation content—reference and contextualize.
+
+**Phase 4: Infrastructure** - Update expertise files (13 domains) and project docs (CLAUDE.md) with terminology and feature gate references.
+
+**Critical Learnings:**
+- Official terminology source: primary chapter becomes authoritative (code.claude.com as external source)
+- Feature gate migration (claude-sneakpeek → CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS): document explicitly at all levels
+- Prerequisites section: include verification pattern (how users confirm feature is enabled)
+- Limitations section: label with date (2026-02-05) since these evolve as feature matures
+- Display modes: document in command level first, reference from chapter (single source of truth)
+- Decision frameworks: use binary question trees (terminal node = recommendation) not prose lists
+
+**Anti-patterns:**
+- Duplicating prerequisites across files (maintenance nightmare when status changes)
+- Vague status language ("available soon") without explicit version or env var
+- Breaking cross-references by updating dependent files before foundation
+- Listing limitations without dating them (readers don't know if limitations still apply)
+
+Implementation: Agent teams rollout across 6+ files, synchronized through feature gate documentation and terminology consistency (2026-02-05).
 
 *[2026-01-30]*: **Bidirectional Cross-Reference Implementation** - When integrating new concepts:
 1. Add Connections section to new content with 4-6 relationship entries

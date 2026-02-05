@@ -2,7 +2,7 @@
 title: Orchestrator Pattern
 description: Hub-and-spoke coordination of specialized sub-agents in a single workflow
 created: 2025-12-08
-last_updated: 2026-01-30
+last_updated: 2026-02-05
 tags: [patterns, multi-agent, orchestration, coordination, tool-restriction, swarm]
 part: 2
 part_title: Craft
@@ -62,6 +62,8 @@ This is the critical insight: parallelism is achieved at the message level, not 
 **Key distinction:** SDK orchestration uses explicit tool calls to spawn subagents. The orchestrator invokes Task tools, waits for responses, and synthesizes results through framework code. Model-native swarm embeds orchestration within the model's reasoning—the model decides when to parallelize, spawns subagents internally, and coordinates execution through trained behavior rather than prompted instructions.
 
 **Trade-off:** SDK orchestration provides explicit control and traceable coordination logic. Model-native swarm offers autonomous parallelization and potentially lower coordination overhead, but reduces visibility into orchestration decisions and couples workflows to specific model families.
+
+*[2026-02-05]*: **Agent Teams Extension** - When SDK orchestrators require peer-to-peer messaging between subagents, agent teams (TeammateTool) provide direct communication primitives. The orchestrator spawns teammates (not just subagents) who can send messages, broadcast notifications, and coordinate without routing through the orchestrator. This sits between traditional SDK orchestration (indirect coordination via orchestrator) and model-native swarm (autonomous parallelization). Subagents for focused work, agent teams for collaboration. See [Agent Teams documentation](../../9-practitioner-toolkit/1-claude-code.md#agent-teams-native-multi-agent-coordination-experimental).
 
 **See:** [Multi-Model Architectures: Model-Native Swarm Orchestration](../../3-model/4-multi-model-architectures.md#model-native-swarm-orchestration) for detailed comparison, including PARL training approach, Critical Steps metric, and performance characteristics (100+ subagents, 3-4.5× speedup).
 

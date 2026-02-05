@@ -2,7 +2,7 @@
 title: Expert Swarm Pattern
 description: Combining domain expertise with parallel swarm execution
 created: 2026-02-02
-last_updated: 2026-02-02
+last_updated: 2026-02-05
 tags: [pattern, swarm, orchestration, expertise, parallel]
 part: 2
 part_title: Craft
@@ -150,26 +150,26 @@ Workers report summary back to orchestrator
 
 Specs serve as coordination state—workers don't receive context directly from the orchestrator. This prevents context pollution and enables true parallelism (workers operate independently).
 
-### TeammateTool Messaging (When Available)
+### Agent Teams Messaging (When Available)
 
-*[2026-01-30]*: TeammateTool provides richer coordination primitives beyond spec files. Currently gated (accessible via claude-sneakpeek), but enables:
+*[2026-01-30]*: Agent teams (TeammateTool) provide richer coordination primitives beyond spec files. Currently experimental (accessible via `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1`), but enable:
 
 - **Write**: Send message to specific worker
 - **Broadcast**: Notify all workers of state change
 - **Read**: Workers query messages without orchestrator mediation
 
-**Expert Swarm + TeammateTool:**
+**Expert Swarm + Agent Teams:**
 ```python
 # Orchestrator broadcasts expertise update
-TeammateTool.Broadcast("Expertise updated: new voice pattern added")
+SendMessage(type: "broadcast", content: "Expertise updated: new voice pattern added")
 
 # Workers read messages and reload expertise
-message = TeammateTool.Read()
+message = ReceiveMessage()
 if "Expertise updated" in message:
     reload_expertise()
 ```
 
-See [TeammateTool documentation](../../9-practitioner-toolkit/1-claude-code.md#teammatetool-native-multi-agent-coordination-hidden) for coordination primitives and patterns.
+See [Agent Teams documentation](../../9-practitioner-toolkit/1-claude-code.md#agent-teams-native-multi-agent-coordination-experimental) for coordination primitives and patterns.
 
 ### No Context Passing Between Agents
 
@@ -420,8 +420,8 @@ Currently blocked by infrastructure. Document as future capability when nesting 
 **Expertise Synchronization:**
 The 750-line target requires discipline. Without governance, expertise.yaml grows unbounded, inflating token costs and diluting signal.
 
-**TeammateTool Gating:**
-Advanced messaging patterns (Write, Broadcast, Read) are currently gated behind claude-sneakpeek. Production systems must rely on spec-as-artifact coordination until TeammateTool is generally available.
+**Agent Teams Availability:**
+Advanced messaging patterns (Write, Broadcast, Read) are currently experimental (requires `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1` environment variable). Production systems should rely on spec-as-artifact coordination as the stable fallback until agent teams reach general availability.
 
 **Token Overhead:**
 Expertise path-passing adds ~3,000 tokens per worker (for 750-line expertise.yaml). At 10 workers, this is 30,000 tokens—manageable but not free. Expertise size governance directly impacts scaling economics.
@@ -487,6 +487,11 @@ Within single domain? ─No─→ Use Multi-Expert Orchestrator (Council)
           │
          Yes
           │
+Do teammates need to message ─Yes─→ Use Agent Teams (if available)
+each other during execution?      Otherwise use Expert Swarm + spec files
+          │
+          No
+          │
 Expertise.yaml exists? ─No─→ Create expertise first OR use generic orchestrator
           │
          Yes
@@ -510,7 +515,7 @@ Scale justifies overhead? ─No─→ Sequential expert pattern
 
 - **To [Self-Improving Experts](2-self-improving-experts.md)**: Expertise.yaml becomes the shared knowledge source for swarm workers. The improve agent runs post-swarm to analyze collective execution and update expertise. This creates a feedback loop: swarms execute → improve analyzes → expertise grows → next swarm benefits.
 
-- **To [TeammateTool](../../9-practitioner-toolkit/1-claude-code.md#teammatetool-native-multi-agent-coordination-hidden)**: Advanced messaging patterns (Write, Broadcast, Read) enable coordination beyond spec-as-artifact. Currently gated but provides richer communication when available. Expert Swarm can layer TeammateTool messaging on top of expertise inheritance.
+- **To [Agent Teams](../../9-practitioner-toolkit/1-claude-code.md#agent-teams-native-multi-agent-coordination-experimental)**: Advanced messaging patterns (Write, Broadcast, Read) enable coordination beyond spec-as-artifact. Currently experimental but provides richer communication when available. Expert Swarm can layer agent teams (TeammateTool) messaging on top of expertise inheritance for peer-to-peer coordination between council members.
 
 - **To [Multi-Agent Context](../../4-context/4-multi-agent-context.md)**: Path-passing protocol implements expertise sharing without context pollution. Workers read expertise.yaml themselves rather than receiving copied context from orchestrator. Maintains context isolation while enabling consistency.
 
@@ -525,7 +530,7 @@ Scale justifies overhead? ─No─→ Sequential expert pattern
 - How do expertise.yaml updates propagate when multiple swarms execute concurrently? (Potential race condition if two improve agents run simultaneously)
 - What's the optimal expertise file size for path-passing? (Current target: 750 lines. Evidence needed for different scales)
 - Can workers selectively read sections of expertise.yaml, or must they load entire file? (Scope extraction reduces tokens but adds complexity)
-- How does expertise inheritance compose with TeammateTool's Council pattern? (Multiple domain experts coordinating—each with their own expertise.yaml)
+- How does expertise inheritance compose with agent teams Council pattern? (Multiple domain experts coordinating—each with their own expertise.yaml)
 - What debugging patterns emerge for tracing expertise influence on worker decisions? (Observability into which expertise sections workers consulted)
 - When nesting becomes reliable, how deep should expertise-inheritance chains go? (Worker → sub-worker → sub-sub-worker: at what depth does overhead exceed benefit?)
 - Should workers report back which expertise sections they consulted? (Would enable expertise usage analysis and pruning of unused patterns)

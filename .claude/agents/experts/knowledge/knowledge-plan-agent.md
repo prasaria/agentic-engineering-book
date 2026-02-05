@@ -235,6 +235,8 @@ Use these when documenting "how to decide" workflows. They make implicit decisio
 
 **When to Use:** Expanding operational guidance chapters, documenting troubleshooting workflows, building practitioner reference material for production issues.
 
+*[2026-02-05]*: **Memory Management Documentation Pattern** - When documenting memory/persistence features with automatic AND manual mechanisms, follow 9-section structure: Opening mental model (bridging assertion) → Automatic mechanism (How It Works/Observable Behavior/Feature Gates) → Manual mechanisms (commands with workflows) → Modular system (directory structure/path-scoping/symlinks) → Hierarchy table (7 tiers × 5 dimensions) → Feature comparison table (5 mechanisms × 5 dimensions) → Decision framework (ASCII tree for mechanism selection) → Practical examples (copy-paste code blocks) → Bidirectional cross-references. Pattern enables readers to select appropriate mechanism via decision tree. Bidirectional linking: Major feature docs add Connections entry; related fundamentals get inline timestamp. Example: chapters/9-practitioner-toolkit/1-claude-code.md Memory Management section (310 lines) links to chapters/4-context/1-context-fundamentals.md (inline timestamp added).
+
 **Leading Questions Pattern:**
 New and developing entries benefit from questions that guide future development:
 ```markdown

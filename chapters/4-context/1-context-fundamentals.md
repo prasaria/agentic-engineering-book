@@ -2,7 +2,7 @@
 title: Context Fundamentals
 description: Core principles of context as agent working memory and capability capacity
 created: 2025-12-10
-last_updated: 2025-12-10
+last_updated: 2026-02-05
 tags: [foundations, context, memory, capability-capacity]
 part: 1
 part_title: Foundations
@@ -22,6 +22,8 @@ Context is everything the agent is aware of at any given time. More concretely, 
 Memory in current LLMs doesn't exist in any meaningful way by default. Each fresh agent instance starts from a blank slate with no awareness of previous agents' work. Throughout an agent's session, its context window fills with accumulated information: user messages, tool calls and responses, read files, and other encountered data.
 
 The distinction matters for architecture. Context is ephemeral working memory that dies with the session. Memory would be persistent knowledge that survives restarts—but without external storage mechanisms, agents don't have this by default. See [Multi-Agent Context: Persistent State vs. Ephemeral Context](4-multi-agent-context.md#persistent-state-vs-ephemeral-context) for the full distinction.
+
+*[2026-02-05]*: Claude Code's session memory feature (v2.1.32+) provides automatic persistent memory across sessions through background summarization. This external storage mechanism enables agents to recall context from previous sessions without manual persistence. See [Claude Code: Memory Management](../9-practitioner-toolkit/1-claude-code.md#memory-management) for implementation details.
 
 ---
 

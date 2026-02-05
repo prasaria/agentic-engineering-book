@@ -1,6 +1,6 @@
 # Table of Contents
 
-*Generated: 2026-01-30*
+*Generated: 2026-02-05*
 
 ---
 
@@ -70,6 +70,7 @@ Recurring architectures and approaches for building agentic systems
 - [ReAct Pattern](chapters/6-patterns/5-react-pattern.md)
 - [Human-in-the-Loop Pattern](chapters/6-patterns/6-human-in-the-loop.md)
 - [Progressive Disclosure Pattern](chapters/6-patterns/7-progressive-disclosure.md)
+- [Expert Swarm Pattern](chapters/6-patterns/8-expert-swarm-pattern.md)
 
 ### Chapter 7: Practices
 
@@ -110,11 +111,12 @@ Tools for agentic engineering with operational insights
 
 ---
 
-## Appendices
+## Part 4: Appendices
 
-### Examples
+### Chapter 10: Appendices
 
-Reference implementations demonstrating book patterns
+Supplementary materials, examples, and reference implementations
 
-- [Examples Overview](appendices/examples/README.md)
-- [KotaDB Case Study](appendices/examples/kotadb/CASE_STUDY.md)
+- [Appendices](appendices/_index.md)
+- [Examples](appendices/examples/README.md)
+- [KotaDB Case Study: Patterns in Production](appendices/examples/kotadb/CASE_STUDY.md)

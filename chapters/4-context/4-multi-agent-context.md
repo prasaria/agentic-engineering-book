@@ -2,7 +2,7 @@
 title: Multi-Agent Context
 description: Context isolation patterns and persistent state management in multi-agent systems
 created: 2025-12-10
-last_updated: 2026-01-11
+last_updated: 2026-02-05
 tags: [foundations, context, multi-agent, state, isolation]
 part: 1
 part_title: Foundations
@@ -45,6 +45,34 @@ Multi-agent context isolation excels in specific scenarios:
 - **Decision support** requiring deterministic, reproducible outputs
 
 For simple tasks, multi-agent context isolation introduces unnecessary overhead.
+
+### Agent Teams vs Subagents
+
+*[2026-02-05]*: Context isolation differs significantly between subagents and agent teams (TeammateTool), reflecting different coordination models.
+
+**Subagents (Traditional Pattern):**
+- Isolated context windows (no parent conversation history)
+- Return summaries to orchestrator
+- No inter-subagent communication (coordination via orchestrator)
+- Coordination state flows through spec files or orchestrator context
+- Pattern: Hub-and-spoke architecture
+
+**Agent Teams (Experimental):**
+- Isolated context windows (independent sessions for each teammate)
+- Peer-to-peer messaging without orchestrator mediation
+- Shared task list and message queue (observable at `~/.claude/teams/<team_id>/`)
+- Automatic message delivery when teammates check for updates
+- Pattern: Peer coordination with optional orchestrator oversight
+
+**Key Distinction:** Subagents isolate context to prevent pollution and enable parallelism. Agent teams isolate context while adding direct communication channels—teammates coordinate through messages, not through shared context.
+
+**When Context Isolation Matters:**
+- **Subagents**: Prevents orchestrator context pollution from worker search/analysis operations
+- **Agent teams**: Prevents peer context pollution while enabling coordination messages
+
+Both patterns achieve context hygiene, but agent teams add collaboration primitives that subagents lack.
+
+**See:** [Agent Teams documentation](../../9-practitioner-toolkit/1-claude-code.md#agent-teams-native-multi-agent-coordination-experimental) for coordination patterns, message primitives, and decision frameworks. [Official Claude Code docs](https://docs.claude.com/en/docs/claude-code/agent-teams) for setup and usage.
 
 ### Contrast with Single-Agent
 

@@ -2,8 +2,8 @@
 title: Claude Code
 description: Anthropic's CLI coding agent with subagents, Skills, and hooks
 created: 2025-12-08
-last_updated: 2026-01-30
-tags: [tools, claude-code, coding-agent, anthropic, slash-commands, expert-pattern, skills, orchestration, tool-restriction, hooks, sandbox, security, multi-agent, teammatetool, coordination]
+last_updated: 2026-02-05
+tags: [tools, claude-code, coding-agent, anthropic, slash-commands, expert-pattern, skills, orchestration, tool-restriction, hooks, sandbox, security, multi-agent, teammatetool, coordination, agent-teams, session-memory, memory-management, persistent-memory, rules, path-scoping]
 part: 3
 part_title: Perspectives
 chapter: 9
@@ -30,6 +30,7 @@ The shift from "assistant" to "system" thinking changes how you use it—instead
 
 - **To [Prompt](../2-prompt/_index.md):** Skills and slash commands demonstrate model-invoked vs user-invoked prompt patterns. See [Model-Invoked vs. User-Invoked Prompts](../2-prompt/_index.md#model-invoked-vs-user-invoked-prompts) for design trade-offs.
 - **To [Context](../4-context/_index.md):** Skills implement the [Progressive Disclosure pattern](../4-context/3-context-patterns.md#progressive-disclosure-pattern) for context management
+- **To [Context Fundamentals](../4-context/1-context-fundamentals.md#context-vs-memory):** Session memory provides persistent memory across sessions, addressing the ephemeral nature of context windows. The .claude/rules/ system enables path-scoped context injection.
 - **To [Cost and Latency](../7-practices/3-cost-and-latency.md):** Token cost models for different feature types—understanding the economics of tools, Skills, subagents, and MCP
 - **ReAct Loop:** How does Claude Code implement the ReAct pattern?
 - **Human-in-the-Loop:** How do you stay in the loop while using Claude Code?
@@ -242,87 +243,164 @@ For now, design architectures that work within the flat model. The workarounds e
 
 ---
 
-## TeammateTool: Native Multi-Agent Coordination (Hidden)
+## Agent Teams: Native Multi-Agent Coordination (Experimental)
 
-*[2026-01-30]*: Claude Code ships with TeammateTool, a multi-agent coordination layer beyond the basic Task tool. This feature is server-side gated but unlockable via `claude-sneakpeek`.
+*[2026-02-05]*: Claude Code ships with agent teams, a multi-agent coordination layer enabling peer-to-peer messaging and shared task lists. This feature is experimental and disabled by default.
+
+### Prerequisites
+
+Agent teams are experimental and disabled by default. Enable them before use:
+
+**Option 1: Environment Variable**
+```bash
+export CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1
+```
+
+**Option 2: settings.json**
+```json
+{
+  "env": {
+    "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1"
+  }
+}
+```
+
+**Verification**: Start Claude Code. If agent teams are enabled, the team coordination tools become available.
+
+**Warning**: Agent teams have known limitations around session resumption, task coordination, and shutdown behavior. See [Availability and Status](#availability-and-status) for details.
 
 ### Your Mental Model
 
-**TeammateTool is the coordination primitive layer that Task abstracts over.** Task provides "spawn and wait"; TeammateTool provides spawn, join, broadcast, plan approval, and structured messaging. The difference resembles `fork()` (Task) versus a full process orchestration framework (TeammateTool).
+**Agent teams enable peer-to-peer coordination between Claude Code sessions, unlike subagents which only report back.** Subagents (Task tool) run within a single session and return results to the caller. Agent teams (TeammateTool) run as independent Claude Code sessions that can message each other directly, share a task list, and coordinate without going through the lead.
 
-### What It Provides
+### Core Capabilities
 
-**13 Coordination Operations:**
-
-TeammateTool exposes coordination primitives at a lower level than the Task tool:
-
+**Coordination Tools:**
+- **SpawnTeam**: Create team with shared task list and messaging system
 - **Spawn**: Create new teammate agents with role definitions
-- **Join**: Wait for specific teammates to complete
-- **Write**: Send message to specific teammate's inbox
-- **Broadcast**: Send message to all teammates
-- **Plan Approval**: Explicit human-in-the-loop gate
-- **Shutdown**: Graceful team termination
-- **List**: Enumerate active teammates
-- **Status**: Query teammate execution state
+- **SendMessage**: Direct message to specific teammate OR broadcast to all
+- **Shutdown**: Request teammate graceful exit (teammate can approve/reject)
+- **Cleanup**: Remove shared team resources (requires all teammates stopped)
 
-Additional operations exist in the codebase but remain undocumented in public materials.
+**Display Modes:**
+- **in-process**: All teammates in main terminal (Shift+Up/Down to select, works any terminal)
+- **split-pane**: Each teammate gets own pane (tmux or iTerm2, see all at once)
 
-**File-Based Messaging:**
+**Keyboard Controls (in-process mode):**
+- `Shift+Up/Down`: Select teammate
+- `Enter`: View teammate's session
+- `Escape`: Interrupt teammate's current turn
+- `Ctrl+T`: Toggle task list
+- `Shift+Tab`: Cycle into delegate mode (lead coordination-only)
 
-Teams communicate via `~/.claude/teams/{name}/inboxes/` directory structure. Each teammate has an inbox; coordinators write messages, teammates read and process. This filesystem-based approach enables:
+**Team Structure:**
+- Team lead: Main Claude Code session that creates the team
+- Teammates: Independent Claude Code instances
+- Task list: Shared work items (pending/in-progress/completed states with dependencies)
+- Mailbox: Messaging system for inter-agent communication
 
-- Inspection of messages mid-execution (debugging)
-- Persistence across session restarts
-- Simple coordination semantics (write file = send message)
-- Observable state for monitoring tools
+**Storage Locations:**
+- Team config: `~/.claude/teams/{team-name}/config.json`
+- Task list: `~/.claude/tasks/{team-name}/`
+- Messages: Delivered automatically (no polling required)
 
-**Example directory structure:**
+### Getting Started
+
+**1. Enable agent teams**:
+```bash
+export CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1
 ```
-~/.claude/teams/research-team/
-├── inboxes/
-│   ├── researcher-1/
-│   │   ├── message-001.json
-│   │   └── message-002.json
-│   ├── researcher-2/
-│   │   └── message-001.json
-│   └── coordinator/
-│       └── message-001.json
+
+**2. Create a team naturally**:
+```
+I'm designing a CLI tool that helps developers track TODO comments across
+their codebase. Create an agent team to explore this from different angles: one
+teammate on UX, one on technical architecture, one playing devil's advocate.
 ```
 
-**Spawn Backends:**
+Claude creates the team, spawns teammates, coordinates work, and attempts cleanup when finished.
 
-| Backend | Use Case | Trade-offs |
-|---------|----------|------------|
-| `in-process` | Fast, isolated contexts within session | Limited to Claude Code session lifecycle; no visual isolation |
-| `tmux` | Persistent, observable via tmux sessions | Requires tmux installed; higher overhead; visible across session restarts |
-| `iterm2` | Visual tabs for each teammate | macOS-only; requires iTerm2; visual debugging support |
+**3. Choose display mode**:
+
+Default is `"auto"` (split panes if in tmux, in-process otherwise). Override in settings.json:
+```json
+{
+  "teammateMode": "in-process"  // or "tmux"
+}
+```
+
+Or per-session:
+```bash
+claude --teammate-mode in-process
+```
+
+**4. Control the team**:
+
+Tell the lead in natural language what you want. It handles coordination, task assignment, delegation.
+
+**5. Interact directly with teammates**:
+
+- **In-process**: Shift+Up/Down to select, type to message
+- **Split-pane**: Click into teammate's pane
+
+### Advanced Features
+
+**Delegate Mode:**
+
+Press `Shift+Tab` to restrict the lead to coordination-only tools (spawning, messaging, shutting down teammates, managing tasks). The lead cannot implement tasks directly—forces pure orchestration role.
+
+Use when: Lead should focus entirely on breaking down work, assigning tasks, and synthesizing results without touching code.
+
+**Plan Approval for Teammates:**
+
+Require teammates to plan before implementing. Teammate works in read-only mode until lead approves approach.
+
+```
+Spawn an architect teammate to refactor the authentication module.
+Require plan approval before they make any changes.
+```
+
+When teammate finishes planning, it sends approval request to lead. Lead reviews and either approves (teammate proceeds) or rejects with feedback (teammate revises and resubmits).
+
+**Influence lead's judgment**: Give approval criteria in prompt ("only approve plans that include test coverage").
+
+**Task Dependencies:**
+
+Tasks can depend on other tasks. Pending tasks with unresolved dependencies cannot be claimed until dependencies complete. System handles dependency resolution automatically.
+
+**Task Claiming:**
+
+- **Lead assigns**: Explicitly assign task to teammate
+- **Self-claim**: After finishing, teammate picks up next unassigned, unblocked task automatically
+
+Task file locking prevents race conditions when multiple teammates claim simultaneously.
 
 ### Coordination Patterns Enabled
 
-TeammateTool enables five coordination patterns documented in the implementation:
+Agent teams enable five coordination patterns documented in the implementation:
 
-**1. Leader-Worker**
+**1. Lead-Teammate**
 
 ```
 ┌──────────┐
-│  Leader  │
+│   Lead   │
 └─────┬────┘
-      │ Spawn N workers
+      │ Spawn N teammates
       ├─────────┬─────────┬─────────┐
       ▼         ▼         ▼         ▼
-   Worker1  Worker2  Worker3  Worker4
+  Teammate1 Teammate2 Teammate3 Teammate4
       │         │         │         │
-      │ Write results back to leader  │
+      │ Send results back to lead     │
       └─────────┴─────────┴─────────┘
                   │
                   ▼ Join (wait for all)
              ┌──────────┐
-             │  Leader  │
+             │   Lead   │
              │ Synthesis│
              └──────────┘
 ```
 
-Leader spawns N workers, distributes work via Write, collects results via Join. Common for parallel data processing, batch operations, or distributed search.
+Lead spawns N teammates, distributes work via SendMessage, collects results via Join. Common for parallel data processing, batch operations, or distributed search.
 
 **2. Swarm**
 
@@ -344,12 +422,12 @@ N peers spawned simultaneously, Broadcast coordinates, emergent behavior from lo
 **3. Pipeline**
 
 ```
-Agent A ──Write──> Agent B ──Write──> Agent C ──Write──> Agent D
-  │                   │                   │                   │
-  └─── Process ───────└─── Transform ────└─── Enrich ────────└─── Finalize
+Agent A ──SendMessage──> Agent B ──SendMessage──> Agent C ──SendMessage──> Agent D
+  │                        │                        │                        │
+  └─── Process ────────────└─── Transform ──────────└─── Enrich ────────────└─── Finalize
 ```
 
-Sequential processing where each agent completes before next begins. Agent A writes to Agent B's inbox, B processes and writes to C's inbox, etc. Classic ETL pattern for multi-stage transformations.
+Sequential processing where each agent completes before next begins. Agent A messages Agent B, B processes and messages C, etc. Classic ETL pattern for multi-stage transformations.
 
 **4. Council**
 
@@ -363,7 +441,7 @@ Sequential processing where each agent completes before next begins. Agent A wri
    Security  Perf   UX      Legal
    Expert   Expert Expert  Expert
        │        │        │        │
-       │   Write responses back   │
+       │   Send responses back    │
        └────────┴────────┴────────┘
                 │
                 ▼ Join + synthesize
@@ -396,98 +474,160 @@ Spawn domain experts, Broadcast question, collect responses, synthesize with arb
 
 Planning agent generates spec, Plan Approval tool blocks execution until human reviews, execution proceeds after approval. Implements human-in-the-loop gate as a first-class coordination primitive.
 
-### Architectural Significance
+### Official Use Cases
 
-TeammateTool indicates Anthropic's thinking on multi-agent coordination:
+Agent teams excel at:
 
-**Three-Tier Hierarchy:**
+1. **Research and review**: Multiple teammates investigate different aspects simultaneously, then share and challenge findings
+2. **New modules or features**: Teammates each own separate piece without stepping on each other
+3. **Debugging with competing hypotheses**: Test different theories in parallel, converge faster
+4. **Cross-layer coordination**: Changes spanning frontend, backend, tests—each owned by different teammate
 
-1. **Task tool** - Simple delegation, return-only communication. Agent spawns subagent, waits for completion, receives result.
-2. **Subagents** - Context isolation, parallel execution. Multiple Tasks in single message enable concurrency.
-3. **TeammateTool** - Full coordination layer: messaging, waiting, approval gates, structured communication.
+**Anti-patterns**:
+- Sequential tasks (use single session or subagents)
+- Same-file edits (causes overwrites)
+- Work with many dependencies (coordination overhead exceeds benefit)
 
-The feature's existence in production code suggests the Claude Agent SDK is evolving beyond simple delegation toward structured multi-agent orchestration primitives.
+**Sources**: Official docs "When to use agent teams", "Best practices"
 
-**Comparison: Task vs TeammateTool**
+### Agent Teams vs Subagents
 
-| Capability | Task | TeammateTool |
-|------------|------|--------------|
-| Spawn agents | ✓ | ✓ |
-| Wait for completion | ✓ (implicit) | ✓ (explicit via Join) |
-| Send messages | ✗ | ✓ (Write, Broadcast) |
-| Selective waiting | ✗ | ✓ (Join specific agents) |
-| Human approval gates | ✗ | ✓ (Plan Approval) |
-| Graceful shutdown | ✗ | ✓ (Shutdown) |
-| Inspect running agents | ✗ | ✓ (List, Status) |
-| Backend selection | ✗ | ✓ (in-process, tmux, iterm2) |
+|                   | Subagents (Task tool)                    | Agent teams (TeammateTool)                  |
+| :---------------- | :--------------------------------------- | :------------------------------------------ |
+| **Context**       | Own context; results return to caller    | Own context; fully independent              |
+| **Communication** | Report results back to main agent only   | Teammates message each other directly       |
+| **Coordination**  | Main agent manages all work              | Shared task list with self-coordination     |
+| **Best for**      | Focused tasks where only result matters  | Complex work requiring discussion and collaboration |
+| **Token cost**    | Lower: results summarized back to main   | Higher: each teammate is separate Claude instance |
 
-TeammateTool provides significantly richer coordination semantics at the cost of explicit orchestration complexity.
+**Sources**: Official docs comparison table
 
-### Relationship to Existing Patterns
+### Best Practices
 
-**Plan Approval Alignment:**
+**Give teammates enough context:**
 
-The built-in Plan Approval operation matches the plan→build→improve cycle. TeammateTool makes this pattern a first-class coordination primitive rather than emergent workflow. Human review becomes an explicit coordination step, not a workflow convention.
+Teammates load CLAUDE.md, MCP servers, and skills automatically, but not lead's conversation history. Include task-specific details in spawn prompt:
 
-**Context Isolation:**
+```
+Spawn a security reviewer teammate with the prompt: "Review the authentication module
+at src/auth/ for security vulnerabilities. Focus on token handling, session
+management, and input validation. The app uses JWT tokens stored in
+httpOnly cookies. Report any issues with severity ratings."
+```
 
-TeammateTool teammates maintain separate contexts like subagents but add structured communication. This solves the "how do agents coordinate without passing full contexts" problem—messages stay in inboxes, not shared context windows.
+**Size tasks appropriately:**
 
-**Nesting Constraint Bypass:**
+- **Too small**: Coordination overhead exceeds benefit
+- **Too large**: Teammates work too long without check-ins, increasing wasted effort risk
+- **Just right**: Self-contained units producing clear deliverable (function, test file, review)
 
-Unlike Task (unavailable to subagents), TeammateTool operates at a lower level. Whether teammates spawned via TeammateTool can themselves use TeammateTool remains undocumented. The feature's architecture suggests nested teams might be possible, but no confirmation exists.
+**Tip**: If lead isn't creating enough tasks, ask it to split work into smaller pieces. Having 5-6 tasks per teammate keeps everyone productive and enables work reassignment if someone stuck.
 
-**Connection to Multi-Agent Context Patterns:**
+**Wait for teammates to finish:**
 
-File-based messaging implements [Message Passing](../4-context/4-multi-agent-context.md) without context pollution. Each agent reads only messages addressed to it, preventing the context bloat common in shared-state coordination. See [Multi-Agent Context](../4-context/4-multi-agent-context.md) for context management strategies across agent boundaries.
+If lead starts implementing instead of waiting:
+```
+Wait for your teammates to complete their tasks before proceeding
+```
 
-### Feature Flag Status
+**Start with research and review:**
 
-**Server-Side Gated:**
+If new to agent teams, start with tasks having clear boundaries that don't require code writing: reviewing PR, researching library, investigating bug. Shows parallel exploration value without coordination challenges.
 
-TeammateTool ships with Claude Code but requires server-side feature flags to activate. The tool is not accessible via standard configuration files or environment variables. This gating suggests production-ready code held back for controlled rollout.
+**Avoid file conflicts:**
 
-**Community Unlock:**
+Two teammates editing same file leads to overwrites. Break work so each teammate owns different set of files.
 
-The `claude-sneakpeek` tool bypasses gating for experimental access. This unofficial unlock path enables practitioner exploration before official release. The existence of a community bypass indicates:
+**Monitor and steer:**
 
-1. Code is sufficiently stable for external testing
-2. Anthropic is open to early adopter feedback
-3. Broader release likely as SDK matures
+Check in on progress, redirect approaches not working, synthesize findings as they come. Letting team run unattended too long increases wasted effort risk.
 
-**Anthropic's Signal:**
+**Sources**: Official docs "Best practices" section
 
-Shipping but gating suggests: (1) code is production-ready, (2) rollout is strategic/controlled, (3) broader release likely as SDK matures. The timing aligns with the Claude Code SDK rename to Claude Agent SDK (late 2025), indicating multi-agent coordination is a core strategic direction.
+### Troubleshooting
 
-### When to Use TeammateTool vs Task
+**Teammates not appearing:**
+- In in-process mode: Press `Shift+Down` to cycle through active teammates
+- Check task complexity warranted team (Claude decides based on task)
+- For split panes: Verify tmux installed (`which tmux`) or iTerm2 + `it2` CLI available
 
-**Use Task when:**
+**Too many permission prompts:**
+Pre-approve common operations in permission settings before spawning teammates to reduce interruptions.
+
+**Teammates stopping on errors:**
+Check output (Shift+Up/Down or click pane), then either:
+- Give additional instructions directly
+- Spawn replacement teammate to continue work
+
+**Lead shuts down before work done:**
+Tell lead to keep going. Can also instruct lead to wait for teammates to finish before proceeding.
+
+**Orphaned tmux sessions:**
+If tmux session persists after team ends:
+```bash
+tmux ls
+tmux kill-session -t <session-name>
+```
+
+**Sources**: Official docs "Troubleshooting" section
+
+### Availability and Status
+
+**Experimental Feature:**
+
+Agent teams are disabled by default as of Claude Code 2.1.x. Enable via:
+
+```bash
+export CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1
+```
+
+Or in `settings.json`:
+```json
+{
+  "env": {
+    "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1"
+  }
+}
+```
+
+**Known Limitations** (as of 2026-02-05):
+
+- **No session resumption with in-process teammates**: `/resume` and `/rewind` do not restore teammates. After resuming, lead may message teammates that no longer exist. Workaround: Spawn new teammates.
+- **Task status can lag**: Teammates sometimes fail to mark tasks completed, blocking dependent tasks. Workaround: Check if work done and update task status manually or nudge teammate.
+- **Shutdown can be slow**: Teammates finish current request/tool call before shutting down (can take time).
+- **One team per session**: Lead can only manage one team at a time. Clean up current team before starting new one.
+- **No nested teams**: Teammates cannot spawn their own teams or teammates. Only lead manages team.
+- **Lead is fixed**: Session that creates team is lead for its lifetime. Cannot promote teammate to lead.
+- **Permissions set at spawn**: All teammates start with lead's permission mode. Can change individual modes after spawning, but cannot set per-teammate modes at spawn time.
+- **Split panes require tmux or iTerm2**: Default in-process mode works any terminal. Split-pane not supported in VS Code integrated terminal, Windows Terminal, Ghostty.
+
+**Sources**: Official docs "Limitations" section
+
+### When to Use Agent Teams vs Subagents
+
+**Use subagents (Task tool) when:**
 
 - Simple delegation suffices (spawn, wait, return)
 - Agents work independently without coordination
 - Official support and stability required
 - Minimal coordination complexity preferred
 
-**Use TeammateTool when:**
+**Use agent teams (TeammateTool) when:**
 
-- Agents need to communicate during execution
+- Teammates need to message each other during execution
 - Selective waiting (Join specific agents, not all)
 - Human approval gates required (Plan Approval)
-- Visual debugging needed (tmux, iterm2 backends)
+- Visual debugging needed (tmux, iTerm2 backends)
 - Exploring cutting-edge coordination patterns
 
 **Decision Framework:**
 
 ```
-Is this officially supported? ──No──> Use Task (safer for production)
+Do teammates need to message each other during execution? ──No──> Use subagents (Task tool) (simpler)
                 │
                Yes
                 │
-Do agents need to communicate? ──No──> Use Task (simpler)
-                │
-               Yes
-                │
-Is human approval required? ──Yes──> TeammateTool (Plan Approval)
+Is human approval required? ──Yes──> Use agent teams (TeammateTool) (Plan Approval)
                 │
                No
                 │
@@ -499,29 +639,38 @@ Multiple perspectives needed? ──Yes──> Consider Council pattern
                 │
                No
                 │
-Default: Use TeammateTool ──> Enable richer coordination
+Default: Use agent teams (TeammateTool) ──> Enable richer coordination
 ```
 
-**Expert Swarm Variant**: Council pattern combines with expertise inheritance when domain experts coordinate. Each council member inherits domain expertise.yaml via path-passing, enabling consistent multi-perspective analysis. See [Expert Swarm Pattern](../../6-patterns/8-expert-swarm-pattern.md) for combining orchestration with expertise consistency.
+**Expert Swarm Variant**: Council pattern combines with expertise inheritance when domain experts coordinate. Each council member (agent teams teammate) inherits domain expertise.yaml via path-passing, enabling consistent multi-perspective analysis. See [Expert Swarm Pattern](../../6-patterns/8-expert-swarm-pattern.md) for combining orchestration with expertise consistency.
 
 ### Open Questions
 
+**From previous analysis:**
 - Which coordination operations beyond the 8 identified exist in the codebase?
-- Can TeammateTool teammates spawn nested teams?
+- Can agent teams teammates spawn nested teams? (Official docs say no as of 2026-02-05)
 - How does file-based messaging scale to 10+ teammates writing concurrently?
 - What happens when inboxes fill—overflow behavior, message ordering guarantees?
-- Will TeammateTool remain CLI-specific or migrate to Claude Agent SDK?
+- Will agent teams remain CLI-specific or migrate to Claude Agent SDK generally?
 - How does Plan Approval integrate with the hooks system?
 - What happens if a teammate crashes while holding unprocessed messages?
-- Do backends (tmux, iterm2) affect coordination semantics or just observability?
+- Do backends (tmux, iTerm2) affect coordination semantics or just observability?
 - What monitoring/observability tools exist for team coordination beyond filesystem inspection?
+
+**From official docs:**
+- How does task dependency resolution handle circular dependencies?
+- What happens when teammate rejects shutdown request? (Official docs mention this capability)
+- Can display modes be changed mid-session, or only at startup?
+- How do permission prompts from teammates surface to lead in split-pane mode?
+- What is the maximum recommended team size before coordination overhead dominates?
+- How does lead's conversation context affect teammate spawning heuristics?
 
 ### Sources
 
-- Claude Code codebase analysis (TeammateTool implementation)
-- `claude-sneakpeek` community unlock tool
-- Claude Agent SDK rename announcement (late 2025)
-- Filesystem observations of `~/.claude/teams/` structure
+- [Official Claude Code Agent Teams Documentation](https://code.claude.com/docs/en/agent-teams) (2026-02-05)
+- [Claude Code codebase analysis](https://github.com/anthropic-ai/claude-code) (TeammateTool implementation)
+- [Claude Agent SDK rename announcement](https://www.anthropic.com/engineering/building-agents-with-the-claude-agent-sdk) (late 2025)
+- Filesystem observations of `~/.claude/teams/` and `~/.claude/tasks/` structure
 
 ---
 
@@ -983,6 +1132,331 @@ def pre_tool_use(event):
 **Security consideration**: `additionalContext` does not replace blocking for true security boundaries. System directories, credential files, and destructive operations should still use hard blocks. Context injection is for "you probably don't want to do this" cases, not "you must never do this" cases.
 
 **Sources:** [Claude Code Changelog 2.1.9](https://code.claude.com/docs/en/changelog)
+
+---
+
+## Memory Management
+
+*[2026-02-05]*: Claude Code 2.1.32 introduced automatic session memory and modular rules system, providing persistent memory across sessions for the first time.
+
+### Your Mental Model
+
+**Session memory bridges ephemeral context and persistent knowledge.** Context dies with each session; session memory automatically preserves critical insights across restarts. The `.claude/rules/` system organizes persistent knowledge modularly rather than monolithically.
+
+### Session Memory: Automatic Recording & Recall
+
+#### How It Works
+
+Session memory operates as a background process that automatically summarizes conversation context at specific intervals. Unlike manual note-taking, this happens without user intervention—the system tracks conversation flow and writes summaries when certain thresholds are met.
+
+**Triggering Conditions:**
+- First summary written at approximately 10,000 tokens of conversation
+- Subsequent summaries every 5,000 tokens OR every 3 tool calls (whichever comes first)
+- Summaries capture key decisions, approaches, and context for future sessions
+
+**Storage Architecture:**
+```
+~/.claude/projects/<project-hash>/<session-id>/session-memory/summary.md
+```
+
+Each session generates its own summary file. When starting a new session in the same project, Claude Code loads relevant summaries from previous sessions.
+
+#### Observable Behavior
+
+**Terminal Indicators:**
+- "Recalled X memories" - Displayed at session start when loading previous session summaries
+- "Wrote X memories" - Displayed during session when new summaries are written
+
+**Expandable Details:**
+Press `Ctrl+O` on the memory indicator to expand and view the full summary content. This shows exactly what context was preserved from previous sessions.
+
+#### Feature Gate Status
+
+**⚠️ Availability:** Session memory requires first-party Anthropic API access and is gated behind the `tengu_session_memory` feature flag. Not all Claude Code installations have this enabled by default.
+
+**Verification:** Start a long session (10,000+ tokens) and watch for "Wrote X memories" indicators. If they don't appear, session memory is not enabled for your account.
+
+### /remember Command: Curated Memory Management
+
+The `/remember` command bridges automatic session memory and deliberate project knowledge. It reviews accumulated session memories, identifies recurring patterns across sessions, and proposes additions to `CLAUDE.local.md`.
+
+**Workflow:**
+1. Run `/remember` after working with session memory enabled
+2. Review proposed memories extracted from session summaries
+3. Approve or reject each proposed addition
+4. Approved memories are written to `CLAUDE.local.md`
+
+**Pattern:** Automatic collection → Manual curation → Permanent storage
+
+This prevents session memory from remaining ephemeral. Important learnings surface through repeated mention across sessions, then graduate to permanent project knowledge through human approval.
+
+### /compact Integration
+
+Session memory pre-written summaries enable instant context compaction. Previously, `/compact` required approximately 2 minutes to generate summaries before compacting context. With session memory, summaries already exist—compaction becomes near-instantaneous.
+
+**Use case:** When approaching context limits mid-session, `/compact` uses existing session summaries to compress conversation history without re-analysis delay.
+
+### # Shortcut: Quick Memory Addition
+
+The `#` shortcut provides a fast path for adding memories directly to CLAUDE.md files during conversation.
+
+**Syntax:**
+```
+# Remember to use pytest fixtures for test setup
+```
+
+Starting a message with `#` flags it as a memory to be added to project documentation. This bypasses the `/remember` approval flow for quick knowledge capture during active work.
+
+### .claude/rules/ System: Modular Path-Scoped Rules
+
+The rules system enables modular, path-specific configuration separate from monolithic CLAUDE.md files.
+
+#### Directory Structure
+
+**Project-level:** `.claude/rules/*.md`
+**User-level:** `~/.claude/rules/*.md`
+
+Claude Code recursively discovers all `.md` files in these directories. Subdirectories are supported for organization:
+
+```
+.claude/rules/
+├── testing/
+│   ├── pytest-conventions.md
+│   └── integration-tests.md
+├── security/
+│   └── auth-review.md
+└── style-guide.md
+```
+
+#### Path-Scoped Rules
+
+Rules with `paths` frontmatter field only activate when working with matching files.
+
+**YAML Frontmatter Pattern:**
+```yaml
+---
+paths:
+  - "**/*_test.py"
+  - "tests/**/*.py"
+---
+
+# Test File Conventions
+
+When working with test files:
+- Use pytest fixtures for shared setup
+- Prefix test functions with test_
+- Group related tests in classes
+- Mock external dependencies
+```
+
+**Glob Pattern Support:**
+- `**/*.py` - All Python files anywhere
+- `src/**/*.ts` - TypeScript files in src tree
+- `*_test.go` - Test files in current directory
+- `docs/**/*.md` - Markdown in docs directory
+
+#### Conditional Loading
+
+Rules without `paths` frontmatter load for all files (project-wide). Rules with `paths` load only when the current file path matches one or more glob patterns.
+
+**This enables:**
+- Test-specific guidance only when editing tests
+- Security review checklists only for auth modules
+- Framework conventions only for relevant file types
+
+#### Symlink Support
+
+Rules can be symlinked across projects for shared conventions.
+
+**Example: User-level Security Rules**
+```bash
+# Create user-level rule once
+cat > ~/.claude/rules/security.md << 'EOF'
+# Security Review Checklist
+
+Before committing code:
+- [ ] No hardcoded credentials
+- [ ] Input validation on user data
+- [ ] SQL injection prevention
+- [ ] XSS protection in templates
+EOF
+
+# Symlink into project
+ln -s ~/.claude/rules/security.md .claude/rules/security.md
+```
+
+Now the security checklist applies to this project without duplicating the file.
+
+**User-Level Rules Default:**
+All rules in `~/.claude/rules/` automatically apply to every project for that user. No symlinks required—these are global defaults.
+
+### Complete Memory Hierarchy
+
+Claude Code loads memory from seven tiers in order of precedence:
+
+| Tier | Location | Scope | Automatic | Example Use |
+|------|----------|-------|-----------|-------------|
+| 1 | `/Library/.../CLAUDE.md` | Org-wide | ✗ | Corporate policies |
+| 2 | `./CLAUDE.md` | Project | ✗ | Team conventions |
+| 3 | `./.claude/rules/*.md` | Project/Path | ✗ | Modular rules |
+| 4 | `~/.claude/CLAUDE.md` | User global | ✗ | Personal defaults |
+| 5 | `./CLAUDE.local.md` | Project local | ✗ | Private overrides |
+| 6 | `~/.claude/projects/.../summary.md` | Session | ✓ | Learned context |
+| 7 | `@path/to/file` | Import | ✗ | Shared docs |
+
+**Key additions in this hierarchy:**
+- **Tier 3:** `.claude/rules/` system for modular, path-scoped organization
+- **Tier 6:** Session memory for automatic persistence across sessions
+
+**Loading behavior:** Later tiers can override or extend earlier ones. Tier 1 (org policy) loads first; Tier 7 (imports) loads last.
+
+### Comparison: Memory System Features
+
+| Feature | Automatic | Persistent | Modular | Path-Scoped | User Control |
+|---------|-----------|-----------|---------|-------------|--------------|
+| Session Memory | ✓ | ✓ | ✗ | ✗ | Low (via /remember) |
+| .claude/rules/ | ✗ | ✓ | ✓ | ✓ | High (direct editing) |
+| CLAUDE.md | ✗ | ✓ | ✗ (monolithic) | ✗ | High |
+| CLAUDE.local.md | ✗ | ✓ | ✗ (monolithic) | ✗ | High |
+| Imports | ✗ | ✓ | Semi | ✗ | High |
+
+**Trade-offs:**
+- Session memory maximizes convenience (automatic) at the cost of control
+- .claude/rules/ maximizes modularity and path-scoping at the cost of setup complexity
+- CLAUDE.md maximizes simplicity (single file) at the cost of modularity
+- CLAUDE.local.md balances team visibility (not committed) with persistence
+
+### Connection to Context Fundamentals
+
+Session memory directly addresses the "Context vs Memory" distinction from [Context Fundamentals](../4-context/1-context-fundamentals.md#context-vs-memory):
+
+> Memory would be persistent knowledge that survives restarts—but without external storage mechanisms, agents don't have this by default.
+
+Session memory provides this external storage mechanism. Agents now have persistent memory that survives restarts, automatically maintained by the system.
+
+### When to Use Each Memory Mechanism
+
+**Use Session Memory when:**
+- Automatic persistence desired (no manual maintenance)
+- Cross-session learning needed (agent learns from past sessions)
+- Working on long-running projects (weeks/months)
+- Manual memory curation feels like overhead
+
+**Use .claude/rules/ when:**
+- Path-specific behavior needed (different rules for different directories)
+- Modular organization preferred (separate concerns into files)
+- Sharing rules across projects (via symlinks)
+- Fine-grained control over rule application required
+
+**Use CLAUDE.md when:**
+- Project-wide conventions apply uniformly
+- Team visibility required (checked into version control)
+- Simple monolithic configuration preferred
+- Single source of truth for project guidance
+
+**Use CLAUDE.local.md when:**
+- Personal preferences differ from team (local overrides)
+- Private information shouldn't be shared (API keys, personal notes)
+- Individual workflow customization needed
+- Experimenting with guidance before committing to CLAUDE.md
+
+### Decision Framework
+
+```
+Is memory automatic or manual?
+│
+├─ Automatic → Session Memory
+│              (system maintains summaries)
+│
+└─ Manual → Is memory path-specific?
+            │
+            ├─ Yes → .claude/rules/
+            │        (path-scoped YAML frontmatter)
+            │
+            └─ No → Is memory shared with team?
+                    │
+                    ├─ Yes → CLAUDE.md
+                    │        (checked into version control)
+                    │
+                    └─ No → CLAUDE.local.md
+                            (private, not committed)
+```
+
+### Practical Examples
+
+#### Example 1: Path-Scoped Test Rules
+
+`.claude/rules/test-conventions.md`:
+```yaml
+---
+paths:
+  - "**/*_test.py"
+  - "tests/**/*.py"
+---
+
+# Test File Conventions
+
+When working with test files:
+- Use pytest fixtures for shared setup
+- Prefix test functions with test_
+- Group related tests in classes
+- Mock external dependencies
+```
+
+This rule only applies when editing Python test files. Regular Python files don't see this guidance.
+
+#### Example 2: Cross-Project Shared Rules
+
+User-level rule (`~/.claude/rules/security.md`):
+```markdown
+# Security Review Checklist
+
+Before committing code:
+- [ ] No hardcoded credentials
+- [ ] Input validation on user data
+- [ ] SQL injection prevention
+- [ ] XSS protection in templates
+```
+
+Applies to all projects for this user automatically. No per-project configuration needed.
+
+#### Example 3: Session Memory → Permanent Memory Flow
+
+**Session 1:** Agent works on authentication refactoring, generates session summary automatically
+
+**Session 2:** Start new work in same project
+```
+> Recalled 1 memory
+```
+
+**Expand with Ctrl+O:**
+```
+Previous session refactored auth module, extracted JWT logic to
+separate service. Token validation now happens in middleware layer
+before route handlers execute.
+```
+
+**User action:** `/remember` → Review summaries → Approve addition to CLAUDE.local.md
+
+**Result:** Temporary session knowledge becomes permanent project knowledge, available to all future sessions
+
+### Open Questions
+
+- How does session memory handle extremely long-running sessions (days/weeks)?
+- What happens when session summaries conflict with CLAUDE.md instructions?
+- Can session memory be disabled per-project for privacy-sensitive work?
+- How are summaries merged across parallel sessions in same project?
+- What's the maximum number of session memories retained before cleanup?
+- Does session memory support manual editing of summary.md files?
+- How do path-scoped rules interact with Skills system (which also uses paths)?
+- Can .claude/rules/ subdirectories have their own scoping beyond path globs?
+- What happens when multiple rules match same path—are they merged or does one win?
+
+### Sources
+
+- [Claude Code Changelog 2.1.32](https://code.claude.com/docs/en/changelog)
+- [Official Memory Documentation](https://code.claude.com/docs/en/memory)
+- Session memory file structure observed at `~/.claude/projects/<project-hash>/`
 
 ---
 
