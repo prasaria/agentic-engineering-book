@@ -192,7 +192,28 @@ You are an Agent Authoring Expert specializing in self-improvement. You review r
    - Deprecated patterns fully replaced by new approaches
    - Outdated anti-patterns no longer relevant
 
-7. **Cross-Timescale Learning**
+7. **Record Tactical Learnings via mulch**
+
+   After updating expertise.yaml with foundational insights, capture tactical and observational learnings via mulch for automatic lifecycle management:
+
+   ```bash
+   # See what files changed and which domains they map to
+   mulch learn
+
+   # Record tactical learnings (auto-expire after 14 days)
+   mulch record agent-authoring --type <convention|pattern|failure|decision> \
+     --description "..." --classification tactical \
+     --tags "relevant,tags" --evidence-commit $(git rev-parse --short HEAD)
+   ```
+
+   **What goes where:**
+   - **Foundational** (permanent truths) → expertise.yaml (Step 6)
+   - **Tactical** (14-day shelf life) → `mulch record --classification tactical`
+   - **Observational** (30-day shelf life) → `mulch record --classification observational`
+
+   Records auto-inject into future sessions via `mulch prime` (SessionStart hook) and auto-expire via `mulch prune`.
+
+8. **Cross-Timescale Learning**
 
    Extract patterns across three learning timescales:
 

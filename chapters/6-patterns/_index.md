@@ -2,7 +2,7 @@
 title: Patterns
 description: Recurring architectures and approaches for building agentic systems
 created: 2025-12-08
-last_updated: 2026-01-30
+last_updated: 2026-02-11
 tags: [patterns, architecture]
 part: 2
 part_title: Craft
@@ -29,6 +29,7 @@ Patterns are solutions that keep showing up. They're not prescriptions—they're
 | [ReAct Loop](5-react-pattern.md) | General-purpose reasoning + action | Flexibility vs. efficiency |
 | [Human-in-the-Loop](6-human-in-the-loop.md) | High-stakes, uncertain, or preference-sensitive | Safety vs. autonomy |
 | [Expert Swarm](8-expert-swarm-pattern.md) | Multiple independent tasks within single domain requiring consistency | Expertise governance vs. generic orchestration |
+| [Production Multi-Agent Systems](9-production-multi-agent-systems.md) | Running 10+ agents in production with recovery and lifecycle | Operational robustness vs. infrastructure overhead |
 
 *Add more patterns as you identify them*
 
@@ -111,6 +112,7 @@ Start: What kind of task?
 | Knowledge should accumulate | Self-Improving Experts | Plan-Build-Review |
 | Quick one-off task | Skip patterns | Direct execution |
 | Complex multi-phase workflow | Plan-Build-Review | Orchestrator |
+| 10+ agents in production at scale | Production Multi-Agent Systems | Orchestrator |
 
 ---
 
@@ -125,6 +127,7 @@ Start: What kind of task?
 | **ReAct** | Tool-heavy exploration, debugging, dynamic decisions | Well-defined specs, batch processing |
 | **Human-in-the-Loop** | Security-sensitive, compliance, ambiguous requirements | Fully automated pipelines, trusted domains |
 | **Progressive Disclosure** | Large codebases, documentation, knowledge-heavy tasks | Small context, everything fits in window |
+| **Production Multi-Agent Systems** | Fleet operations, persistent identity, autonomous recovery at scale | Single-agent workflows, development-only use |
 
 ---
 

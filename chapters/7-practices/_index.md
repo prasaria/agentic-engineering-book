@@ -2,7 +2,7 @@
 title: Practices
 description: The craft of building, debugging, and running agents in the real world
 created: 2025-12-08
-last_updated: 2025-12-10
+last_updated: 2026-02-11
 tags: [practices, craft, operations]
 part: 2
 part_title: Craft
@@ -27,6 +27,7 @@ Theory gets you started. Practice is where the learning happens.
 | [Production Concerns](4-production-concerns.md) | Running agents reliably at scale |
 | [Workflow Coordination](5-workflow-coordination.md) | Structured metadata for agent coordination |
 | [Knowledge Evolution](6-knowledge-evolution.md) | Guidelines for updating knowledge base entries |
+| [Operating Agent Swarms](7-operating-agent-swarms.md) | Running multi-agent systems at production scale |
 
 ---
 

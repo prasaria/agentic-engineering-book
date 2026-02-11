@@ -147,7 +147,28 @@ as appropriate.
    each phase. This enables parallel execution and clearer responsibility boundaries.
    ```
 
-6. **Cross-Timescale Learning**
+6. **Record Tactical Learnings via mulch**
+
+   After updating expertise.yaml with foundational insights, capture tactical and observational learnings via mulch for automatic lifecycle management:
+
+   ```bash
+   # See what files changed and which domains they map to
+   mulch learn
+
+   # Record tactical learnings (auto-expire after 14 days)
+   mulch record claude-config --type <convention|pattern|failure|decision> \
+     --description "..." --classification tactical \
+     --tags "relevant,tags" --evidence-commit $(git rev-parse --short HEAD)
+   ```
+
+   **What goes where:**
+   - **Foundational** (permanent truths) → expertise.yaml (Step 5)
+   - **Tactical** (14-day shelf life) → `mulch record --classification tactical`
+   - **Observational** (30-day shelf life) → `mulch record --classification observational`
+
+   Records auto-inject into future sessions via `mulch prime` (SessionStart hook) and auto-expire via `mulch prune`.
+
+7. **Cross-Timescale Learning**
 
    Extract patterns across three learning timescales:
 

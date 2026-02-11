@@ -1,6 +1,6 @@
 # Table of Contents
 
-*Generated: 2026-02-06*
+*Generated: 2026-02-11*
 
 ---
 
@@ -72,6 +72,7 @@ Recurring architectures and approaches for building agentic systems
 - [Progressive Disclosure Pattern](chapters/6-patterns/7-progressive-disclosure.md)
 - [Expert Swarm Pattern](chapters/6-patterns/8-expert-swarm-pattern.md)
 - [Multi-Agent Collaboration Pattern](chapters/6-patterns/9-multi-agent-collaboration.md)
+- [Production Multi-Agent Systems](chapters/6-patterns/9-production-multi-agent-systems.md)
 
 ### Chapter 7: Practices
 
@@ -84,6 +85,7 @@ The craft of building, debugging, and running agents in the real world
 - [Production Concerns](chapters/7-practices/4-production-concerns.md)
 - [Workflow Coordination for Agents](chapters/7-practices/5-workflow-coordination.md)
 - [Knowledge Evolution](chapters/7-practices/6-knowledge-evolution.md)
+- [Operating Agent Swarms](chapters/7-practices/7-operating-agent-swarms.md)
 
 ---
 
@@ -99,6 +101,7 @@ Frameworks for thinking about agentic systems
 - [Specs as Source Code](chapters/8-mental-models/3-specs-as-source-code.md)
 - [Context as Code](chapters/8-mental-models/4-context-as-code.md)
 - [Execution Topologies](chapters/8-mental-models/5-execution-topologies.md)
+- [Design as Bottleneck](chapters/8-mental-models/6-design-as-bottleneck.md)
 
 ### Chapter 9: Practitioner Toolkit
 
@@ -109,6 +112,7 @@ Tools for agentic engineering with operational insights
 - [Google ADK](chapters/9-practitioner-toolkit/2-google-adk.md)
 - [IDE Integrations](chapters/9-practitioner-toolkit/3-ide-integrations.md)
 - [Agent Frameworks](chapters/9-practitioner-toolkit/4-agent-frameworks.md)
+- [Multi-Agent Workspace Managers](chapters/9-practitioner-toolkit/5-multi-agent-workspace-managers.md)
 
 ---
 

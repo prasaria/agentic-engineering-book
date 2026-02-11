@@ -2,7 +2,7 @@
 title: Examples
 description: Real prompts, configurations, and patterns from actual projects
 created: 2025-12-08
-last_updated: 2025-12-08
+last_updated: 2026-02-11
 tags: [examples, reference, real-world]
 ---
 
@@ -23,6 +23,7 @@ Examples organized by project:
 - `context-loading-demo/` - Basic context management and tool use patterns
 - `kotadb/` - KotaDB database project examples (Level 2-3 patterns)
 - `orchestrator/` - Orchestration pattern examples
+- `gastown/` - [Gas Town: Multi-Agent Workspace Manager](gastown/_index.md) case study
 
 ## Using These Examples
 
