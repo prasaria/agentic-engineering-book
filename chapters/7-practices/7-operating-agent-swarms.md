@@ -2,8 +2,8 @@
 title: "Operating Agent Swarms"
 description: "Practices for running multi-agent systems at production scale, from cost management to incident response"
 created: 2026-02-11
-last_updated: 2026-02-11
-tags: [practices, multi-agent, production, operations, cost, scale, gastown]
+last_updated: 2026-02-13
+tags: [practices, multi-agent, production, operations, cost, scale, gastown, overstory]
 part: 2
 part_title: Craft
 chapter: 7
@@ -58,6 +58,8 @@ Running one agent is engineering. Running thirty is operations. The shift from s
 | Cost per agent-hour | ~$3-5 | Varies by model and task complexity |
 
 **Linear scaling is the key constraint.** Unlike traditional compute where parallelism introduces sublinear cost growth through shared resources, agent swarms scale linearly. Agent 30 costs as much as agent 1. There are no economies of scale at the token level.
+
+*[2026-02-13]*: Overstory's subscription-based cost model (Claude Code Pro subscription, fixed monthly cost) contrasts with Gas Town's API token model (~$100/hr for 20-30 agents). The fixed-cost approach changes economic incentives: practitioners optimize for throughput (maximize agents within subscription limits) rather than per-token efficiency. This shifts the bottleneck from token budget to subscription tier limits and human design capacity. The divergence suggests cost model choice (subscription vs pay-per-use) fundamentally shapes operational strategy.
 
 ### Cost Optimization Levers
 
@@ -180,6 +182,8 @@ Every agent action includes structured identity metadata:
 
 These records enable objective performance evaluation. Instead of guessing which model or configuration works best, compare actual production data across agents.
 
+*[2026-02-13]*: Overstory implements attribution through SQLite metrics store (`.overstory/metrics.db`) with per-agent session tracking. Agent CVs accumulate in `.overstory/agents/{name}/identity.yaml` with structured work history. The TypeScript implementation demonstrates that attribution infrastructure is language-agnostic—both Go (Gas Town) and TypeScript (Overstory) converge on persistent identity + structured logging as foundation for capability routing and performance analysis.
+
 ### Attribution Enables Capability Routing
 
 With sufficient work history, the system can route tasks to agents with proven track records:
@@ -232,6 +236,8 @@ Agent Work → Quality Gate → Merge Queue → Main Branch
 
 **Workers never push directly to main.** Every change flows through a merge queue with automated validation. This is non-negotiable at scale—30 agents pushing directly to main produces merge conflicts, broken builds, and untraceable regressions.
 
+*[2026-02-13]*: Overstory's merge queue implements 4-tier resolution escalation (Clean → Auto-Resolve → AI-Resolve → Re-Imagine) as a quality gate. Each tier validates correctness before advancing: Tier 1-2 validate syntactically (clean merge), Tier 3 validates semantically (AI understands intent), Tier 4 reimplements against current state (quality over merge archaeology). The escalation structure demonstrates that quality gates at scale require multiple resolution strategies, not binary pass/fail.
+
 ### Human Review at Scale: Sampling-Based
 
 At 30 concurrent agents, reviewing every PR in detail is physically impossible. Production practice shifts to **sampling-based review**:
@@ -274,6 +280,44 @@ The most dangerous failure mode at scale is **trust creep**—gradually relaxing
 5. Systemic issues compound until a major failure
 
 Resist this. Quality gates exist for the failure mode, not the success mode.
+
+---
+
+## Safeguards Across the Ecosystem
+
+### Defense-in-Depth as Baseline
+
+*[2026-02-11]*: Production multi-agent systems in early 2026 converge on layered security rather than single-point controls. Each layer catches what the layer above misses:
+
+| Layer | Mechanism | What It Catches |
+|-------|-----------|-----------------|
+| OS-level sandbox | gVisor, Kata containers, macOS Seatbelt | Syscall-level violations, arbitrary code execution |
+| Filesystem restrictions | Tiered access (none / read-only / read-write) | Unauthorized file modification |
+| Command allowlists | Only permitted commands execute | Shell injection, unauthorized tooling |
+| Agent config protection | Block writes to CLAUDE.md, .cursorrules, MCP configs | Configuration tampering by agents |
+| Credential injection | Minimal at start, task-required only, short-lived tokens | Credential sprawl, persistent access |
+
+**Application-level controls are insufficient alone.** Attackers use indirection—calling restricted tools through approved ones. An agent denied direct shell access might invoke a build tool that shells out internally. OS-level enforcement (intercepting syscalls before they reach the host kernel) catches these indirection attacks regardless of the execution path.
+
+### The Command Allowlist Pattern
+
+AutoForge implements a concrete example: a `security.py` file defines exactly which bash commands agents can execute—file inspection tools (`ls`, `cat`, `grep`), development tools (`npm`, `node`, `git`), and process management (`ps`, `sleep`). Everything outside the allowlist is blocked. This simple mechanism prevents entire categories of unintended agent behavior.
+
+The pattern generalizes beyond AutoForge. Any multi-agent system benefits from an explicit command allowlist rather than relying on implicit trust. The allowlist acts as a capability boundary: agents operate freely within it and hit a hard wall outside it.
+
+### Opt-In Communication as a Safeguard
+
+*[2026-02-11]*: OpenClaw defaults agent-to-agent communication to OFF. Cross-talk requires explicit allowlisting per agent pair via configuration (`tools.agentToAgent: { enabled: false, allow: ['home', 'work'] }`). This treats inter-agent communication as a capability to be granted rather than a default to be restricted—a meaningful philosophical difference that prevents uncontrolled coordination between agents.
+
+The principle extends beyond communication. Every capability an agent possesses—file access, network access, tool invocation, peer messaging—represents a potential attack surface or failure mode. Defaulting to off and requiring explicit enablement produces systems where the blast radius of any single compromise is bounded by the permissions actually granted.
+
+### Prompt Injection Remains Unsolved
+
+Every framework studied acknowledges prompt injection as an open problem. Mitigations include defense-in-depth (locked DMs, mention gating, instruction-hardened models), but no framework claims prevention. The practical stance across the ecosystem: assume injections will occur, limit blast radius, audit aggressively.
+
+This has operational implications for swarm operators. Quality gates (see [Quality Gates at Scale](#quality-gates-at-scale) above) catch many consequences of injection—anomalous outputs, scope violations, unexpected file modifications—but they catch symptoms, not the injection itself. Layered safeguards ensure that even a successfully injected agent operates within constrained boundaries.
+
+**Cross-reference**: See [The Multi-Agent Landscape: Safeguards](../6-patterns/10-multi-agent-landscape.md#safeguards--bounded-autonomy-as-standard) for the full ecosystem analysis of how production frameworks implement these layers.
 
 ---
 

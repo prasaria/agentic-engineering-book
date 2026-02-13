@@ -142,6 +142,36 @@ Added three complementary patterns with structured schemas:
 
 **When to Use:** Adding quantified evidence from production systems to existing qualitative guidance, showing real-world implementations of mental models, documenting multi-session workflow patterns.
 
+### Companion Case Study Implementation
+
+*[2026-02-13]*: When building companion case studies (800-1300 lines) to validate existing patterns across tech stacks, use inline timestamp additions to pattern chapters rather than creating new pattern documentation:
+
+**Implementation Pattern:**
+1. Create comprehensive case study in `appendices/examples/<project>/`
+2. Add inline timestamp evidence to existing pattern chapters (not new patterns)
+3. Use comparison tables to show convergence and divergence
+4. Include temporal framing ("as of early 2026") for rapidly evolving systems
+5. Distinguish architecture patterns (stable) from implementation details (changing)
+
+**Example: Overstory Integration (2026-02-13):**
+- Created `appendices/examples/overstory/_index.md` (1259 lines)
+- Added inline timestamps to all 6 patterns in `chapters/6-patterns/11-production-multi-agent-systems.md`
+- Each timestamp cites both Gas Town (Go) and Overstory (TypeScript/Bun) implementations
+- Comparison tables show: persistent identity (filesystem vs YAML), mail protocol (filesystem vs SQLite), cost model (API vs subscription)
+- Result: Cross-tech-stack validation strengthens pattern credibility without pattern proliferation
+
+**Format for Inline Timestamp Evidence:**
+```markdown
+*[2026-02-13]*: Overstory demonstrates the same separation through TypeScript/Bun
+implementation. Agent identity persists in `.overstory/agents/{name}/identity.yaml`
+with work history in `work-history.md`. Sessions spawn via `overstory sling` with
+fresh context loaded through `overstory prime`, implementing the seancing pattern
+through different tooling. The cross-ecosystem validation (Go + TypeScript) suggests
+this pattern is language-agnostic and fundamental to swarm coordination.
+```
+
+**When to Use:** Second (or third) production example implementing same patterns through different tech stack, validating patterns as language-agnostic, demonstrating implementation choice trade-offs.
+
 ### Architectural Pattern Structure (Commit 20500f1 + 2026-02-02 Expert Swarm Example)
 
 *[2026-02-02]*: When building sophisticated patterns (300-550 lines), follow this 10-12 section structure observed in ReAct, HITL, Progressive Disclosure, and Expert Swarm patterns:

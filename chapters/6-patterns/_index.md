@@ -29,7 +29,8 @@ Patterns are solutions that keep showing up. They're not prescriptions—they're
 | [ReAct Loop](5-react-pattern.md) | General-purpose reasoning + action | Flexibility vs. efficiency |
 | [Human-in-the-Loop](6-human-in-the-loop.md) | High-stakes, uncertain, or preference-sensitive | Safety vs. autonomy |
 | [Expert Swarm](8-expert-swarm-pattern.md) | Multiple independent tasks within single domain requiring consistency | Expertise governance vs. generic orchestration |
-| [Production Multi-Agent Systems](9-production-multi-agent-systems.md) | Running 10+ agents in production with recovery and lifecycle | Operational robustness vs. infrastructure overhead |
+| [Production Multi-Agent Systems](11-production-multi-agent-systems.md) | Running 10+ agents in production with recovery and lifecycle | Operational robustness vs. infrastructure overhead |
+| [The Multi-Agent Landscape](10-multi-agent-landscape.md) | Architectural decision-making across the multi-agent ecosystem | Comprehensive coverage vs. rapid evolution |
 
 *Add more patterns as you identify them*
 
@@ -113,6 +114,7 @@ Start: What kind of task?
 | Quick one-off task | Skip patterns | Direct execution |
 | Complex multi-phase workflow | Plan-Build-Review | Orchestrator |
 | 10+ agents in production at scale | Production Multi-Agent Systems | Orchestrator |
+| Cross-framework architectural decisions | Multi-Agent Landscape | Orchestrator |
 
 ---
 
@@ -128,6 +130,7 @@ Start: What kind of task?
 | **Human-in-the-Loop** | Security-sensitive, compliance, ambiguous requirements | Fully automated pipelines, trusted domains |
 | **Progressive Disclosure** | Large codebases, documentation, knowledge-heavy tasks | Small context, everything fits in window |
 | **Production Multi-Agent Systems** | Fleet operations, persistent identity, autonomous recovery at scale | Single-agent workflows, development-only use |
+| **Multi-Agent Landscape** | Comparing communication, topology, safeguard, memory, and autonomy approaches | Prescriptive step-by-step implementation guidance |
 
 ---
 

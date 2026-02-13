@@ -2,7 +2,7 @@
 title: Multi-Agent Context
 description: Context isolation patterns and persistent state management in multi-agent systems
 created: 2025-12-10
-last_updated: 2026-02-05
+last_updated: 2026-02-11
 tags: [foundations, context, multi-agent, state, isolation]
 part: 1
 part_title: Foundations
@@ -207,6 +207,65 @@ This is a real gap. When an agent learns something valuable mid-session, how doe
 ### See Also
 
 [Google ADK: State and Memory Architecture](../9-practitioner-toolkit/2-google-adk.md#state-and-memory-architecture) — Concrete implementation of state scoping
+
+---
+
+## Memory Architectures for Multi-Agent Systems
+
+*[2026-02-11]*: As multi-agent systems mature beyond single-session interactions, memory architecture becomes a defining design choice. Three models appear in production systems, each with distinct trade-off profiles.
+
+### Three Production Models
+
+**Shared Pool** — All agents access a common memory store (vector database, document store, SQLite). Fast knowledge reuse across agents. Risk: overwrite conflicts, stale reads, and **memory contamination** — where incorrect information written by one agent propagates across the system as "ground truth" for every subsequent reader.
+
+**Local with Synchronization** — Each agent owns private memory, sharing selected information via periodic sync. Isolation by default means fewer contention issues and natural containment of errors. Scales better than shared pools but requires explicit synchronization protocol design.
+
+**Event Bus** — Agents maintain private state and communicate asynchronously via structured events. Maximum decoupling, but requires disciplined event schema governance. Best suited for systems where agents operate on fundamentally different timescales or data domains.
+
+| Model | Isolation | Reuse Speed | Contamination Risk | Scaling |
+|-------|-----------|-------------|-------------------|---------|
+| Shared Pool | None | Immediate | High | Limited by contention |
+| Local + Sync | Default | Sync interval | Low (contained) | Horizontal |
+| Event Bus | Full | Event latency | Minimal | Independent |
+
+### The Two-Tier Pattern
+
+Multiple production systems converge on a two-tier approach separating ephemeral from durable memory:
+
+- **OpenClaw** uses daily log files (`memory/YYYY-MM-DD.md`) for running context alongside a curated `MEMORY.md` for durable facts and decisions, with hybrid vector + BM25 search across both tiers
+- **Gas Town** uses git-backed JSONL (Beads) with hierarchical task organization and semantic "memory decay" that summarizes old closed tasks to save context window tokens
+- **AutoForge** deliberately starts each session with a fresh context window while maintaining state in SQLite — trading recall for context cleanliness
+
+The convergence is notable: all three separate short-lived operational context from long-lived knowledge, despite using entirely different storage backends.
+
+### Virtual Memory for Cognition
+
+*[2026-02-11]*: OpenClaw's architecture treats the LLM context window as cache and disk/database as source of truth — a "virtual memory for cognition" model. The implication: context management shifts from "fitting everything in the window" to "managing a memory hierarchy" with different tiers serving different access patterns and durability guarantees.
+
+This reframes context strategy. Rather than optimizing a single flat window, effective multi-agent systems design memory hierarchies:
+
+| Tier | Analog | Access Pattern | Durability |
+|------|--------|---------------|------------|
+| Context window | CPU cache | Immediate, capacity-limited | Session-scoped |
+| Session logs | RAM | Fast retrieval, structured | Session or daily |
+| Curated memory | Disk | Selective loading | Persistent |
+| External database | Cold storage | Query-based | Permanent |
+
+### Memory Contamination
+
+When agents share memory, incorrect information spreads across the system. A single agent's hallucination written to shared state becomes "ground truth" for every subsequent agent that reads it. The trend in production systems is toward fine-grained access control — private by default with selective, explicit sharing — rather than all-or-nothing memory pools.
+
+Mitigation strategies observed in production:
+- **Write validation gates** — verify outputs before committing to shared state
+- **Source attribution** — tag memory entries with authoring agent and confidence
+- **Read isolation** — agents read snapshots rather than live state
+- **Periodic audits** — scheduled verification of shared memory against ground truth
+
+### Fresh Context as Strategy
+
+*[2026-02-11]*: AutoForge's approach of starting every session with an empty context window represents a deliberate design choice, not a limitation. Fresh context prevents the accumulation of stale assumptions, outdated instructions, and hallucinated context that degrades long-running sessions. When paired with reliable external state (SQLite, git), each session operates on clean data rather than inherited noise.
+
+This aligns with the token economics of multi-agent systems: spending tokens on fresh context loading is cheaper than debugging degraded reasoning from context contamination. The pattern works best when external state is well-structured and queryable — unstructured state dumps negate the benefits of starting fresh.
 
 ---
 

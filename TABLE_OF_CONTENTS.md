@@ -1,6 +1,6 @@
 # Table of Contents
 
-*Generated: 2026-02-11*
+*Generated: 2026-02-13*
 
 ---
 
@@ -8,14 +8,10 @@
 
 ### Chapter 1: Foundations
 
-The core four pillars of agentic systems - prompt, model, context, and tooling
-
 - [Foundations](chapters/1-foundations/_index.md)
 - [Twelve Leverage Points of Agentic Coding](chapters/1-foundations/1-twelve-leverage-points.md)
 
 ### Chapter 2: Prompt
-
-The art and science of instructing agentic systems
 
 - [Prompt](chapters/2-prompt/_index.md)
 - [Prompt Types](chapters/2-prompt/1-prompt-types.md)
@@ -23,8 +19,6 @@ The art and science of instructing agentic systems
 - [Prompt Language](chapters/2-prompt/3-language.md)
 
 ### Chapter 3: Model
-
-Understanding and leveraging the capabilities of foundation models in agentic systems
 
 - [Model](chapters/3-model/_index.md)
 - [Model Selection](chapters/3-model/1-model-selection.md)
@@ -35,8 +29,6 @@ Understanding and leveraging the capabilities of foundation models in agentic sy
 
 ### Chapter 4: Context
 
-Managing the information available to an agent at any given moment
-
 - [Context](chapters/4-context/_index.md)
 - [Context Fundamentals](chapters/4-context/1-context-fundamentals.md)
 - [Context Management Strategies](chapters/4-context/2-context-strategies.md)
@@ -44,8 +36,6 @@ Managing the information available to an agent at any given moment
 - [Multi-Agent Context](chapters/4-context/4-multi-agent-context.md)
 
 ### Chapter 5: Tool Use
-
-How agents use tools to affect the world
 
 - [Tool Use](chapters/5-tool-use/_index.md)
 - [Tool Design](chapters/5-tool-use/1-tool-design.md)
@@ -60,8 +50,6 @@ How agents use tools to affect the world
 
 ### Chapter 6: Patterns
 
-Recurring architectures and approaches for building agentic systems
-
 - [Patterns](chapters/6-patterns/_index.md)
 - [Plan-Build-Review Pattern](chapters/6-patterns/1-plan-build-review.md)
 - [Self-Improving Expert Commands](chapters/6-patterns/2-self-improving-experts.md)
@@ -72,11 +60,10 @@ Recurring architectures and approaches for building agentic systems
 - [Progressive Disclosure Pattern](chapters/6-patterns/7-progressive-disclosure.md)
 - [Expert Swarm Pattern](chapters/6-patterns/8-expert-swarm-pattern.md)
 - [Multi-Agent Collaboration Pattern](chapters/6-patterns/9-multi-agent-collaboration.md)
-- [Production Multi-Agent Systems](chapters/6-patterns/9-production-multi-agent-systems.md)
+- [The Multi-Agent Landscape](chapters/6-patterns/10-multi-agent-landscape.md)
+- [Production Multi-Agent Systems](chapters/6-patterns/11-production-multi-agent-systems.md)
 
 ### Chapter 7: Practices
-
-The craft of building, debugging, and running agents in the real world
 
 - [Practices](chapters/7-practices/_index.md)
 - [Debugging Agents](chapters/7-practices/1-debugging-agents.md)
@@ -93,8 +80,6 @@ The craft of building, debugging, and running agents in the real world
 
 ### Chapter 8: Mental Models
 
-Frameworks for thinking about agentic systems
-
 - [Mental Models](chapters/8-mental-models/_index.md)
 - [Pit of Success](chapters/8-mental-models/1-pit-of-success.md)
 - [Prompt Maturity Model](chapters/8-mental-models/2-prompt-maturity-model.md)
@@ -104,8 +89,6 @@ Frameworks for thinking about agentic systems
 - [Design as Bottleneck](chapters/8-mental-models/6-design-as-bottleneck.md)
 
 ### Chapter 9: Practitioner Toolkit
-
-Tools for agentic engineering with operational insights
 
 - [Practitioner Toolkit](chapters/9-practitioner-toolkit/_index.md)
 - [Claude Code](chapters/9-practitioner-toolkit/1-claude-code.md)
@@ -118,10 +101,7 @@ Tools for agentic engineering with operational insights
 
 ## Part 4: Appendices
 
-### Chapter 10: Appendices
+### Chapter 10: Case Studies
 
-Supplementary materials, examples, and reference implementations
-
-- [Appendices](appendices/_index.md)
-- [Examples](appendices/examples/README.md)
-- [KotaDB Case Study: Patterns in Production](appendices/examples/kotadb/CASE_STUDY.md)
+- [Gas Town: Multi-Agent Workspace Manager](appendices/examples/gastown/_index.md)
+- [Overstory: Session-as-Orchestrator Multi-Agent System](appendices/examples/overstory/_index.md)

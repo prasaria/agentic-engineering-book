@@ -2,20 +2,20 @@
 title: "Production Multi-Agent Systems"
 description: "Patterns for operating multi-agent systems at scale, from persistent identity to watchdog chains"
 created: 2026-02-11
-last_updated: 2026-02-11
-tags: [patterns, multi-agent, production, orchestration, gastown]
+last_updated: 2026-02-13
+tags: [patterns, multi-agent, production, orchestration, gastown, overstory]
 part: 2
 part_title: Craft
 chapter: 6
-section: 9
-order: 2.6.9
+section: 11
+order: 2.6.11
 ---
 
 # Production Multi-Agent Systems
 
 Running multi-agent systems in production differs fundamentally from running them in development. Development tolerates manual restarts, lost context, and occasional zombies. Production demands autonomous recovery, persistent tracking, and clean resource lifecycle. The patterns in this section address what happens after "it works on my machine."
 
-**Production Evidence:** Gas Town, a multi-agent system operating 20+ parallel workers across multiple repositories, demonstrates these patterns under sustained load. Each pattern generalized here has been validated through continuous production operation where failures are not hypothetical—they are routine events the system handles autonomously.
+**Production Evidence:** Gas Town and Overstory—two production multi-agent systems operating 10-30 parallel workers across different technology stacks (Go vs TypeScript/Bun) and coordination models (daemon-based vs session-based)—demonstrate these patterns under sustained load. Each pattern generalized here has been validated through implementations that handle failures as routine operational events, not exceptional circumstances.
 
 ---
 
@@ -102,6 +102,8 @@ Agent sessions are inherently ephemeral. Context windows fill, processes crash, 
 5. **Session end**: Results persist to disk; session terminates cleanly
 
 **Evidence:** Gas Town workers ("polecats") maintain CVs across sessions. When a new session starts, `gt prime` restores identity context. A worker that crashed mid-task can be replaced by a new session that seances the crashed session's logs to understand what was attempted.
+
+*[2026-02-13]*: Overstory demonstrates the same separation through TypeScript/Bun implementation. Agent identity persists in `.overstory/agents/{name}/identity.yaml` with work history in `work-history.md`. Sessions spawn via `overstory sling` with fresh context loaded through `overstory prime`, implementing the seancing pattern through different tooling. The cross-ecosystem validation (Go + TypeScript) suggests this pattern is language-agnostic and fundamental to swarm coordination.
 
 ### Implementation
 
@@ -217,6 +219,17 @@ Each tier has a distinct capability and speed:
 
 **Evidence:** Gas Town implements this as Daemon → Boot (triage) → Deacon (patrol) → Witness (per-unit supervisor). The Daemon detects process-level failures in seconds. Boot classifies them and decides between restart, escalate, or ignore. The Deacon performs periodic sweeps of overall system health. Witnesses supervise individual workers during task execution.
 
+*[2026-02-13]*: Overstory's tiered watchdog architecture parallels Gas Town but organizes layers differently:
+
+| Tier | Overstory | Gas Town |
+|------|-----------|----------|
+| 0 (Mechanical) | Watchdog daemon (tmux/PID monitoring) | Daemon (Go process) |
+| 1 (AI Triage) | Ephemeral triage agent (on-demand classification) | Boot (ephemeral) |
+| 2 (Monitor) | Continuous patrol agent (persistent background) | Deacon (persistent) |
+| 3 (Supervisor) | Per-project oversight agent (depth-1) | Witness + Refinery |
+
+Both implement the same escalation pattern (mechanical → AI reasoning → strategic) through different tier labels and agent roles. The convergence validates the three-tier model as robust across implementations. Overstory's session-based coordination adds a distinct constraint: Tier 3 supervisors are active agents in the practitioner's orchestrator session, not independent daemons.
+
 ### Escalation Flow
 
 ```
@@ -312,6 +325,8 @@ A production mail protocol needs a small set of well-defined message types:
 4. **Order is per-route, not global.** Messages between Worker A and the Merge Queue are ordered. Messages across different routes have no ordering guarantee. This prevents global ordering bottlenecks.
 
 **Evidence:** Gas Town implements a typed mail protocol with `POLECAT_DONE`, `MERGE_READY`, `REWORK_REQUEST`, and other message types. Each message follows a defined route (sender → receiver), creating an auditable trail of every coordination event across 20+ concurrent workers.
+
+*[2026-02-13]*: Overstory implements typed mail protocol through custom SQLite database (`.overstory/mail.db`) with WAL mode for concurrent access. Message schema includes 8 protocol types (`status`, `question`, `result`, `error`, `dispatch`, `escalation`, `worker_done`, `merge_ready`) with ~1-5ms query latency. Hook integration (UserPromptSubmit) injects unread messages into agent context automatically. The SQLite approach demonstrates that file-based mail can achieve sub-10ms coordination suitable for production swarms, validating the pattern across both filesystem-based (Gas Town) and database-backed (Overstory) implementations.
 
 ### Implementation
 
@@ -423,6 +438,8 @@ Treating "idle" as a valid worker state creates three problems:
 
 **Evidence:** Gas Town codifies this as the "Idle Polecat Heresy." Workers execute `gt done` on task completion, which pushes the branch, submits to the merge queue, destroys the sandbox, and terminates the session. The system never has idle workers—only working workers and cleanup-in-progress workers.
 
+*[2026-02-13]*: Overstory implements the same pattern through worktree lifecycle management. Agent completion triggers `bd close <task-id>`, which pushes the branch, sends `worker_done` mail to orchestrator, and marks the task complete. The `overstory worktree clean` command removes the worktree directory, deletes the branch reference (if merged), and kills the tmux session. Logs are preserved (never auto-deleted) for debugging. The convergence validates that self-cleaning workers are implementation-agnostic—both Go and TypeScript implementations discover that idle state is an anti-pattern at scale.
+
 ### Cleanup Sequence
 
 A well-defined cleanup sequence prevents partial resource release:
@@ -529,6 +546,8 @@ A single convoy can track work spanning multiple repositories, providing a unifi
 
 **Evidence:** Gas Town convoys group issues across repositories into a single tracking unit. Ephemeral worker swarms execute batches of tasks. When a worker fails, the convoy records it and includes the task in the next swarm. Dashboard visibility shows convoy-level completion, not per-worker status.
 
+*[2026-02-13]*: Overstory implements batch coordination through task groups (`overstory group create <name>`). Groups track completion state across multiple beads (issues), auto-closing when all member issues complete. The persistent tracking survives worker failures—groups live in `.overstory/` filesystem state, not worker memory. While Gas Town's convoy pattern is more elaborate (multi-repo, multi-swarm), Overstory's task groups validate the core insight: persistent tracking units must outlive ephemeral worker executions.
+
 ### When to Use
 
 **Good fit:**
@@ -587,6 +606,15 @@ The merge processor operates through escalating resolution strategies:
 **Re-imagination** is the critical innovation. When a worker's branch has drifted so far from main that merging is impractical, the merge processor understands the *intent* of the change (from the task description and branch diff) and re-implements it cleanly against current main.
 
 **Evidence:** Gas Town's Refinery agent processes the merge queue. When standard merge fails, it escalates through AI resolution. For intractable conflicts—common when 20+ workers modify shared test fixtures—the Refinery re-imagines the implementation against current main state rather than attempting to merge divergent branches.
+
+*[2026-02-13]*: Overstory's merge queue implements 4-tier resolution escalation:
+
+1. **Clean merge** — `git merge` succeeds (seconds)
+2. **Auto-resolve** — Standard conflict resolution by region (seconds)
+3. **AI resolve** — AI reads both versions, produces merged result (minutes)
+4. **Re-imagine** — AI re-implements change against current main (minutes-hours)
+
+The "re-imagination" tier matches Gas Town's Refinery pattern, validating the approach across implementations. When merge drift exceeds auto-resolution capacity, reimplementation becomes cheaper than conflict archaeology. Both systems discover that Tier 4 is not a failure mode—it's a pragmatic escalation strategy when branch divergence is severe.
 
 ### Queue Properties
 

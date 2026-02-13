@@ -190,6 +190,33 @@ Use these when documenting "how to decide" workflows. They make implicit decisio
 
 **When to Use This Structure:** Sophisticated multi-agent architectural patterns (3+ components), patterns solving known tensions, production patterns with quantified evidence, patterns requiring protocol specification. Typical length: 300-550 lines.
 
+### Companion Case Study Integration
+
+*[2026-02-13]*: Companion case studies validate patterns as language-agnostic by demonstrating convergence across fundamentally different technology stacks and coordination models. Overstory integration (TypeScript/Bun, session-based, 1259 lines) following Gas Town (Go, daemon-based, 733 lines) demonstrates this approach:
+
+**Structure for Companion Case Studies:**
+- First study establishes 6 production patterns with tech-stack-specific evidence
+- Second study adds evidence to SAME 6 patterns through different stack
+- Inline timestamps (*[YYYY-MM-DD]*:) in pattern chapters cite both implementations
+- Comparison tables show convergence (universal patterns) and divergence (implementation choices)
+- Temporal framing critical: "as of early 2026" for rapidly evolving projects
+- Architecture patterns (stable) documented separately from implementation details (changing)
+
+**Gas Town + Overstory Convergence Validates:**
+- Persistent Identity pattern (Go `.identity/` vs TypeScript `identity.yaml`)
+- Supervision pattern (daemon-based vs session-based watchdog tiers)
+- Mail protocol (filesystem vs SQLite, both achieve ~1-5ms coordination)
+- Self-cleaning workers (both discover idle state is anti-pattern at scale)
+- Batch tracking (convoy pattern vs task groups, both outlive worker failures)
+- Merge escalation (4-tier resolution including "re-imagination" tier)
+
+**Divergence Reveals Implementation Choices:**
+- Cost model: API tokens ($100/hr for 20-30 agents) vs subscription (fixed monthly)
+- Coordination model: Daemon-based (separate process) vs session-as-orchestrator (active CLI)
+- Mail backend: Filesystem (Gas Town) vs SQLite WAL (Overstory)
+
+**Key Technique:** Convergence strengthens pattern credibility without requiring new pattern documentation—instead adds inline timestamp evidence to existing pattern chapters. Architecture-vs-implementation distinction guides what to document.
+
 ### Integrating Production Patterns from External Projects
 
 *[2026-02-06]*: Integrating patterns from external open source projects requires careful framing that generalizes principles while attributing examples. GSD project integration (commit 0e1e644 - 12K-star meta-prompting system) demonstrates effective pattern extraction:

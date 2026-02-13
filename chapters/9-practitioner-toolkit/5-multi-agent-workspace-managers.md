@@ -1,9 +1,9 @@
 ---
 title: "Multi-Agent Workspace Managers"
-description: "Tools for orchestrating large-scale agent swarms, with Gas Town as primary example"
+description: "Tools for orchestrating large-scale agent swarms, with Gas Town and Overstory as primary examples"
 created: 2026-02-11
-last_updated: 2026-02-11
-tags: [toolkit, multi-agent, gastown, workspace-management, orchestration]
+last_updated: 2026-02-13
+tags: [toolkit, multi-agent, gastown, overstory, workspace-management, orchestration]
 part: 3
 part_title: Perspectives
 chapter: 9
@@ -198,6 +198,135 @@ This layered approach means a single agent failure does not cascade. The witness
 
 ---
 
+## Overstory: TypeScript/Bun Workspace Manager
+
+*[2026-02-13]*: Overstory represents the session-as-orchestrator alternative to Gas Town's daemon-based architecture. Built in TypeScript using Bun runtime (~31K LOC, 912 tests), Overstory demonstrates that workspace management patterns transcend language ecosystems and coordination models.
+
+### Architecture Overview
+
+```
+.overstory/                         Target project root
+├── config.yaml                     Project configuration
+├── agent-manifest.json             Agent registry
+├── hooks.json                      Central hooks config
+├── agents/                         Agent state
+│   └── {name}/
+│       ├── identity.yaml           Persistent identity (CVs)
+│       └── work-history.md         Append-only work log
+├── worktrees/                      Git worktrees (gitignored)
+│   └── {agent-name}/
+├── specs/                          Task specifications
+│   └── {bead-id}.md
+├── logs/                           Agent logs (gitignored)
+│   └── {agent-name}/{timestamp}/
+├── mail.db                         SQLite mail (gitignored, WAL)
+└── metrics.db                      SQLite metrics (gitignored)
+```
+
+**Key Architectural Decisions:**
+
+- **Session-as-orchestrator**: Your active Claude Code session coordinates agents via `overstory` CLI. No separate daemon process.
+- **Bun runtime**: Zero runtime dependencies—only Bun built-ins (sqlite, spawn, file I/O).
+- **Hook integration**: SessionStart/UserPromptSubmit/PreToolUse hooks provide coordination points.
+- **SQLite messaging**: WAL mode enables concurrent agent messaging at ~1-5ms latency.
+- **Two-layer definitions**: Base agent .md files (HOW) + dynamic overlay CLAUDE.md (WHAT).
+
+### Core Workflows
+
+#### Spawning Workers
+
+```bash
+overstory sling --task bd-abc --capability builder --name auth-login \
+  --spec .overstory/specs/bd-abc.md --files src/auth/login.ts,src/auth/types.ts
+```
+
+Creates worktree, writes overlay CLAUDE.md, deploys hooks, starts tmux session running Claude Code.
+
+#### Communication
+
+```bash
+overstory mail send --to orchestrator --subject "Build complete" \
+  --body "Implemented login flow. Tests passing." --type result
+```
+
+Messages persist in `.overstory/mail.db` (SQLite). Hook automatically injects unread messages into agent context on next prompt submission.
+
+#### Merge Queue
+
+```bash
+overstory merge --branch overstory/auth-login/bd-abc
+```
+
+4-tier resolution: Clean → Auto-Resolve → AI-Resolve → Re-Imagine. Escalates automatically until conflicts resolve.
+
+#### Monitoring
+
+```bash
+overstory status       # Show all active agents, worktrees, beads state
+overstory watch        # Start watchdog daemon
+overstory metrics      # Show metrics summary
+```
+
+### Comparison with Gas Town
+
+| Dimension | Overstory | Gas Town |
+|-----------|-----------|----------|
+| **Runtime** | TypeScript/Bun | Go |
+| **Orchestrator** | Session-as-orchestrator (your active Claude Code session) | External daemon (Mayor) |
+| **CLI** | overstory (17 commands) | gt/bd dual CLIs |
+| **Messaging** | Custom SQLite mail (~1-5ms) | Typed mail protocol |
+| **Cost Model** | Subscription (fixed monthly cost) | API tokens (~$100/hr) |
+| **Dependencies** | Zero (Bun built-ins only) | Go stdlib |
+| **Agent Definition** | Base .md + overlay CLAUDE.md | Similar pattern |
+| **Merge Resolution** | 4-tier (Clean/Auto/AI/Re-Imagine) | Refinery with AI resolution |
+| **Supervision** | Tiered (Daemon → Triage → Monitor → Supervisor) | Daemon → Boot → Deacon → Witness |
+
+**Convergence:** Both implement persistent identity, worktree isolation, typed messaging, tiered health monitoring, and merge queue infrastructure. The architectural alignment across different technology stacks (Go vs TypeScript) and coordination models (daemon vs session) validates these patterns as fundamental to swarm coordination.
+
+### When to Choose Overstory
+
+**Good fit:**
+- TypeScript/Bun ecosystem preferred
+- Subscription cost model acceptable (fixed monthly vs per-token)
+- Session-based coordination workflow natural (human stays engaged)
+- Zero-dependency deployment valued
+- Hook-based mechanical enforcement sufficient
+
+**Poor fit:**
+- Multi-language polyglot teams (Go ecosystem familiarity in Gas Town)
+- API token budget model required (pay-per-use vs subscription)
+- External daemon coordination preferred (orchestrator survives session crashes)
+- Production validation maturity critical (Gas Town has more operational history as of early 2026)
+
+---
+
+## Workspace Manager Selection Framework
+
+When choosing between workspace managers, consider scale requirements, ecosystem preferences, and coordination models:
+
+```
+Scale and requirements:
+  1-5 agents → Claude Code Agent Teams (built-in)
+  5-15 agents → Overstory (session-based) OR Gas Town (daemon-based)
+  15-30 agents → Gas Town (proven at scale as of early 2026)
+
+Ecosystem preference:
+  TypeScript/Bun → Overstory
+  Go → Gas Town
+  Language-agnostic → Either (patterns converge)
+
+Cost model:
+  Subscription (fixed) → Overstory
+  API tokens (pay-per-use) → Gas Town
+  Either acceptable → Choose by ecosystem
+
+Coordination model:
+  Session-as-orchestrator → Overstory
+  External daemon → Gas Town
+```
+
+---
+
 ## When Workspace Managers Make Sense
 
 ### Good Fit
@@ -241,26 +370,29 @@ Agent Count Decision Framework:
 
 ## Comparison with Other Approaches
 
-| Dimension | Gas Town | Claude Code Agent Teams | Google ADK | LangGraph |
-|-----------|----------|------------------------|------------|-----------|
-| **Scale target** | 20-30 agents | 2-8 agents | Varies | Varies |
-| **Primary abstraction** | Workspace/worktree | Teammate session | Agent/workflow | Graph node |
-| **Persistence** | Git-backed beads | Session-only | State store | Checkpoints |
-| **Agent identity** | Persistent (named CVs) | Ephemeral | Configurable | Ephemeral |
-| **Coordination model** | Mail protocol + beads | Message passing + tasks | Shared state | Graph edges |
-| **Merge strategy** | Automated AI refinery | Manual | N/A | N/A |
-| **Supervision** | Deacon/Witness/Dogs | Flat (lead monitors) | Configurable | External |
-| **Failure recovery** | Automatic (supervisor chain) | Manual (respawn) | Configurable | Checkpoint restore |
-| **Cost profile** | ~$100/hr (20-30 agents) | Lower (2-8 agents) | Lower | Lower |
-| **Maturity** | Early (December 2025) | Experimental | Production | Production (v1.0) |
-| **Language** | Go (CLI tools) | TypeScript (SDK) | Python | Python |
-| **License** | MIT | Proprietary | Apache 2.0 | MIT |
+| Dimension | Gas Town | Overstory | Claude Code Agent Teams | Google ADK | LangGraph |
+|-----------|----------|-----------|------------------------|------------|-----------|
+| **Scale target** | 20-30 agents | 10-15 agents | 2-8 agents | Varies | Varies |
+| **Primary abstraction** | Workspace/worktree | Worktree + session | Teammate session | Agent/workflow | Graph node |
+| **Persistence** | Git-backed beads | Filesystem + SQLite | Session-only | State store | Checkpoints |
+| **Agent identity** | Persistent (named CVs) | Persistent (identity.yaml) | Ephemeral | Configurable | Ephemeral |
+| **Coordination model** | Mail protocol + beads | SQLite mail (~1-5ms) | Message passing + tasks | Shared state | Graph edges |
+| **Orchestrator model** | External daemon (Mayor) | Session-as-orchestrator | Built-in (flat) | Configurable | Explicit graph |
+| **Merge strategy** | Automated AI refinery | 4-tier escalation | Manual | N/A | N/A |
+| **Supervision** | Deacon/Witness/Dogs | Daemon/Triage/Monitor/Supervisor | Flat (lead monitors) | Configurable | External |
+| **Failure recovery** | Automatic (supervisor chain) | Tiered (mechanical → AI) | Manual (respawn) | Configurable | Checkpoint restore |
+| **Cost profile** | ~$100/hr (20-30 agents) | Subscription (fixed monthly) | Lower (2-8 agents) | Lower | Lower |
+| **Maturity** | Early (December 2025) | Early (February 2026) | Experimental | Production | Production (v1.0) |
+| **Language** | Go (CLI tools) | TypeScript/Bun | TypeScript (SDK) | Python | Python |
+| **Dependencies** | Go stdlib | Zero (Bun built-ins) | Node + npm packages | Python + pip packages | Python + pip packages |
+| **License** | MIT | MIT | Proprietary | Apache 2.0 | MIT |
 
 **Key differentiators:**
 
-- **Git-native persistence**: Gas Town's bead system leverages Git for all state, making every state change versioned, auditable, and recoverable. Other approaches use ephemeral or application-specific state.
-- **Merge automation**: No other tool in this comparison automates merge conflict resolution. At 20+ agents producing concurrent branches, merge becomes the primary bottleneck without automation.
-- **Supervisory depth**: Three-layer supervision (deacon/witness/dogs) provides fault isolation missing from flat coordination models. A failed agent is detected and recovered without affecting peers.
+- **Git-native persistence**: Gas Town's bead system and Overstory's filesystem + SQLite persistence both ensure state survives crashes. Other approaches use ephemeral or application-specific state.
+- **Merge automation**: Gas Town and Overstory automate merge conflict resolution through AI-assisted tiers. At 20+ agents producing concurrent branches, merge becomes the primary bottleneck without automation.
+- **Supervisory depth**: Three-layer supervision (Gas Town: deacon/witness/dogs; Overstory: daemon/triage/monitor/supervisor) provides fault isolation missing from flat coordination models. A failed agent is detected and recovered without affecting peers.
+- **Coordination model**: Gas Town's daemon-based Mayor vs Overstory's session-as-orchestrator represent fundamental architectural trade-offs. Daemon provides crash independence; session provides infrastructure simplicity.
 
 ---
 

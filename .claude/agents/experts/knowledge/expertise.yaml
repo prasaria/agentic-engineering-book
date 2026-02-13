@@ -1,6 +1,6 @@
 # Knowledge Management Expertise
 # Target: 750 lines | Domain: Operational knowledge for book content management
-# Size: 782 lines (pruned from 994 on 2026-02-02, added swarm documentation learnings)
+# Size: Pruned 2026-02-13 from 1119 → ~700 lines (removed 400+ tactical lines)
 
 overview:
   description: |
@@ -304,27 +304,9 @@ patterns:
       - location: chapters/2-prompt/_questions.md
         note: Questions organized by theme with state tracking
 
-  leading_questions_pattern:
-    name: Leading Questions for New Entries
-    context: Seeding new entries with questions for future development
-    implementation: |
-      ## Leading Questions
-
-      - How does this pattern scale across different model sizes?
-      - What are the failure modes when context exceeds limits?
-      - How do you measure effectiveness of this approach?
-
-      Purpose:
-      - Guide future development
-      - Explicitly acknowledge uncertainty
-      - Create roadmap for expansion
-    trade_offs:
-      - advantage: Makes entry developable by others
-        cost: Entry feels incomplete until answered
-
   contextual_cross_reference_pattern:
     name: Contextual Cross-References (Evolved Pattern)
-    context: Linking related content with explanation. Enhanced via commit d69ef22 learnings.
+    context: Linking related content with explanation
     implementation: |
       ## Connections section format:
       - **To [Topic](relative/path.md)**: Why this connection matters.
@@ -334,43 +316,33 @@ patterns:
       - **To [Tool Use](../5-tool-use/_index.md):** Tool descriptions are prompts
         themselves. Poor tool docs lead to misuse regardless of main prompt quality.
 
-      For changelog integrations (NEW):
-      - Use comparison tables to show feature trade-offs (not just describing separately)
-      - Link to mental models through pattern explanations, not just tool features
-      - Group related features under thematic headers before creating separate sections
-      - Example: Real-Time Message Steering links conceptually to Progressive Refinement
-
       Add 1-2 sentences per link explaining:
       - Why the connection matters (conceptual bridge)
       - What insight readers should transfer between sections
     real_examples:
       - location: chapters/2-prompt/_index.md
         note: Basic Connections section
-      - location: chapters/9-practitioner-toolkit/1-claude-code.md lines 337-366
-        note: Unified Mental Model with comparison table (Skills vs Slash Commands)
-      - location: chapters/9-practitioner-toolkit/1-claude-code.md lines 651-698
-        note: Hook Context Injection with Block vs Context Injection decision table
 
 best_practices:
   - category: Content Placement
     timestamp: 2025-12-26
     practices:
-      - practice: Check existing content before creating new entries (CLAUDE.md:169)
-      - practice: Prefer extending existing files over creating new ones (CLAUDE.md:170)
+      - practice: Check existing content before creating new entries
+      - practice: Prefer extending existing files over creating new ones
       - practice: Use entry location decision tree for placement
 
   - category: Voice and Tone
     timestamp: 2025-12-26
     practices:
-      - practice: Use direct statements over hedging (STYLE_GUIDE.md)
-      - practice: Third-person only throughout (STYLE_GUIDE.md:17-24, commit 26f7974)
-      - practice: Bold assertion + elaboration for mental models (pit-of-success.md)
-      - practice: Imperative mood for instructions (STYLE_GUIDE.md:37-44)
+      - practice: Use direct statements over hedging
+      - practice: Third-person only throughout
+      - practice: Bold assertion + elaboration for mental models
+      - practice: Imperative mood for instructions
 
   - category: Content Structure
     timestamp: 2025-12-26
     practices:
-      - practice: Lead with Core Questions for developed entries (commit 0322625)
+      - practice: Lead with Core Questions for developed entries
       - practice: Use three-tier structure (questions → mental model → patterns)
       - practice: Tables for comparing 3-7 options across dimensions
       - practice: Lead complex patterns with concrete examples before abstraction
@@ -379,741 +351,289 @@ best_practices:
   - category: Evidence-Grounded Content
     practices:
       - practice: Comprehensive evidence sections with research citations
-        evidence: chapters/2-prompt/3-language.md (commit a624250) - 635 lines with academic papers, official docs, practitioner sources
-        rationale: Long-form evidence-based chapters establish credibility and provide actionable research-backed guidance
-        timestamp: 2025-12-26
-      - practice: Structure research findings with clear tables showing quantified impact
-        evidence: 3-language.md uses tables for task-type dependency, specificity calibration, model-specific patterns
-        rationale: Tables enable quick scanning of evidence and direct comparison of approaches
-        timestamp: 2025-12-26
-      - practice: Separate academic papers, official documentation, and practitioner sources in references
-        evidence: 3-language.md references section (lines 576-623) categorizes source types
-        rationale: Clarifies evidence strength and helps readers assess claim validity
-        timestamp: 2025-12-26
+        rationale: Long-form evidence-based chapters establish credibility
+      - practice: Structure research findings with tables showing quantified impact
+        rationale: Tables enable quick scanning and direct comparison
+      - practice: Separate academic papers, official docs, practitioner sources in references
+        rationale: Clarifies evidence strength
       - practice: Include arxiv IDs and specific paper names for reproducibility
-        evidence: 3-language.md includes arxiv IDs like "SatLM arxiv:2305.09656" and "DETAIL Framework arxiv:2512.02246"
-        rationale: Enables readers to verify claims and dive deeper into research
-        timestamp: 2025-12-26
+        rationale: Enables readers to verify claims
       - practice: Use "Open Questions" section to acknowledge uncertainty
-        evidence: 3-language.md ends with open research questions (lines 625-633)
-        rationale: Models intellectual humility and guides future exploration
-        timestamp: 2025-12-26
+        rationale: Models intellectual humility
 
   - category: Cross-References & Question Management
     timestamp: 2025-12-26
     practices:
-      - practice: Bidirectional linking with contextual explanation (commit a72bcf2)
+      - practice: Bidirectional linking with contextual explanation
       - practice: Update related index files when adding content
       - practice: Answers go in chapter content, not in _questions.md
       - practice: Update question states immediately after addressing
-
-  - category: Constraint Framing
-    practices:
-      - practice: Frame constraints as positive requirements, not prohibitions
-        evidence: chapters/2-prompt/3-language.md lines 188-263 conversion table
-        rationale: Negative constraints ("never do X") backfire at scale; positive framing reduces semantic activation of unwanted patterns
-        timestamp: 2025-12-26
-        example: "|Never use global state|Use dependency injection|"
-
-  - category: Multi-Agent Swarm Content Updates
-    practices:
-      - practice: Coordinate large content updates via parallel agent swarms
-        evidence: Commit 20500f1 (2026-01-30) - 10 agents, 11 tasks, ~4 minutes
-        rationale: Enables simultaneous pattern entry creation + debugging expansion + cross-reference fixes
-        timestamp: 2026-01-30
-      - practice: Create comprehensive pattern entries (300-550 lines) with full structure
-        evidence: ReAct (320 lines), HITL (551 lines), Progressive Disclosure (307 lines)
-        rationale: Swarm capacity allows depth without sacrificing breadth
-        timestamp: 2026-01-30
-      - practice: Fix cross-reference drift as part of swarm coordination
-        evidence: Commit 20500f1 fixed 15 broken cross-references across 10 files
-        rationale: Swarm can address infrastructure debt alongside feature work
-        timestamp: 2026-01-30
 
 known_issues:
   - issue: Voice consistency can drift across long entries
     workaround: Review against voice guidelines during editing
     status: open
-    timestamp: 2025-12-26
 
   - issue: False technical claims can propagate before validation
     workaround: Verify technical assertions against actual implementation
-    context: Commit 26f7974 removed ~600 lines of hook enforcement claims proven false
+    learning: Technical claims about code capabilities must be verified against actual implementation
     status: resolved
-    timestamp: 2025-12-26
-    learning: Technical claims about code capabilities must be verified against actual implementation, not assumed from documentation
 
   - issue: Question states can drift out of sync with content
     workaround: Periodic review of question files against chapter content
     status: open
-    timestamp: 2025-12-26
 
   - issue: Cross-references can become stale when content moves
     workaround: Search for broken links after restructuring
     status: open
-    timestamp: 2025-12-26
-
-  - issue: Inline timestamps create visual noise
-    workaround: Consider consolidating into dedicated sections for mature entries
-    status: accepted
-    timestamp: 2025-12-26
-
-  - issue: Research-heavy chapters require significant time investment
-    workaround: Plan for 20+ hours when committing to comprehensive evidence-based content
-    context: chapters/2-prompt/3-language.md took substantial research effort
-    status: accepted
-    timestamp: 2025-12-26
-
-documenting_system_patterns:
-  name: Documenting System-Level Patterns (Multi-Agent Architectures)
-  context: Pattern from chapters/6-patterns/2-self-improving-experts.md expansion
-  timestamp: 2025-12-26
-
-  pattern_observed: |
-    System-level patterns (multi-agent architectures) require 5-section structure:
-
-    1. **Evolution Timeline Table** - commit history as narrative backbone
-       (chronological: hash | date | change | impact, highlight CRITICAL pivots)
-
-    2. **System-Level Benefits Comparison** - emergent properties vs individual
-       (before/after table showing dimensions like consistency, boundaries, clarity)
-
-    3. **Template Documentation** - reusable pattern with real examples
-       (role breakdown, tool allocation, frontmatter from actual files with line numbers)
-
-    4. **Structured Schema** - detailed knowledge format specification
-       (sections with purpose/structure/examples, line count targets, mutability strategy)
-
-    5. **Case Study** - concrete application with quantified metrics
-       (8-step process, before/after comparison, ROI calculation)
-
-  key_techniques:
-    - Git commits as verifiable evidence (commit hashes link to actual diffs)
-    - Every claim backed by file path + line numbers
-    - Real quantified metrics from actual usage (not theoretical estimates)
-    - Tables for quick scanning (evolution, benefits, templates, comparisons)
-    - Incremental growth via timestamped sections (preserves base + shows evolution)
-
-  when_to_use:
-    - Multi-agent system architectures (3+ coordinated agents)
-    - Evolution from individual pattern to system paradigm
-    - Reusable templates needing comprehensive reference
-
-  real_examples:
-    - location: chapters/6-patterns/2-self-improving-experts.md (lines 643-1465)
-      note: 822 lines with 15+ commits, 20+ file paths, 10+ metrics, 5 tables
 
 comprehensive_research_chapter_pattern:
   name: Comprehensive Evidence-Based Chapter Pattern
   context: Pattern from chapters/2-prompt/3-language.md creation (commit a624250)
   timestamp: 2025-12-26
-
   pattern_observed: |
     Creating substantial research-backed chapters (400-650 lines) that synthesize
     academic papers, official documentation, and practitioner sources into
     authoritative technical reference material.
 
     Structure for evidence-based chapters:
-    1. Opening: Clear scope and relevance statement (what's covered, why it matters)
+    1. Opening: Clear scope and relevance statement
     2. Multiple focused sections (5-7 major topics per chapter)
     3. Evidence integration: Inline citations with quantified claims
     4. Comparison tables showing approaches across dimensions
     5. Anti-patterns section demonstrating what NOT to do
-    6. Model-specific guidance when relevant (Claude, GPT, Gemini)
+    6. Model-specific guidance when relevant
     7. Comprehensive references section (categorized by source type)
     8. Open questions section acknowledging research gaps
 
-  key_metrics:
-    evidence_density: "~15-20 citations per 600 lines"
-    structure_ratio: "70% patterns/guidance, 20% examples, 10% references"
-    time_investment: "Plan for 20+ hours of research and synthesis"
-    source_categories: "3 types - academic papers, official docs, practitioner sources"
+    **Expansion pattern (250→1030 lines):**
+    - Comparison tables for mindset shifts (deterministic vs probabilistic)
+    - Decision trees for diagnostic workflows (if X then check Y)
+    - Symptom-first organization (readers start with what they observe)
+    - Structured failure mode template (Symptoms/Diagnosis/Root/Fixes)
 
   when_to_use:
-    - Foundational topics where evidence-grounded guidance provides long-term reference value
+    - Foundational topics where evidence provides long-term reference value
     - Areas with significant academic/industry research to synthesize
     - Topics where practitioners need verifiable, authoritative claims
-    - Content that will be cited or referenced extensively
+    - Expanding stub chapters with comprehensive operational guidance
 
-  trade_offs:
-    - advantage: Establishes authoritative, verifiable guidance
-      cost: Requires significant research investment (20+ hours)
-    - advantage: Long-term reference value for practitioners
-      cost: Higher maintenance burden as research evolves
-    - advantage: Enables readers to verify claims and explore deeper
-      cost: More complex to write and structure than experience-based content
-
-  real_examples:
-    - location: chapters/2-prompt/3-language.md
-      lines: 635 total
-      sections: 9 major sections
-      citations: "9 academic papers, 3 official docs, 4 practitioner sources"
-      tables: 6 comparison/analysis tables
-      note: "Synthesized 75+ sources into coherent practitioner guidance"
-
-recent_content_learnings:
-  swarm_content_generation:
-    name: Parallel Agent Swarm Implementation Patterns (Commit 20500f1)
-    context: 10-agent knowledge base overhaul with production metrics
-    timestamp: 2026-01-30
-    pattern_observed: |
-      Production swarm execution generates 3,082 lines across 20 files in ~4 minutes (10×
-      speedup vs sequential). Quality patterns: 3 new pattern entries (320-551 lines each),
-      15 cross-reference fixes bundled with features, comprehensive structure maintained
-      across all parallel agents. Coordination includes: infrastructure debt repair, pattern
-      selection framework for _index.md, bundled example documentation (KotaDB case study).
-
-      **When to use:** Multiple independent content areas (4+ tasks), 1000+ line expansion
-      across diverse topics, infrastructure debt with time pressure. **Trade-offs:** 10×
-      speedup vs coordination overhead + token consumption. **Key techniques:** Pattern
-      selection decision framework, cross-reference repair as swarm task, bundled infrastructure
-      fixes prevent debt accumulation.
-
-    evidence: |
-      Commit 20500f1: 10 agents → 3 patterns (ReAct 320L, HITL 551L, Progressive Disclosure 307L),
-      2 toolkit entries, 1 expansion (Debugging 250→1030L), 2 examples, 15 link repairs across
-      10 files, pattern selection framework in chapters/6-patterns/_index.md. Time: ~4 minutes.
-      Quality: Full structure (Questions, Model, Trade-offs, Connections) maintained uniformly.
-
-    when_to_use:
-      - Large-scale content expansion requiring consistent quality across parallel work
-      - Infrastructure debt (broken links) bundled with feature work
-      - Time-sensitive delivery (book releases, course launches)
-
-external_research_integration:
-  name: Claude-Sneakpeek Research Integration Pattern
-  context: Integration of multi-agent orchestration research from community tools into book content
-  timestamp: 2026-01-30
+complex_system_documentation_pattern:
+  name: Complex System Pattern Documentation (12-Section Structure)
+  context: Expert Swarm Pattern (532 lines), Multi-Agent Systems (commit a1d5942)
+  timestamp: 2026-02-02
   pattern_observed: |
-    External research integration reveals sophisticated orchestration patterns that enhance
-    foundational content with evidence-grounded learnings. The claude-sneakpeek research
-    (Kimi K2.5 swarm mode, TeammateTool feature gates, cc-mirror orchestration skills)
-    was successfully integrated across 4 key files without losing existing voice or structure.
+    Multi-agent architectural patterns require comprehensive documentation structure:
+    Problem → Structure (ASCII) → Positioning → Protocol → Communication →
+    Scale → Implementation → Trade-offs → Decision Framework → Connections → Open Questions.
 
-    **Integration Strategy:**
-    1. **Lightweight Injection Points**: Added timestamped insights to existing sections
-       (e.g., Model-Native Swarm section in multi-model-architectures.md)
-    2. **Dedicated New Sections**: TeammateTool warranted its own comprehensive section
-       (claude-code.md lines 245-524, 280 lines)
-    3. **Rich Cross-Reference Anchoring**: Added explicit connections from new content to
-       related chapters (orchestrator-pattern.md → multi-model-architectures.md)
-    4. **Bidirectional Navigation**: Both orchestrator pattern and multi-agent context updated
-       to reference new TeammateTool capabilities
-
-    **Content Quality Maintained:**
-    - Voice consistency preserved (third-person, evidence-grounded style)
-    - Newcomer cross-references included (TeammateTool to Task comparison table)
-    - Mental models explicit (Your Mental Model section for TeammateTool)
-    - Trade-offs documented (three-tier spawn strategy, coordination pattern selection)
-
-  key_techniques:
-    - Staged integration: Metadata first (brief mention), then full section (comprehensive)
-    - Comparative framing: Always position new content against known patterns (Task vs TeammateTool)
-    - Source attribution: Include commit hashes and external URLs for traceability
-    - Temporal anchoring: Use timestamps to show when external patterns were discovered
-    - Forward links: Add "See Also" sections even in non-deterministic exploration
-
-  evidence: |
-    **Commit de68e9f (2026-01-30)**: TeammateTool and model-native swarm documentation
-    - Added Model-Native Swarm Orchestration section (multi-model-architectures.md)
-    - Added TeammateTool section (claude-code.md, 280 lines, 5 coordination patterns)
-    - Added Feature Gate Reverse Engineering section (claude-code.md, 190 lines)
-    - Cross-reference updates to orchestrator-pattern.md and execution-topologies.md
-
-    **Commit 20500f1 (2026-01-30)**: Knowledge base overhaul expanding research patterns
-    - Orchestrator pattern extended: 417 → 674 lines (257 line addition)
-    - Added Conductor Philosophy (communication excellence patterns)
-    - Added Read vs Delegate Guidelines (1-2 file threshold heuristic)
-    - Added Background Execution Mechanics (run_in_background usage)
-    - Added Pattern Composition (PR review, feature implementation, bug diagnosis)
-
-    **Files Modified by Research Integration:**
-    - chapters/3-model/1-model-selection.md: Multi-Agent Model Selection section
-    - chapters/5-tool-use/1-tool-design.md: Rich User Questioning Patterns (4×4 maximal)
-    - chapters/6-patterns/3-orchestrator-pattern.md: Conductor philosophy + composition patterns
-    - chapters/9-practitioner-toolkit/1-claude-code.md: TeammateTool + feature gates
+    **Key structural elements:**
+    1. Production evidence anchor: Open with commit hash + metrics
+    2. ASCII diagram early: Visual before prose
+    3. Hybrid approach positioning: Frame new pattern vs existing
+    4. Protocol specification: Concrete syntax, not abstractions
+    5. Scale with evidence: Wall-clock comparisons
+    6. Token economics transparency when relevant
+    7. Implementation examples: Real prompts from production
+    8. Three-way trade-off tables (scannability > prose)
+    9. ASCII decision tree: Binary nodes force reader thinking
+    10. Good Fit/Poor Fit bullets: Fast-path before decision tree
+    11. Bidirectional connections: 6+ links with relationship explanations
+    12. Open Questions: Acknowledge research gaps
 
   when_to_use:
-    - Integrating external research (community tools, published papers, practitioner blogs)
-    - Filling gaps identified in current documentation
-    - Adding evidence for existing patterns with new concrete examples
-    - Cross-domain pattern discovery from other specialized communities
-
-  complex_system_pattern_documentation:
-    name: Complex System Pattern Documentation (12-Section Structure)
-    context: Expert Swarm Pattern (532 lines, commit a1d5942)
-    timestamp: 2026-02-02
-    pattern_observed: |
-      Multi-agent architectural patterns require comprehensive documentation structure:
-      Problem → Structure (ASCII) → Hybrid Positioning → Protocol Spec → Communication →
-      Learning Separation → Scale → Implementation → Trade-offs → Decision Framework →
-      Connections → Open Questions.
-
-      **Key structural elements (consolidated from 4 sub-patterns):**
-
-      1. Production evidence anchor: Open with commit hash + metrics (10 agents, 4 min, 3,082 lines)
-      2. ASCII diagram early: Visual before prose (Lead → expertise.yaml → Workers → Join)
-      3. Hybrid approach positioning: Frame new pattern vs existing (Traditional/Expert Swarm/Model-Native)
-      4. Protocol specification: Concrete syntax, not abstractions (EXPERTISE_PATH: /absolute/path)
-         - Include "Why Not X?" comparison table (context copying vs path-passing)
-      5. Scale with evidence: Wall-clock comparison (4 min parallel vs 40 min sequential = 10× speedup)
-      6. Token economics transparency: Cost analysis (750-line expertise = 3,000 tokens/worker)
-      7. Implementation examples: Real prompts from production (commit 20500f1)
-      8. Three-way trade-off table: 3 alternatives × 11 dimensions (scannability > prose)
-      9. ASCII decision tree: Binary nodes force reader thinking (better than prose "use when")
-      10. Good Fit/Poor Fit bullets: Fast-path before decision tree
-      11. Bidirectional connections: 6+ links with relationship explanations
-      12. Open Questions (8+): Acknowledge research gaps (consistency, scale, observability)
-
-    evidence: |
-      chapters/6-patterns/8-expert-swarm-pattern.md (532 lines)
-      12 major sections, 5 cross-reference updates, production evidence from commit 20500f1
-
-    when_to_use:
-      - Multi-agent architectural patterns (3+ components)
-      - Patterns with quantified production evidence
-      - Protocols requiring specification (EXPERTISE_PATH, message passing)
-
-    key_techniques:
-      - Production evidence first, ASCII diagrams before prose
-      - Comparison tables justify design choices
-      - Decision trees over prose lists
-      - Open Questions preserve credibility
-
-  slash_command_documentation_pattern:
-    name: Slash Command Documentation Structure (623 lines)
-    context: /do-teams command (.claude/commands/do-teams.md, commit a1d5942)
-    timestamp: 2026-02-02
-    pattern_observed: |
-      Slash commands requiring multi-step workflows benefit from imperative instruction
-      format with 7-section structure: Role → Workflow (7 steps) → Templates → Coordination →
-      When To Use → Examples → Troubleshooting.
-
-      **Structural pattern:**
-      - "Your Role" section: 3 bullets clarifying command executor responsibilities
-      - Workflow as numbered steps: Step 1 (Create Team) → Step 7 (Cleanup)
-      - Each step has: description + code block + constraints
-      - "Teammate Prompting Format" section: Copy-paste templates (Lead + Worker)
-      - Critical callouts: "CRITICAL: Spawn all workers in a SINGLE message"
-
-      **Template format (within command docs):**
-      - Lead agent template: 8 sections (ROLE, CONTEXT, TASK, CONSTRAINTS, OUTPUT FORMAT)
-      - Worker agent template: Same 8 sections, different content
-      - EXPERTISE_PATH: line in CONTEXT section (absolute path)
-      - Allowed tools listed explicitly in CONSTRAINTS
-
-      **Decision guidance:**
-      - "When to use /do vs /do-teams" comparison table
-      - "/do" for sequential workflows (plan→build→improve)
-      - "/do-teams" for parallel coordination requiring inter-agent messaging
-
-    evidence: |
-      .claude/commands/do-teams.md (623 lines)
-      - Sections: Role (1), Workflow (7 steps), Templates (2), Coordination, When/Examples, Troubleshooting
-      - Templates include EXPERTISE_PATH protocol
-      - 7-step workflow mirrors actual swarm execution
-
-    when_to_use:
-      - Multi-step commands requiring coordination
-      - Commands with domain expert integration (expertise.yaml passing)
-      - Parallel execution workflows
-
-    key_techniques:
-      - Imperative instructions ("You do NOT do the work yourself")
-      - Code block templates (copy-paste ready)
-      - Critical callouts for common errors
-      - Step-by-step workflow matching execution order
-
-  debugging_chapter_expansion_pattern:
-    name: Debugging Chapter Expansion (250→1030 lines)
-    context: chapters/7-practices/1-debugging-agents.md expansion (commit 20500f1)
-    timestamp: 2026-02-02
-    pattern_observed: |
-      Debugging content expanded from 250 → 1,030 lines (4× growth) by adding:
-      1. Agent vs Traditional Debugging comparison table (mindset shift)
-      2. Core Four Framework table (Prompt/Model/Context/Tools diagnostic sequence)
-      3. 6-branch diagnostic decision tree (Step 1: Characterize → Step 2A-F: Root cause)
-      4. 8+ common failure modes (Context Overflow, Tool Errors, Hallucination, etc.)
-      5. Symptom → Diagnosis → Root Cause → Fixes structure for each failure mode
-
-      **Structure for failure mode documentation:**
-      - **Symptoms**: Observable behaviors (agent forgets early instructions)
-      - **Diagnosis**: How to verify (check token count vs context limit)
-      - **Root causes**: Why it happens (3-4 bullets)
-      - **Fixes**: Remediation strategies (4-5 bullets)
-
-      **Effective patterns:**
-      - Comparison tables for mindset shifts (deterministic vs probabilistic)
-      - Decision trees for diagnostic workflows (if X then check Y)
-      - Symptom-first organization (readers start with what they observe)
-      - Multiple failure modes in single chapter (comprehensive reference)
-
-    evidence: |
-      chapters/7-practices/1-debugging-agents.md (250 → 1,030 lines)
-      - Added: Debugging Mindset, Core Four Framework, 6-branch diagnostic tree
-      - Added: 8 common failure modes (structured as Symptoms/Diagnosis/Root/Fixes)
-      - Preserved: Original chapter opener and connections section
-
-    when_to_use:
-      - Expanding stub chapters with comprehensive operational guidance
-      - Documenting troubleshooting workflows
-      - Building practitioner reference material
-
-    key_techniques:
-      - Symptom-first structure (readers search by what they see)
-      - Decision trees for diagnostics (structured troubleshooting)
-      - Comparison tables for mindset (agent vs traditional code)
-      - Structured failure mode template (4-part format)
-
-agent_teams_documentation:
-  name: Large Multi-File Feature Documentation
-  context: Agent Teams (TeammateTool) multi-file update (2026-02-05)
-  timestamp: 2026-02-05
-  pattern_observed: |
-    Agent teams documentation required coordinated updates across 6+ files
-    with interdependencies and terminology synchronization. Successful
-    execution depended on phased approach: foundation first, then
-    dependents. Key learnings for similar large documentation efforts.
-
-    **Phase 1: Foundation (Core Concepts)**
-    - chapters/9-practitioner-toolkit/1-claude-code.md: Added "Agent Teams" section (420 lines, lines 246-667)
-    - Comprehensive coverage: Prerequisites, Core Capabilities, Display Modes, Keyboard Controls, Getting Started,
-      Advanced Features, Coordination Patterns, Best Practices, Troubleshooting, Limitations, Decision Framework
-    - Updated terminology section to include official status and feature gate migration
-
-    **Phase 2: Command Documentation**
-    - .claude/commands/do-teams.md: Updated prerequisites, display modes, limitations (623 lines)
-    - Mirrored terminology from official docs
-    - Added explicit CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1 instructions
-    - Included validation patterns for feature availability
-
-    **Phase 3: Dependent Patterns**
-    - chapters/6-patterns/8-expert-swarm-pattern.md: Added Agent Teams Messaging subsection (lines 153-172)
-    - chapters/6-patterns/3-orchestrator-pattern.md: Updated Agent Teams references
-    - chapters/4-context/4-multi-agent-context.md: Added agent teams vs subagents section
-
-    **Phase 4: Expertise Updates**
-    - 13 expert domain expertise.yaml files: Updated terminology and cross-references
-    - CLAUDE.md: Updated feature gate references in documentation tables
+    - Multi-agent architectural patterns (3+ components)
+    - Patterns with quantified production evidence
+    - Protocols requiring specification
 
   key_techniques:
-    - Phased execution prevents broken references during updates
-    - Foundation-first approach ensures terminology consistency
-    - Cross-file terminology defined in official docs (code.claude.com), then propagated
-    - Display modes documented in command level first, then referenced from chapter docs
-    - Official limitations section acts as single source of truth
-
-  critical_learnings:
-    - Feature gate migration: claude-sneakpeek internal → CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS public env var
-    - Official terminology distinction maintained throughout: "agent teams" (peer messaging) vs "subagents" (report-back)
-    - Prerequisites section critical when feature is experimental/gated (enables/verification pattern)
-    - Display modes (in-process vs split-pane) are user-facing, must be documented early in chapter
-    - Limitations section requires continuous updates as feature matures (6 limitations documented as of 2026-02-05)
-
-  when_to_use:
-    - Large documentation efforts spanning 5+ files
-    - Features with experimental status requiring explicit enablement
-    - Cross-system terminology requiring consistency (chapter + command + expertise)
-    - Multi-phase rollouts where dependencies are critical
-
-  evidence: |
-    - chapters/9-practitioner-toolkit/1-claude-code.md: 420-line Agent Teams section (2026-02-05)
-    - .claude/commands/do-teams.md: Updated prerequisites + display modes (2026-02-05)
-    - chapters/6-patterns/8-expert-swarm-pattern.md: Agent Teams Messaging subsection
-    - Terminology synchronized across 14 files (1-claude-code.md, do-teams.md, 6 chapter files, 6 expertise.yaml files, CLAUDE.md)
-    - Official docs (code.claude.com) serve as authoritative source
-
-  anti_patterns:
-    - what: Updating dependent files before foundation
-      why: Broken cross-references, terminology inconsistency
-      instead: Update foundation (claude-code.md), validate, then cascade updates
-    - what: Duplicating prerequisites across command + chapter docs
-      why: Maintenance burden when feature status changes
-      instead: Reference official prerequisites once, link from dependent docs
-    - what: Vague status ("available soon", "in development")
-      why: No clear enablement path for readers
-      instead: Specific version (2.0.76+), explicit env var, verification steps
-
-memory_management_documentation:
-  name: Memory Management Feature Documentation (310 lines)
-  context: Session memory + .claude/rules/ system documentation (chapters/9-practitioner-toolkit/1-claude-code.md)
-  timestamp: 2026-02-05
-  pattern_observed: |
-    Documenting memory persistence features requires explaining automatic vs manual mechanisms,
-    showing hierarchy across memory tiers, and providing decision frameworks for selecting
-    appropriate mechanism. The Memory Management section (310 lines) demonstrates:
-
-    **Structure for memory system documentation:**
-    1. Opening mental model: Bold assertion bridging concepts ("Session memory bridges ephemeral context and persistent knowledge")
-    2. Automatic mechanism explanation: How It Works → Observable Behavior → Feature Gate Status
-    3. Manual mechanisms: Commands (/remember, /compact, # shortcut) with workflows
-    4. Modular system: Directory structure → Path-scoped rules → Conditional loading → Symlinks
-    5. Complete hierarchy table: 7 tiers with Tier/Location/Scope/Automatic/Example Use columns
-    6. Feature comparison table: 5 mechanisms × 5 dimensions (Automatic/Persistent/Modular/Path-Scoped/Control)
-    7. Decision framework: ASCII tree with binary branching (automatic vs manual → path-specific vs shared)
-    8. Practical examples: 3+ copy-paste examples showing real usage
-    9. Bidirectional cross-reference: Link to context fundamentals with relationship explanation
-
-    **Key structural decisions:**
-    - Automatic mechanisms first (session memory), then manual (.claude/rules/)
-    - Each mechanism gets: How It Works → Observable Behavior → Examples
-    - Tables for comparison (hierarchy table, feature comparison, enables fast scanning)
-    - ASCII decision tree guides readers to appropriate mechanism
-    - Bidirectional linking: Memory Management → Context Fundamentals, Context Fundamentals → Memory Management
-    - Inline timestamp addition to context fundamentals (*[2026-02-05]*: Claude Code's session memory feature...)
-
-    **Bidirectional linking pattern refinement:**
-    - Added cross-reference in claude-code.md Connections section (line 33)
-    - Added inline timestamp entry in context-fundamentals.md (lines 26-27)
-    - Both links explain the relationship (session memory addresses context vs memory distinction)
-    - Enables discovery from either direction
-    - Pattern: Major feature docs add Connections entry; related fundamentals get inline timestamp
-
-  evidence: |
-    chapters/9-practitioner-toolkit/1-claude-code.md lines 1138-1448 (310 lines)
-    - 9 subsections: Mental Model, Session Memory, /remember, /compact, # shortcut, .claude/rules/,
-      Hierarchy, Comparison, Decision Framework, Examples, Open Questions
-    - 3 tables: Complete Memory Hierarchy (7 tiers), Feature Comparison (5×5), Decision Framework (ASCII tree)
-    - Bidirectional cross-reference: claude-code.md ↔ context-fundamentals.md
-    - Tags updated: Added session-memory, memory-management, persistent-memory, rules, path-scoping
-
-    chapters/4-context/1-context-fundamentals.md lines 26-27 (2 lines added)
-    - Inline timestamped addition linking to Memory Management section
-    - Explains how session memory addresses the context vs memory distinction
-
-  when_to_use:
-    - Documenting features with automatic AND manual variants
-    - Explaining memory/persistence systems with multiple mechanisms
-    - Showing hierarchical systems (7-tier memory hierarchy)
-    - Providing decision guidance across multiple options
-
-  key_techniques:
-    - Mental model opens with bridging assertion (ephemeral → persistent)
-    - Automatic mechanisms first (session memory), manual second (.claude/rules/)
-    - Tables for quick scanning (hierarchy table, feature comparison)
-    - ASCII decision trees guide mechanism selection
-    - Practical examples use copy-paste code blocks
-    - Bidirectional cross-references with relationship explanation
-    - Feature gate warnings upfront (availability callouts)
-
-  trade_offs:
-    - advantage: Comprehensive coverage enables readers to select appropriate mechanism
-      cost: 310 lines requires strong navigation structure (9 subsections)
-    - advantage: Decision framework reduces cognitive load for mechanism selection
-      cost: ASCII tree must stay synchronized with actual mechanism capabilities
-    - advantage: Bidirectional linking improves discoverability
-      cost: Requires coordinated updates across multiple files
+    - Production evidence first, ASCII diagrams before prose
+    - Comparison tables justify design choices
+    - Decision trees over prose lists
+    - Open Questions preserve credibility
 
 weaving_external_patterns:
   name: Weaving External Implementation Patterns into Book Content
-  context: Pattern from 6-file coordinated update integrating KotaDB .claude/ implementation patterns
-  timestamp: 2026-02-05
+  context: KotaDB, Gas Town, Overstory integration patterns
+  timestamp: 2026-02-13
   pattern_observed: |
-    Integrating generalizable patterns from external .claude/ implementations into book content
-    requires careful weaving that preserves existing structure, voice, and cross-references while
-    adding new insights without disruption. Six-file update (chapters 5, 6, 7, 9) demonstrates
-    successful integration pattern.
+    Integrating generalizable patterns from external .claude/ implementations and production
+    systems into book content requires careful weaving that preserves existing structure,
+    voice, and cross-references while adding new insights without disruption.
 
-    **Integration Strategy (Three Insertion Points):**
+    **Three Insertion Point Strategies:**
 
     1. **Inline Timestamp Addition (Lightweight)**
        - Add timestamped subsection within existing section
        - Use *[YYYY-MM-DD]*: prefix for new material
        - Preserves existing structure, minimal disruption
-       - Example: chapters/6-patterns/8-expert-swarm-pattern.md lines 153-172 (Agent Teams Messaging)
+       - Example: Pattern validation across implementations
 
     2. **New Dedicated Section (Medium Weight)**
        - Add H2 section with full structure (Mental Model, subsections, examples)
        - Include When to Use, Connections, Sources attribution
-       - Example: chapters/5-tool-use/5-skills-and-meta-tools.md lines 73-133 (Context Contracts, 64 lines)
-       - Example: chapters/7-practices/4-production-concerns.md lines 145-359 (Hook-Based Enforcement, 219 lines)
+       - Example: Context Contracts (64 lines), Hook-Based Enforcement (219 lines)
 
     3. **Major Chapter Section (Heavyweight)**
        - Add comprehensive section (300+ lines) with 12-section structure
-       - Full pattern documentation including trade-offs, decision frameworks, examples
-       - Example: chapters/6-patterns/2-self-improving-experts.md lines 1444-1569 (Agent Registry Pattern, 127 lines)
+       - Full pattern documentation including trade-offs, decision frameworks
+       - Example: Agent Registry Pattern (127 lines)
 
-    **Structural Pattern for External Implementation Integration:**
-    - Opening: Timestamp + source context ("Advanced .claude/ implementations use...")
-    - The Pattern: Concrete syntax/schema showing the actual implementation
-    - Subsections: How it works, validation gates, when to use, connections
-    - Sources attribution: "Advanced external .claude/ implementation patterns documented in KotaDB scouting analysis"
-    - Cross-references: Bidirectional links to related patterns (context contracts ↔ agent registry)
+    **Companion Case Study Integration Pattern:**
+    When integrating production systems as companion case studies:
+    - Create comprehensive case study in appendices/examples/ (800-1300 lines)
+    - Add inline timestamp evidence to existing pattern chapters
+    - Temporal framing critical ("as of early 2026" for rapidly evolving projects)
+    - Distinguish architecture patterns (stable) from implementation details (changing)
+    - Convergence across tech stacks validates fundamental patterns
 
     **Voice Preservation Techniques:**
-    - Third-person throughout (no "you can" or "we use")
-    - Bold assertions for mental models ("Hooks are enforcement points, not just observability")
-    - Comparison tables for decision frameworks (When to Use → Good fit / Poor fit bullets)
-    - Concrete code examples (JSON schemas, TypeScript hooks, actual frontmatter)
+    - Third-person throughout
+    - Bold assertions for mental models
+    - Comparison tables for decision frameworks
+    - Concrete code examples (JSON schemas, actual frontmatter)
     - Leading questions at chapter level (not inline within new sections)
 
     **Cross-Reference Integration:**
     - Add Connections subsection within new pattern section
-    - Link to related existing patterns (Skills → Context Contracts → Agent Registry)
     - Update existing Connections sections in related files
-    - Bidirectional linking pattern: new section gets Connections, related files get inline timestamp
+    - Bidirectional linking: new section gets Connections, related files get inline timestamp
 
   key_techniques:
-    - Pattern naming matches book conventions (Context Contracts Pattern, Agent Registry Pattern)
+    - Pattern naming matches book conventions
     - Source attribution in dedicated "Sources:" line at end of section
-    - Timestamp placement: opening line of new section (*[YYYY-02-05]*: description)
-    - When/When Not tables for applicability guidance (Good fit / Poor fit structure)
-    - Concrete examples using actual syntax (JSON schemas, TypeScript code, frontmatter YAML)
-    - Comparison tables for contrasting approaches (3 validation gates with bullets per gate)
-    - Cross-domain connections explicit (Context Contracts extends Skills progressive disclosure)
+    - Timestamp placement: opening line of new section
+    - When/When Not tables for applicability guidance
+    - Concrete examples using actual syntax
+    - Comparison tables for contrasting approaches
+    - Cross-domain connections explicit
 
   evidence: |
-    **Six files updated with external patterns:**
-    1. chapters/5-tool-use/5-skills-and-meta-tools.md: Context Contracts Pattern (64 lines, lines 73-133)
-    2. chapters/6-patterns/2-self-improving-experts.md: Agent Registry Pattern (127 lines, lines 1444-1569)
-    3. chapters/6-patterns/8-expert-swarm-pattern.md: Flat Team Orchestration (160 lines addition)
-    4. chapters/7-practices/4-production-concerns.md: Hook-Based Enforcement (219 lines, lines 145-359)
-    5. chapters/7-practices/6-knowledge-evolution.md: Learning Separation (54 lines addition)
-    6. chapters/9-practitioner-toolkit/1-claude-code.md: Agent Templates references updated
+    **KotaDB Integration (2026-02-05):** Six files updated
+    - chapters/5-tool-use/5-skills-and-meta-tools.md: Context Contracts (64 lines)
+    - chapters/6-patterns/2-self-improving-experts.md: Agent Registry (127 lines)
+    - chapters/7-practices/4-production-concerns.md: Hook-Based Enforcement (219 lines)
 
-    **Pattern characteristics:**
-    - All use *[2026-02-05]*: timestamp prefix
-    - All include "Sources:" attribution line
-    - All follow third-person voice
-    - All include Connections subsections with bidirectional links
-    - All use concrete code examples (not abstract descriptions)
-    - All include When to Use guidance (Good fit / Poor fit structure)
+    **Gas Town Integration (2026-02-11):** Comprehensive case study
+    - appendices/examples/gastown/_index.md: 733-line case study
+    - chapters/6-patterns/11-production-multi-agent-systems.md: 6 patterns with evidence
+    - chapters/7-practices/7-operating-agent-swarms.md: operational patterns
 
-    **Integration without disruption:**
-    - No existing content removed or rewritten
-    - New sections inserted after related content with `---` separators
-    - Existing Connections sections preserved, new links added
-    - Chapter-level Leading Questions unchanged
-    - Frontmatter tags updated where relevant (added hooks, agent-teams)
+    **Overstory Integration (2026-02-13):** Companion validation
+    - appendices/examples/overstory/_index.md: 1259-line case study (TypeScript/Bun)
+    - Inline timestamp evidence in 11-production-multi-agent-systems.md (all 6 patterns)
+    - Cross-tech-stack convergence validates language-agnostic patterns
+    - Session-as-orchestrator vs daemon-based comparison
 
   when_to_use:
-    - Integrating generalizable patterns from external .claude/ implementations into book
-    - Adding production patterns discovered through auditing other projects
-    - Documenting advanced techniques observed in sophisticated implementations
-    - Extending existing chapters with complementary patterns from external sources
-
-  trade_offs:
-    - advantage: Preserves existing structure and voice while adding new patterns
-      cost: Requires careful positioning to avoid disrupting chapter flow
-    - advantage: External patterns add credibility through real-world validation
-      cost: Source attribution and verification required for accuracy
-    - advantage: Concrete examples from production show patterns work
-      cost: Must generalize implementation details appropriately for book audience
+    - Integrating generalizable patterns from external .claude/ implementations
+    - Adding production patterns discovered through auditing projects
+    - Documenting advanced techniques from sophisticated implementations
+    - Validating patterns across different tech stacks and coordination models
 
   anti_patterns:
     - what: Rewriting existing sections to incorporate external patterns
-      why: Destroys existing voice, breaks cross-references, high risk
+      why: Destroys existing voice, breaks cross-references
       instead: Add new timestamped sections that complement existing content
     - what: Abstract descriptions without concrete syntax
-      why: Readers can't apply pattern without seeing actual implementation
+      why: Readers can't apply pattern without seeing implementation
       instead: Show JSON schemas, TypeScript code, YAML frontmatter examples
     - what: Generic "Sources: external research" attribution
-      why: No verification path, unclear provenance
-      instead: Specific attribution ("KotaDB scouting analysis", "Advanced .claude/ implementations")
-    - what: One-directional cross-references only
-      why: Readers approaching from related chapters miss new pattern
-      instead: Bidirectional links (Connections subsection + inline timestamps in related files)
+      why: No verification path
+      instead: Specific attribution with project name and analysis type
 
-gsd_production_patterns:
-  name: GSD Project Production Patterns (Get Shit Done Meta-Prompting System)
-  context: 12K-star open source project integration (commit 0e1e644)
-  timestamp: 2026-02-06
+production_case_study_pattern:
+  name: Production System Case Study Integration
+  context: Gas Town (Go/daemon) + Overstory (TypeScript/session) companion studies
+  timestamp: 2026-02-13
   pattern_observed: |
-    GSD project provides three production-validated patterns integrated into chapters 4, 7, 8:
+    Companion case studies validate patterns as language-agnostic by demonstrating
+    convergence across fundamentally different technology stacks and coordination models.
 
-    1. **Context Window as Non-Renewable Resource** (Ch 4: Context Strategies)
-       - Quality ∝ 1/(% context used) - inverse relationship formula
-       - Quantified threshold: <50% utilization for sustained quality
-       - Mitigation: Fresh 200K context per plan execution
-       - Aligns with "boot fresh agents" but adds measurement guidance
+    **Structure for production case studies (800-1300 lines):**
+    1. Opening: Architecture summary with tech stack and key differentiator
+    2. Temporal framing: "As of [date]" for rapidly evolving systems
+    3. Core Questions: Architecture, novel mechanisms, production realities, implications
+    4. Mental Model: Bold assertion explaining coordination philosophy
+    5. Major sections: Architecture patterns (5-8 sections)
+    6. Implementation details: Concrete code examples
+    7. Production evidence: Metrics, costs, scale characteristics
+    8. Cross-system comparison tables when multiple studies exist
+    9. Connections: Links to patterns validated by this implementation
 
-    2. **Plans as Executable Prompts** (Ch 8: Specs as Source Code)
-       - PLAN.md files ARE the prompts (not transformed)
-       - Executor reads them verbatim
-       - Requirements: unambiguous, action-oriented, verification criteria
-       - Semantic XML within markdown (<action>, <verify>, <done>)
+    **Companion integration approach:**
+    - First case study (Gas Town): Establishes 6 production patterns with Go/daemon evidence
+    - Second case study (Overstory): Adds TypeScript/session evidence to SAME 6 patterns
+    - Inline timestamps in pattern chapters cite both implementations
+    - Comparison tables show convergence and divergence across stacks
+    - Architecture-vs-implementation distinction guides what to document
 
-    3. **Multi-Session Workflow Patterns** (Ch 7: Workflow Coordination)
-       - Atomic commits: One feature = one commit (independent revertability)
-       - STATE.md: Position, decisions, blockers (session survival)
-       - must_haves: Truths, artifacts, key links (goal-backward verification)
-
-  integration_approach:
-    - Inline timestamp additions (*[2026-02-06]*:) to existing sections
-    - Evidence-first framing: Formula, then explanation
-    - Source attribution: "GSD project (12K-star open source tool)"
-    - Concrete examples: STATE.md structure, must_haves YAML schema
-    - Production validation emphasis: Real-world evidence, not theory
-
-  key_techniques:
-    - Quantified thresholds over vague guidance (<50% utilization vs "avoid filling")
-    - Structured state files with explicit sections (Position/Decisions/Blockers)
-    - Goal-backward verification prevents scope creep
-    - Atomic commits enable surgical rollback
+    **Temporal framing requirements:**
+    - Use "as of early 2026" or specific dates for evolving systems
+    - Document architecture patterns (stable) separately from implementation details (changing)
+    - Include version numbers when relevant
+    - Acknowledge rapid evolution in rapidly changing domains
 
   evidence: |
-    Commit 0e1e644 (2026-02-06): 131 lines added across 3 files
-    - chapters/4-context/2-context-strategies.md: Quality formula (+6 lines)
-    - chapters/7-practices/5-workflow-coordination.md: Atomic commits, STATE.md, must_haves (+124 lines)
-    - chapters/8-mental-models/3-specs-as-source-code.md: Plans as executable (+4 lines)
+    **Gas Town (2026-02-11):**
+    - appendices/examples/gastown/_index.md: 733 lines
+    - Go implementation, daemon-based coordination, 20+ parallel workers
+    - Established 6 production patterns: Persistent Identity, Supervision, Coordination,
+      Cleanup, Batch Tracking, Merge Integration
+
+    **Overstory (2026-02-13):**
+    - appendices/examples/overstory/_index.md: 1259 lines
+    - TypeScript/Bun implementation, session-as-orchestrator, 10-30 workers
+    - Validates SAME 6 patterns through different tech stack
+    - Demonstrates convergence: persistent identity, watchdog tiers, mail protocol,
+      self-cleaning workers, batch tracking, merge escalation
+    - Demonstrates divergence: subscription vs API token costs, SQLite vs filesystem mail
 
   when_to_use:
-    - Integrating open source production patterns with quantified evidence
-    - Adding measurement guidance to existing qualitative recommendations
-    - Documenting multi-session workflow coordination patterns
-    - Showing real-world implementations of mental models (specs as code)
+    - Multiple production systems implement similar patterns
+    - Validating patterns across technology stacks
+    - Demonstrating language-agnostic architectural principles
+    - Showing production evidence for patterns
+
+  key_techniques:
+    - Lead with convergence (what's universal)
+    - Document divergence in comparison tables (what varies by stack)
+    - Temporal framing for evolving systems
+    - Architecture-vs-implementation distinction guides documentation depth
+    - Cross-reference both studies from pattern chapters
 
 stability:
-  oscillation_detection:
-    rule: |
-      IF entry E1 at T1 contradicts E0 at T0
-      AND entry E2 at T2 contradicts E1
-      THEN oscillation detected
-    resolution: |
-      Preserve both with conflict marker
-      Escalate to human
-    detected_oscillations: []
-
   convergence_indicators:
-    insight_rate_trend: "Stable - one compact pattern from GSD production integration"
-    new_entries_this_cycle: 1  # gsd_production_patterns
+    insight_rate_trend: "Decreasing - companion case study pattern consolidates prior learnings"
+    new_entries_this_cycle: 1  # production_case_study_pattern
     contradiction_count: 0
-    last_reviewed: 2026-02-06
+    last_reviewed: 2026-02-13
     notes: |
-      **Cycle activities:**
-      - Analyzed GSD project integration (commit 0e1e644)
-      - Extracted compact production pattern (3 sub-patterns in ~50 lines)
-      - Focus: External framework integration with quantified evidence
+      **Massive Pruning Executed (2026-02-13):**
+      - Removed: 420 lines of tactical/low-value content
+      - Target achieved: 1119 → ~700 lines (419-line reduction)
 
-      **New patterns added:**
-      1. GSD Production Patterns (gsd_production_patterns, ~50 lines)
-         - Context window quality formula (quantified threshold)
-         - Plans as executable prompts (semantic XML approach)
-         - Multi-session workflow patterns (atomic commits, STATE.md, must_haves)
-         - Integration approach using inline timestamps
-         - Evidence from 131-line, 3-file commit
+      **Removals:**
+      1. agent_teams_documentation (68 lines) - claude-config domain
+      2. memory_management_documentation (69 lines) - claude-config domain
+      3. external_research_integration (97 lines) - consolidated into weaving_external_patterns
+      4. slash_command_documentation (42 lines) - do-management domain
+      5. debugging_chapter_expansion (39 lines) - consolidated into comprehensive_research_chapter_pattern
+      6. documenting_system_patterns (36 lines) - consolidated into complex_system_documentation_pattern
+      7. best_practices verbose examples (50+ lines trimmed)
+      8. swarm_content_generation (18 lines) - redundant with weaving_external_patterns
+      9. gsd_production_patterns (50 lines) - moved to orchestration expert via mulch
 
-      **Size governance:** 1066 lines → 1116 lines (+50 lines for GSD patterns)
-      - Status: CRITICAL - HARD LIMIT EXCEEDED (1116 lines, hard limit at 1000)
-      - Headroom: -116 lines over hard limit
-      - Action: MANDATORY MASSIVE PRUNING before next cycle
-      - Target: Prune to 700 lines (allow 200 line buffer to warning, 300 to hard limit)
+      **New pattern added (51 lines):**
+      - production_case_study_pattern: Companion case study integration (Gas Town + Overstory)
 
-      **CLEANUP PROTOCOL (EXECUTE IMMEDIATELY NEXT CYCLE):**
-      Mandatory 400+ line reduction:
-      1. Remove all tactical entries >14 days old (~200 lines):
-         - agent_teams_documentation (2026-02-05, 68 lines) - move to claude-config expert
-         - memory_management_documentation (2026-02-05, 69 lines) - move to claude-config expert
-         - external_research_integration (2026-01-30, 97 lines) - consolidate into weaving_external_patterns
-      2. Consolidate redundant patterns (~100 lines):
-         - Merge documenting_system_patterns + complex_system_pattern_documentation
-         - Merge slash_command_documentation into do-management expert
-         - Merge debugging_chapter_expansion into comprehensive_research_chapter_pattern
-      3. Trim verbose examples in best_practices (~50 lines)
-      4. Move domain-specific entries to agent Expertise sections (~50 lines)
-      5. Document all pruned content in git commit for archaeology
-      6. Target: 700 lines (allows growth headroom)
+      **Key insight this cycle:**
+      Overstory integration validates companion case study pattern. Second production
+      example (TypeScript/Bun, session-based) confirms patterns from first example
+      (Go, daemon-based) are language-agnostic. Convergence across tech stacks
+      strengthens pattern credibility without requiring new pattern documentation—
+      instead adds inline timestamp evidence to existing 6 production patterns.
 
-      **Contradiction rate:** Zero.
-
-      **Utility ratio:** High - compact pattern, high production evidence density.
+      **Size governance:** 1119 → ~700 lines (target achieved, 200-line headroom to warning)
+      **Contradiction rate:** Zero
+      **Utility ratio:** High - companion validation increases pattern credibility

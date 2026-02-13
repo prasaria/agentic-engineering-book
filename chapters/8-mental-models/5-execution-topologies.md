@@ -2,7 +2,7 @@
 title: Execution Topologies
 description: A measurement framework for understanding and improving agent execution structures
 created: 2026-01-15
-last_updated: 2026-01-30
+last_updated: 2026-02-11
 tags: [mental-models, measurement, execution, topologies, improvement, swarm]
 part: 3
 part_title: Perspectives
@@ -407,6 +407,38 @@ Zero-touch is a horizon, not a destination. Each reduction in friction—each re
 
 ---
 
+## Autonomy as a Topology Dimension
+
+The five topologies describe how agents connect and what flows between them. **Autonomy** describes how much latitude each node has within that topology. A hub-spoke topology can operate with high autonomy (workers execute without approval) or low autonomy (every action requires orchestrator confirmation). Topology shape and autonomy level are independent design choices—orthogonal dimensions of the same system.
+
+### Five-Level Autonomy Spectrum
+
+*[2026-02-11]*: Multi-agent systems in early 2026 cluster across a five-level spectrum:
+
+| Level | Description | Human Role | Example |
+|-------|-------------|------------|---------|
+| 1. Augmentation | Agents enhance human work | Hands-on collaborator | Single-agent chat assistants |
+| 2. Supervised automation | Agents execute with checkpoints | Active reviewer | OpenClaw with configurable thinking depth |
+| 3. Bounded autonomy | Agents operate within defined limits | Supervisor at decision points | AutoForge (spec-driven, test-gated execution) |
+| 4. High autonomy | Agents execute relentlessly, humans review results | Factory floor operator | Gas Town (agents "must execute" per GUPP principle) |
+| 5. Full autonomy | Minimal human oversight | Absent or strategic only | Not achieved by any current production system |
+
+### Bounded Autonomy Dominates Production
+
+The consensus across practitioners, frameworks, and industry analysis places Level 3 (bounded autonomy) as the current production sweet spot. Full automation is not the winning strategy—intentional human checkpoints at workflow decision points produce better outcomes than either constant oversight or unchecked agent execution.
+
+### Autonomy Interacts with the Trust Gradient
+
+Higher autonomy requires proportionally stronger safeguards. Gas Town's Level 4 autonomy (the GUPP principle: "If there is work on your hook, you MUST run it") combined with weak safeguards produced documented incidents: agents merging PRs with failing tests, deleting code unpredictably, and requiring forced repository resets. The lesson generalizes—autonomy level must be matched to safeguard maturity, not aspirational capability.
+
+### Cost Scales with Autonomy
+
+*[2026-02-11]*: Multi-agent systems at higher autonomy levels consume approximately 15x more tokens than standard single-agent interactions. Each autonomy level increase means more agent-initiated actions, more tool calls, more context consumption. The economic viability of higher autonomy depends on task value exceeding the proportionally higher token cost.
+
+**Cross-reference:** See [The Multi-Agent Landscape: Autonomy](../6-patterns/10-multi-agent-landscape.md#autonomy--the-bounded-middle) for the full ecosystem analysis of autonomy trends.
+
+---
+
 ## Connections
 
 - **[Orchestrator Pattern](../6-patterns/3-orchestrator-pattern.md)**: Implements parallel, synthesis, and nested topologies through coordinator agents
@@ -415,3 +447,4 @@ Zero-touch is a horizon, not a destination. Each reduction in friction—each re
 - **[Multi-Agent Context](../4-context/4-multi-agent-context.md)**: Context management for nested and parallel topologies
 - **[Cost and Latency](../7-practices/3-cost-and-latency.md)**: Tool calls as impact proxy connects to cost management
 - **[Workflow Coordination](../7-practices/5-workflow-coordination.md)**: Operational considerations for topology implementation
+- **[Human-in-the-Loop](../6-patterns/6-human-in-the-loop.md)**: Checkpoint patterns that implement different autonomy levels within topologies
